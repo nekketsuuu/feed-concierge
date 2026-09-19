@@ -57,6 +57,8 @@
   if (new URLSearchParams(location.search).get("debug")) {
     const f = n => Number(n).toFixed(2);
     const pct = v => `${Math.max(0, Math.min(1, v)) * 100}%`;
+    const days = h => `${Number.isInteger(h / 24) ? h / 24 : (h / 24).toFixed(1)}d`;
+    const dur = h => h < 48 ? `${h}h` : days(h);
     const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
     const fillOf = value => { const i = el("i"); i.style.width = pct(value); return i; };
     const flexRow = (cls, parts) => {
@@ -98,13 +100,13 @@
       if (!li) continue;
       const fr = row.explain.freshness;
       const box = el("div", "dbg");
-      box.appendChild(el("div", null, `${row.source} · ${row.question_set} · ${row.age_hours}h`));
+      box.appendChild(el("div", null, `${row.source} · ${row.question_set} · ${dur(row.age_hours)}`));
       box.appendChild(waterfall(row));
       const rel = node("relevance", row.relevance, "Σ weight × answer");
       rel.appendChild(slotBar(row)); box.appendChild(rel);
       box.appendChild(node("freshness", row.freshness,
-        `age ${fr.age_hours}h · half-life ${fr.half_life_hours}h = ${fr.base_half_life_hours}h + ${fr.bonus_hours}h × evergreen ${f(fr.evergreen)} · ` +
-        `if evergreen were 0 → ${f(fr.if_evergreen_zero)}, 1 → ${f(fr.if_evergreen_one)}`));
+        `age ${dur(fr.age_hours)} · half-life ${days(fr.half_life_hours)} = ${days(fr.base_half_life_hours)} + ${days(fr.bonus_hours)} × evergreen ${f(fr.evergreen)} · ` +
+        `without evergreen ${f(fr.if_evergreen_zero)}, fully evergreen ${f(fr.if_evergreen_one)}`));
       li.appendChild(box);
     }
   }
