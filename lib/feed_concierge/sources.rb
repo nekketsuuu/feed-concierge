@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "sources/http"
 require_relative "sources/hacker_news"
 require_relative "sources/lobsters"
@@ -29,11 +31,11 @@ module FeedConcierge
     end
 
     # Source name -> Judge question set name (config `questions:`, default "default").
-def self.question_sets(configs)
-  configs.to_h { |cfg| [cfg["name"] || cfg["type"], cfg.fetch("questions", "default")] }
-end
+    def self.question_sets(configs)
+      configs.to_h { |cfg| [cfg["name"] || cfg["type"], cfg.fetch("questions", "default")] }
+    end
 
-# Sources are fetched in config order; when several list the same link, the first wins.
+    # Sources are fetched in config order; when several list the same link, the first wins.
     # A broken source is logged and skipped so the rest of the build still runs.
     def self.fetch_all(configs, logger: $stderr)
       articles = build(configs).flat_map do |source|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "net/http"
 require "uri"
 
@@ -11,7 +13,7 @@ module FeedConcierge
       def get(url, redirects_left: 3)
         uri = URI(url)
         response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
-                                   open_timeout: 15, read_timeout: 30) do |http|
+                                                       open_timeout: 15, read_timeout: 30) do |http|
           http.request_get(uri.request_uri, "User-Agent" => "feed-concierge/0.1")
         end
         if response.is_a?(Net::HTTPRedirection) && response["location"] && redirects_left.positive?

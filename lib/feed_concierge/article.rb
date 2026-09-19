@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "uri"
 
 module FeedConcierge
@@ -13,7 +15,10 @@ module FeedConcierge
     def canonical_url
       uri = URI(url)
       query = URI.decode_www_form(uri.query.to_s).reject { |k, _| k.start_with?("utm_") || k == "ref" }
-      "#{uri.host.to_s.delete_prefix("www.")}#{uri.path.to_s.chomp("/")}#{query.empty? ? "" : "?#{URI.encode_www_form(query)}"}#{uri.fragment ? "##{uri.fragment}" : ""}".downcase
+      host = uri.host.to_s.delete_prefix("www.")
+      query_part = query.empty? ? "" : "?#{URI.encode_www_form(query)}"
+      fragment_part = uri.fragment ? "##{uri.fragment}" : ""
+      "#{host}#{uri.path.to_s.chomp("/")}#{query_part}#{fragment_part}".downcase
     rescue URI::InvalidURIError, ArgumentError
       url
     end

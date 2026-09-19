@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "erb"
 require "fileutils"
 require "json"
@@ -29,7 +31,8 @@ module FeedConcierge
 
     def to_json_row(r)
       {
-        id: r.article.id, source: r.article.source, title: r.article.title, url: r.article.url, comments_url: r.article.comments_url,
+        id: r.article.id, source: r.article.source, title: r.article.title, url: r.article.url,
+        comments_url: r.article.comments_url,
         published_at: r.article.published_at.iso8601, points: r.article.points, comments: r.article.comment_count,
         score: r.score.round(4), relevance: r.relevance.round(4), freshness: r.freshness.round(4),
         exposure: r.exposure.round(4), tags: tags_for(r), judgment: r.entry["judgment"]
@@ -41,6 +44,5 @@ module FeedConcierge
     def tags_for(r)
       Judge.tags_for(r.entry["judgment"], min_probability: @tag_config["min_probability"], max: @tag_config["max_per_article"])
     end
-
   end
 end

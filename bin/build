@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require_relative "../lib/feed_concierge"
 
 store_path = ENV.fetch("FEED_CONCIERGE_STORE", File.join(FeedConcierge::ROOT, "data", "scores.json"))

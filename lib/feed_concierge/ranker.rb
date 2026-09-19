@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FeedConcierge
   # Combines Jev's answers with freshness and exposure. Every number here is code-owned
   # so weights can be tuned without re-querying Jev.

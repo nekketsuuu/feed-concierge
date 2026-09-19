@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rss"
 require "uri"
 require "cgi"
@@ -19,7 +21,9 @@ module FeedConcierge
       def articles
         feed = RSS::Parser.parse(Http.get(FEED), false) or raise FetchError, "#{FEED}: not a feed"
         cutoff = Time.now - @max_age_days * 86_400
-        items = feed.items.select { |i| i.link.to_s.include?("/wr/") && i.link.to_s.include?("#") && (i.date || Time.now) >= cutoff }
+        items = feed.items.select { |i|
+          i.link.to_s.include?("/wr/") && i.link.to_s.include?("#") && (i.date || Time.now) >= cutoff
+        }
         pages = items.map { |i| i.link.to_s.split("#").first }.uniq.to_h { |url| [url, sections(Http.get(url))] }
         items.map do |item|
           page, anchor = item.link.to_s.split("#", 2)

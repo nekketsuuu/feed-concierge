@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # Rebuilds the page from cached judgments without fetching feeds or calling Jev.
 # Useful when tuning config/settings.yml ranking weights.
 require_relative "../lib/feed_concierge"
@@ -6,8 +8,10 @@ require_relative "../lib/feed_concierge"
 store = FeedConcierge::Store.new(ENV.fetch("FEED_CONCIERGE_STORE", File.join(FeedConcierge::ROOT, "data", "scores.json")))
 output_dir = ENV.fetch("FEED_CONCIERGE_OUTPUT", File.join(FeedConcierge::ROOT, "site"))
 ranked = FeedConcierge::Ranker.new(FeedConcierge.settings["ranking"]).rank(store)
-FeedConcierge::Site.new(output_dir, title: FeedConcierge.settings.dig("site", "title"), repository_url: FeedConcierge.settings.dig("site", "repository_url"), tag_config: FeedConcierge.settings.fetch("tags"))
-                 .build(ranked, generated_at: Time.now, judged_count: store.each_article.size)
+site_settings = FeedConcierge.settings["site"]
+site = FeedConcierge::Site.new(output_dir, title: site_settings["title"], repository_url: site_settings["repository_url"],
+                                           tag_config: FeedConcierge.settings.fetch("tags"))
+site.build(ranked, generated_at: Time.now, judged_count: store.each_article.size)
 ranked.each_with_index do |r, i|
   puts format("%2d %.3f rel=%.2f fresh=%.2f exp=%.2f  %s", i + 1, r.score, r.relevance, r.freshness, r.exposure, r.article.title)
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FeedConcierge
   class Pipeline
     def initialize(settings: FeedConcierge.settings, store_path:, output_dir:, client:, logger: $stderr)
@@ -22,9 +24,10 @@ module FeedConcierge
 
       @store.prune!(retention_days: @settings["retention_days"])
       ranked = Ranker.new(@settings["ranking"]).rank(@store)
-      Site.new(@output_dir, title: @settings.dig("site", "title"), repository_url: @settings.dig("site", "repository_url"), tag_config: @settings.fetch("tags")).build(
-        ranked, generated_at: Time.now, judged_count: @store.each_article.size
-      )
+      site = Site.new(@output_dir, title: @settings.dig("site", "title"),
+                                   repository_url: @settings.dig("site", "repository_url"),
+                                   tag_config: @settings.fetch("tags"))
+      site.build(ranked, generated_at: Time.now, judged_count: @store.each_article.size)
       @store.mark_shown(ranked.map { |r| r.article.id })
       @store.save
       @log.puts "ranked #{ranked.size} articles -> #{@output_dir}"
@@ -59,7 +62,8 @@ module FeedConcierge
       until results.empty?
         article, excerpt, judgment = results.pop
         @store.remember(article, judgment: judgment, excerpt_used: !excerpt.nil?)
-        @log.puts format("  %-60.60s interest=%.2f worth=%.2f", article.title, judgment["interest"].to_f, judgment["worth_reading"].to_f)
+        @log.puts format("  %-60.60s interest=%.2f worth=%.2f", article.title, judgment["interest"].to_f,
+                         judgment["worth_reading"].to_f)
       end
     end
 

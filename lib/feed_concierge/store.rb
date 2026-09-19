@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "json"
 require "fileutils"
 
@@ -35,7 +37,7 @@ module FeedConcierge
     def refresh_stats(article)
       entry = @entries[article.id] or return
       entry["article"].merge!("points" => article.points, "comment_count" => article.comment_count,
-                               "published_at" => article.published_at.iso8601)
+                              "published_at" => article.published_at.iso8601)
     end
 
     def mark_shown(ids, now: Time.now)
