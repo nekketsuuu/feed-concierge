@@ -28,15 +28,16 @@ The page lists every article with `score >= min_score`, newest-scored first, up 
 
 Judgments are cached in `data/scores.json` for `retention_days`, so each article costs one Jev
 request per retention window; after that it is forgotten and its exposure resets.
-Changing weights only needs `bin/rerank`.
+Changing weights only needs `bin/regenerate`.
 
 ## Running locally
 
 ```sh
 bundle install
 # Export TYPESAFE_AI_API_KEY using tools such as `op run` or `envchain`.
-bin/build   # fetch feeds, judge new articles, write site/index.html
-bin/rerank  # rebuild the page from the cache with current weights
+bin/build       # fetch feeds, judge new articles, write site/index.html
+bin/regenerate  # rebuild the page from the cache with current weights
+
 FEED_CONCIERGE_FAKE_JEV=1 bin/build  # dry run without an API key
 ```
 
