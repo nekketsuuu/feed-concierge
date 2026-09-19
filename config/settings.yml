@@ -51,6 +51,13 @@ sources:
     max_age_days: 14
     excerpt: false
     questions: changelog
+  - type: github_pulls
+    name: rails_prs
+    repo: rails/rails
+    lookback_days: 3
+    base_branch: main
+    excerpt: false
+    questions: pull_request
 
 model: jev-latest
 concurrency: 6
@@ -76,6 +83,11 @@ ranking:
       interest: 0.5
       change_kind: 0.3
       worth_reading: 0.2
+    pull_request:
+      pr_kind: 0.35
+      user_impact: 0.25
+      interest: 0.2
+      worth_reading: 0.2
   # How much each Choice option is worth (0..1) when normalizing a choice answer.
   choice_weights:
     kind:
@@ -92,6 +104,13 @@ ranking:
       incremental_improvement: 0.5
       fix_or_maintenance: 0.3
       regional_availability: 0.15
+    pr_kind:
+      new_feature: 1.0
+      behavior_change_or_deprecation: 0.9
+      performance: 0.7
+      bug_fix: 0.5
+      internal_refactor: 0.3
+      docs_tests_ci: 0.1
   # Freshness decays with age since publication. Evergreen articles decay slower.
   freshness:
     half_life_hours: 18
@@ -103,6 +122,7 @@ ranking:
   # Optional per-source caps so one busy source cannot fill the page.
   max_per_source:
     ruby_bugs: 8
+    rails_prs: 6
   # Articles below this relevance never make the page even when fresh.
   min_relevance: 0.2
 
@@ -118,3 +138,4 @@ site:
     aws_whats_new: AWS
     cloudflare_changelog: Cloudflare
     fastly_changelog: Fastly
+    rails_prs: rails PR

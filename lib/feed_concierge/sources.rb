@@ -3,10 +3,12 @@ require_relative "sources/hacker_news"
 require_relative "sources/lobsters"
 require_relative "sources/rss"
 require_relative "sources/redmine"
+require_relative "sources/github_pulls"
 
 module FeedConcierge
   module Sources
-    REGISTRY = { "hacker_news" => HackerNews, "lobsters" => Lobsters, "rss" => Rss, "redmine" => Redmine }.freeze
+    REGISTRY = { "hacker_news" => HackerNews, "lobsters" => Lobsters, "rss" => Rss, "redmine" => Redmine,
+                 "github_pulls" => GithubPulls }.freeze
     NON_CONSTRUCTOR_KEYS = %w[type excerpt questions].freeze
 
     # Builds sources from config/settings.yml entries like:

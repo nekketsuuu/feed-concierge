@@ -38,11 +38,20 @@ CHANGE_KINDS = {
   fix_or_maintenance: "Bug fixes, security patches, version bumps, or documentation updates."
 }.freeze
 
+    PR_KINDS = {
+      new_feature: "Adds a new public API, option, generator, or capability that users of the framework can call or configure.",
+      behavior_change_or_deprecation: "Changes existing public behaviour or defaults, deprecates or removes something, or requires users to adjust when upgrading.",
+      performance: "Makes existing behaviour faster or lighter on memory without changing what it does.",
+      bug_fix: "Fixes incorrect behaviour that users could hit, without adding new capabilities.",
+      internal_refactor: "Restructures, cleans up, or renames internal code with no user-visible effect.",
+      docs_tests_ci: "Documentation, comments, tests, CI configuration, dependency bumps, or release chores."
+    }.freeze
+
     USER_IMPACT_LEVELS = [
       "Only affects contrived code, fuzzer inputs, or an internal detail no ordinary program touches.",
       "Affects a specific niche: one platform, one rarely used method, or an unusual configuration.",
       "Affects a commonly used method, class, or idiom that many programs rely on.",
-      "Affects nearly every program: core syntax, object model, threading, or a language-wide rule."
+      "Affects nearly every program: core syntax, object model, threading, or a project-wide rule."
     ].freeze
 
     WORTH_READING = {
@@ -92,6 +101,25 @@ CHANGE_KINDS = {
   worth_reading: WORTH_READING,
   evergreen: EVERGREEN
 },
+      "pull_request" => {
+        pr_kind: {
+          type: "choice",
+          instructions: "`article` is a merged pull request (title, labels, and description). Which kind of change is it?",
+          criteria: PR_KINDS
+        },
+        user_impact: {
+          type: "score",
+          instructions: "How much of the project's user base would notice the change described in `article` after upgrading?",
+          criteria: USER_IMPACT_LEVELS
+        },
+        interest: {
+          type: "score",
+          instructions: "How well does the change in the pull request `article` match the interests described in `reader_profile`?",
+          criteria: INTEREST_LEVELS
+        },
+        worth_reading: WORTH_READING,
+        evergreen: EVERGREEN
+      },
       "ticket" => {
         kind: {
           type: "choice",
