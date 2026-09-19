@@ -60,15 +60,16 @@ module FeedConcierge
       config = { weights: @ranking_config["weights"], min_score: @ranking_config["min_score"],
                  top_n: @ranking_config["top_n"],
                  max_per_source: @ranking_config["max_per_source"] || {},
-                 freshness: { half_life_days: f["half_life_hours"] / 24.0, bonus_days: f["evergreen_half_life_bonus_hours"] / 24.0,
+                 freshness: { half_life_days: f["half_life_hours"] / 24.0,
+                              bonus_days: f["evergreen_half_life_bonus_hours"] / 24.0,
                               floor: f["floor"], steepness: f["steepness"] } }
       rows = candidates.map do |item|
         judgment = item.entry["judgment"]
         { id: item.article.id, title: item.article.title, url: item.article.url, domain: item.article.domain,
           date: date_label(item.article.published_at), source: item.article.source, question_set: judgment["question_set"],
           dedup_key: item.article.dedup_key, baseline_rank: rank[item.article.id],
-          age_hours: item.age_hours.round(1), evergreen: judgment["evergreen"].to_f.round(3),
-          components: item.components.map { |c| { id: c[:id], value: c[:value].round(3) } },
+          age_hours: item.age_hours, evergreen: judgment["evergreen"].to_f,
+          components: item.components.map { |c| { id: c[:id], value: c[:value] } },
           choices: judgment.select { |k, _| k.end_with?("_probabilities") } }
       end
       JSON.generate({ config: config, rows: rows }).gsub("</", "<\/")
