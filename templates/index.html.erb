@@ -34,6 +34,13 @@
   .node-how { margin: .1rem 0 0; }
   .bar { position: relative; height: 8px; background: var(--bar-track); border-radius: 0 4px 4px 0; }
   .bar i { display: block; height: 100%; background: var(--bar-fill); border-radius: 0 4px 4px 0; }
+  .curve { display: block; margin-top: .2rem; overflow: visible; }
+  .curve-axis { stroke: rgba(127,127,127,.35); stroke-width: 1; }
+  .curve-faint { fill: none; stroke: var(--bar-track); stroke-width: 2; stroke-linejoin: round; }
+  .curve-line { fill: none; stroke: var(--bar-fill); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .curve-dot { fill: var(--bar-fill); stroke: Canvas; stroke-width: 2; }
+  .curve-text { font-size: 9px; fill: var(--muted); }
+  .curve-end { text-anchor: end; }
   .slots { margin: .2rem 0 0; }
   .slots-bars, .slots-labels { display: flex; gap: 2px; }
   .slot { height: 10px; background: var(--bar-track); border-radius: 0 4px 4px 0; overflow: hidden; }
@@ -82,6 +89,25 @@
       n.appendChild(head); if (how) n.appendChild(el("div", "node-how", how));
       return n;
     };
+    // freshness over age: the article's own decay curve (solid), the curve without evergreen
+    // (faint), and a dot at the article's current age. 14 days wide.
+    const curve = fr => {
+      const W = 220, H = 44, PAD = 6, DAYS = 14, ns = "http://www.w3.org/2000/svg";
+      const fresh = (h, hl) => fr.floor + (1 - fr.floor) / (1 + Math.pow(h / hl, fr.steepness));
+      const x = h => PAD + (Math.min(h, DAYS * 24) / (DAYS * 24)) * (W - 2 * PAD);
+      const y = v => PAD + (1 - v) * (H - 2 * PAD);
+      const path = hl => Array.from({ length: 57 }, (_, i) => { const h = i * DAYS * 24 / 56; return `${i ? "L" : "M"}${x(h).toFixed(1)},${y(fresh(h, hl)).toFixed(1)}`; }).join(" ");
+      const svg = document.createElementNS(ns, "svg"); svg.setAttribute("class", "curve"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("width", W); svg.setAttribute("height", H);
+      const add = (tag, attrs) => { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); svg.appendChild(e); return e; };
+      add("line", { x1: PAD, x2: W - PAD, y1: y(0), y2: y(0), class: "curve-axis" });
+      add("line", { x1: x(fr.half_life_hours), x2: x(fr.half_life_hours), y1: y(0), y2: y(1), class: "curve-axis" });
+      add("path", { d: path(fr.base_half_life_hours), class: "curve-faint" });
+      add("path", { d: path(fr.half_life_hours), class: "curve-line" });
+      add("circle", { cx: x(fr.age_hours), cy: y(fresh(fr.age_hours, fr.half_life_hours)), r: 4, class: "curve-dot" });
+      add("text", { x: x(fr.half_life_hours) + 3, y: y(0) - 3, class: "curve-text" }).textContent = `half-life ${days(fr.half_life_hours)}`;
+      add("text", { x: W - PAD, y: y(0) - 3, class: "curve-text curve-end" }).textContent = `${DAYS}d`;
+      return svg;
+    };
     // relevance: one slot per question, as wide as its weight, filled by the answer.
     const slotBar = row => {
       const bars = [], labels = [];
@@ -104,9 +130,10 @@
       box.appendChild(waterfall(row));
       const rel = node("relevance", row.relevance, "Σ weight × answer");
       rel.appendChild(slotBar(row)); box.appendChild(rel);
-      box.appendChild(node("freshness", row.freshness,
+      const fresh = node("freshness", row.freshness,
         `age ${dur(fr.age_hours)} · half-life ${days(fr.half_life_hours)} = ${days(fr.base_half_life_hours)} + ${days(fr.bonus_hours)} × evergreen ${f(fr.evergreen)} · ` +
-        `without evergreen ${f(fr.if_evergreen_zero)}, fully evergreen ${f(fr.if_evergreen_one)}`));
+        `without evergreen ${f(fr.if_evergreen_zero)}, fully evergreen ${f(fr.if_evergreen_one)}`);
+      fresh.appendChild(curve(fr)); box.appendChild(fresh);
       li.appendChild(box);
     }
   }

@@ -39,6 +39,7 @@ module FeedConcierge
           age_hours: item.age_hours.round, evergreen: evergreen.round(2),
           half_life_hours: (f["half_life_hours"] + (f["evergreen_half_life_bonus_hours"] * evergreen)).round,
           base_half_life_hours: f["half_life_hours"], bonus_hours: f["evergreen_half_life_bonus_hours"], floor: f["floor"],
+          steepness: f["steepness"],
           if_evergreen_zero: freshness_of(item.age_hours, evergreen: 0.0).round(3),
           if_evergreen_one: freshness_of(item.age_hours, evergreen: 1.0).round(3)
         }
