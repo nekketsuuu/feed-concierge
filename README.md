@@ -6,7 +6,7 @@ and publishes the ranked list to GitHub Pages.
 
 ## How ranking works
 
-Every article is judged once by Jev with a *question set* chosen per source
+Every article is judged once by Jev with a question set chosen per source
 (`questions:` in `config/settings.yml`, see `lib/feed_concierge/judge.rb`). The reader
 profile from `config/profile.md` is part of the state.
 
