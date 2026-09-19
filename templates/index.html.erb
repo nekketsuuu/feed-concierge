@@ -64,7 +64,7 @@
   if (new URLSearchParams(location.search).get("debug")) {
     const f = n => Number(n).toFixed(2);
     const pct = v => `${Math.max(0, Math.min(1, v)) * 100}%`;
-    const days = h => `${Number.isInteger(h / 24) ? h / 24 : (h / 24).toFixed(1)}d`;
+    const days = h => `${Number.isInteger(h / 24) ? h / 24 : (h / 24).toFixed(1).replace(/\.0$/, "")}d`;
     const dur = h => h < 48 ? `${h}h` : days(h);
     const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
     const fillOf = value => { const i = el("i"); i.style.width = pct(value); return i; };
@@ -131,10 +131,12 @@
       box.appendChild(waterfall(row));
       const rel = node("relevance", row.relevance, "Σ weight × answer");
       rel.appendChild(slotBar(row)); box.appendChild(rel);
-      const fresh = node("freshness", row.freshness,
-        `age ${dur(fr.age_hours)} · half-life ${days(fr.half_life_hours)} = ${days(fr.base_half_life_hours)} + ${days(fr.bonus_hours)} × evergreen ${f(fr.evergreen)} · ` +
-        `without evergreen ${f(fr.if_evergreen_zero)}, fully evergreen ${f(fr.if_evergreen_one)}`);
-      fresh.appendChild(curve(fr)); box.appendChild(fresh);
+      const fresh = node("freshness", row.freshness, `age ${dur(fr.age_hours)} · half-life ${days(fr.half_life_hours)} = ${days(fr.base_half_life_hours)} + ${days(fr.bonus_hours)} × evergreen`);
+      fresh.appendChild(curve(fr));
+      // evergreen is a Jev answer; shown as its own bar so it compares across articles.
+      fresh.appendChild(node("evergreen", fr.evergreen,
+        `Jev answer · adds ${days(fr.bonus_hours * fr.evergreen)} to the ${days(fr.base_half_life_hours)} half-life · freshness without it ${f(fr.if_evergreen_zero)}, fully evergreen ${f(fr.if_evergreen_one)}`));
+      box.appendChild(fresh);
       li.appendChild(box);
     }
   }
