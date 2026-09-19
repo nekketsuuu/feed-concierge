@@ -226,8 +226,9 @@ ranking:
       interest: 0.15
       worth_reading: 0.2
     advisory:
-      affects_stack: 0.45
-      component_kind: 0.35
+      affects_stack: 0.35
+      adoption: 0.25
+      component_kind: 0.2
       worth_reading: 0.2
     changelog:
       interest: 0.5

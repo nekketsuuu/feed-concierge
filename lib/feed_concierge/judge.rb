@@ -55,6 +55,13 @@ module FeedConcierge
       docs_tests_ci: "Documentation, comments, tests, CI configuration, dependency bumps, or release chores."
     }.freeze
 
+    ADOPTION_LEVELS = [
+      "A niche or little-known package, plugin, or product with a small user base.",
+      "Known within its ecosystem but not a common dependency; used by a moderate number of projects.",
+      "A widely used dependency, tool, or product that many applications rely on directly or transitively.",
+      "Ubiquitous: an operating system, a major runtime, or a library present in most deployments."
+    ].freeze
+
     COMPONENT_KINDS = {
       os_or_kernel: "An operating system, kernel, or base system component such as a libc, shell, or init system.",
       language_runtime_or_package: "A programming language runtime or a package from a language ecosystem such as a gem, npm package, or PyPI package.",
@@ -113,14 +120,19 @@ module FeedConcierge
           type: "noul",
           instructions: "Does the vulnerability in `article` affect software that the developer described in `reader_profile` runs or depends on?",
           criteria: {
-            "true" => "The affected product is an operating system or kernel, a language runtime or package, a library that web or mobile applications depend on, a cloud service, or a developer tool that such a developer would use.",
-            "false" => "The affected product is network equipment, an enterprise or industrial product, a consumer device, or software that developer would not operate."
+            "true" => "The affected product is something that developer plausibly has in production or on a workstation: the operating system or kernel, the Ruby, JavaScript, or mobile toolchains, a widely used package or library in those ecosystems, a common database or server, a cloud service, or a mainstream developer tool.",
+            "false" => "The affected product is network equipment, an enterprise or industrial product, a consumer device, a niche package in an ecosystem or domain that developer does not work in (for example IoT, blockchain, data science notebooks, or a CMS plugin), or software that developer would not operate."
           }
         },
         component_kind: {
           type: "choice",
           instructions: "What kind of component does the vulnerability in `article` affect?",
           criteria: COMPONENT_KINDS
+        },
+        adoption: {
+          type: "score",
+          instructions: "How widely used is the software affected by the vulnerability in `article`?",
+          criteria: ADOPTION_LEVELS
         },
         worth_reading: WORTH_READING,
         evergreen: EVERGREEN
