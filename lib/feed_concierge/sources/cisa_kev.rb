@@ -15,7 +15,7 @@ module FeedConcierge
       end
 
       def articles
-        cutoff = (Time.now.utc - @lookback_days * 86_400).strftime("%Y-%m-%d")
+        cutoff = (Time.now.utc - (@lookback_days * 86_400)).strftime("%Y-%m-%d")
         JSON.parse(Http.get(FEED)).fetch("vulnerabilities")
             .select { |v| v["dateAdded"] >= cutoff }
             .map { |v| to_article(v) }
@@ -24,15 +24,15 @@ module FeedConcierge
 
       private
 
-      def to_article(v)
+      def to_article(vuln)
         Article.new(
-          id: "#{@name}:#{v["cveID"]}",
+          id: "#{@name}:#{vuln["cveID"]}",
           source: @name,
-          title: "#{v["cveID"]}: #{v["vulnerabilityName"]}",
-          url: "https://nvd.nist.gov/vuln/detail/#{v["cveID"]}",
-          published_at: Time.parse("#{v["dateAdded"]}T00:00:00Z"),
-          summary: "#{v["shortDescription"]} Known ransomware campaign use: #{v["knownRansomwareCampaignUse"]}.",
-          tags: [v["vendorProject"], v["product"], *v["cwes"].to_a].compact
+          title: "#{vuln["cveID"]}: #{vuln["vulnerabilityName"]}",
+          url: "https://nvd.nist.gov/vuln/detail/#{vuln["cveID"]}",
+          published_at: Time.parse("#{vuln["dateAdded"]}T00:00:00Z"),
+          summary: "#{vuln["shortDescription"]} Known ransomware campaign use: #{vuln["knownRansomwareCampaignUse"]}.",
+          tags: [vuln["vendorProject"], vuln["product"], *vuln["cwes"].to_a].compact
         )
       end
     end

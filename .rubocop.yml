@@ -1,7 +1,16 @@
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.4
   SuggestExtensions: false
+
+Metrics:
+  Enabled: false
+
+Style:
+  Enabled: false
 
 Layout/LineLength:
   Max: 130
+  # Long natural-language strings (question criteria) are fine on one line.
+  AllowedPatterns:
+    - '\A\s*"[^"]*",?\s*\z'
+    - '\A\s*\w+: "[^"]*",?\s*\z'

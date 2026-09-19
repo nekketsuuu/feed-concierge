@@ -55,7 +55,7 @@ module FeedConcierge
     # Entries older than the retention window are forgotten entirely, so an article that is
     # still in a feed after that is judged again and starts with a clean exposure.
     def prune!(retention_days:, now: Time.now)
-      cutoff = now - retention_days * 86_400
+      cutoff = now - (retention_days * 86_400)
       @entries.delete_if { |_, e| Time.parse(e["first_seen_at"]) < cutoff }
     end
 

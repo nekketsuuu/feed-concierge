@@ -24,7 +24,7 @@ module FeedConcierge
       end
 
       def articles
-        cutoff = Time.now - @lookback_days * 86_400
+        cutoff = Time.now - (@lookback_days * 86_400)
         merged = []
         (1..MAX_PAGES).each do |page|
           pulls = JSON.parse(get(page))
@@ -36,11 +36,11 @@ module FeedConcierge
 
       private
 
-      def merged_recently?(pr, cutoff)
-        return false unless pr["merged_at"] && Clock.parse(pr["merged_at"]) >= cutoff
-        return false if @base_branch && pr.dig("base", "ref") != @base_branch
+      def merged_recently?(pull, cutoff)
+        return false unless pull["merged_at"] && Clock.parse(pull["merged_at"]) >= cutoff
+        return false if @base_branch && pull.dig("base", "ref") != @base_branch
 
-        !@exclude_authors.include?(pr.dig("user", "login"))
+        !@exclude_authors.include?(pull.dig("user", "login"))
       end
 
       def get(page)
@@ -56,16 +56,16 @@ module FeedConcierge
         response.body
       end
 
-      def to_article(pr)
+      def to_article(pull)
         Article.new(
-          id: "#{@name}:#{pr["number"]}",
+          id: "#{@name}:#{pull["number"]}",
           source: @name,
-          title: "#{@repo}##{pr["number"]} #{pr["title"].to_s.strip}",
-          url: pr["html_url"],
-          author: pr.dig("user", "login"),
-          published_at: Clock.parse(pr["merged_at"]),
-          summary: clean_body(pr["body"].to_s)[0, @body_max_chars],
-          tags: pr["labels"].to_a.map { |l| l["name"] }
+          title: "#{@repo}##{pull["number"]} #{pull["title"].to_s.strip}",
+          url: pull["html_url"],
+          author: pull.dig("user", "login"),
+          published_at: Clock.parse(pull["merged_at"]),
+          summary: clean_body(pull["body"].to_s)[0, @body_max_chars],
+          tags: pull["labels"].to_a.map { |l| l["name"] }
         )
       end
 

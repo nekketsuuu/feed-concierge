@@ -20,7 +20,7 @@ module FeedConcierge
 
       def articles
         feed = RSS::Parser.parse(Http.get(FEED), false) or raise FetchError, "#{FEED}: not a feed"
-        cutoff = Time.now - @max_age_days * 86_400
+        cutoff = Time.now - (@max_age_days * 86_400)
         items = feed.items.select { |i|
           i.link.to_s.include?("/wr/") && i.link.to_s.include?("#") && (i.date || Time.now) >= cutoff
         }

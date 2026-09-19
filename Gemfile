@@ -1,4 +1,8 @@
 source "https://rubygems.org"
 
-gem "rss"
 gem "rexml"
+gem "rss"
+
+group :development do
+  gem "rubocop", require: false
+end

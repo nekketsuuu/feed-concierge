@@ -21,7 +21,7 @@ module FeedConcierge
 
       text = html_to_text(response.body.to_s.force_encoding("UTF-8").scrub)
       text.empty? ? nil : text[0, max_chars]
-    rescue StandardError, Timeout::Error
+    rescue StandardError
       nil
     end
 

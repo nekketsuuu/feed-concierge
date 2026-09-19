@@ -20,7 +20,7 @@ module FeedConcierge
       end
 
       def articles
-        since = (Time.now - @lookback_days * 86_400).utc.strftime("%Y-%m-%d")
+        since = (Time.now - (@lookback_days * 86_400)).utc.strftime("%Y-%m-%d")
         issues = []
         loop do
           page = JSON.parse(Http.get(issues_url(since, issues.size)))

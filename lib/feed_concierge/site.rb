@@ -28,20 +28,20 @@ module FeedConcierge
       ERB.new(File.read(TEMPLATE), trim_mode: "-").result(binding)
     end
 
-    def to_json_row(r)
+    def to_json_row(item)
       {
-        id: r.article.id, source: r.article.source, title: r.article.title, url: r.article.url,
-        comments_url: r.article.comments_url,
-        published_at: r.article.published_at.iso8601, points: r.article.points, comments: r.article.comment_count,
-        score: r.score.round(4), relevance: r.relevance.round(4), freshness: r.freshness.round(4),
-        exposure: r.exposure.round(4), tags: tags_for(r), judgment: r.entry["judgment"]
+        id: item.article.id, source: item.article.source, title: item.article.title, url: item.article.url,
+        comments_url: item.article.comments_url,
+        published_at: item.article.published_at.iso8601, points: item.article.points, comments: item.article.comment_count,
+        score: item.score.round(4), relevance: item.relevance.round(4), freshness: item.freshness.round(4),
+        exposure: item.exposure.round(4), tags: tags_for(item), judgment: item.entry["judgment"]
       }
     end
 
     def h(text) = ERB::Util.html_escape(text)
 
-    def tags_for(r)
-      Judge.tags_for(r.entry["judgment"], min_probability: @tag_config["min_probability"], max: @tag_config["max_per_article"])
+    def tags_for(item)
+      Judge.tags_for(item.entry["judgment"], min_probability: @tag_config["min_probability"], max: @tag_config["max_per_article"])
     end
 
     def local(time) = time.getlocal(@site["timezone"])

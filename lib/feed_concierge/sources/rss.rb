@@ -20,7 +20,7 @@ module FeedConcierge
         items = @feeds.flat_map { |url| fetch(url) }.uniq(&:id)
         return items unless @max_age_days
 
-        cutoff = Time.now - @max_age_days * 86_400
+        cutoff = Time.now - (@max_age_days * 86_400)
         items.select { |a| a.published_at >= cutoff }
       end
 

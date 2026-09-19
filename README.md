@@ -58,6 +58,7 @@ Changing weights only needs `bin/rerank`.
 
 ```
 bundle install
+bundle exec rubocop   # Layout, Lint, and Naming cops; Metrics and Style are disabled
 export TYPESAFE_AI_API_KEY=...
 bin/build            # fetch feeds, judge new articles, write site/index.html
 bin/rerank           # rebuild the page from the cache with current weights

@@ -66,8 +66,8 @@ module FeedConcierge
       type: "noul",
       instructions: "Would the person described in `reader_profile` be glad they opened `article`?",
       criteria: {
-        true: "The reader would find it worth their time based on their stated interests.",
-        false: "The reader would consider it a waste of time or outside their interests."
+        "true" => "The reader would find it worth their time based on their stated interests.",
+        "false" => "The reader would consider it a waste of time or outside their interests."
       }
     }.freeze
 
@@ -75,8 +75,8 @@ module FeedConcierge
       type: "noul",
       instructions: "Will `article` still be worth reading a month from now?",
       criteria: {
-        true: "The content is explanatory, technical, or timeless; its value does not depend on being current.",
-        false: "The content is breaking news, a time-limited event, or a status update that goes stale quickly."
+        "true" => "The content is explanatory, technical, or timeless; its value does not depend on being current.",
+        "false" => "The content is breaking news, a time-limited event, or a status update that goes stale quickly."
       }
     }.freeze
 
@@ -159,8 +159,8 @@ module FeedConcierge
       tag_vocabulary.to_h do |tag, description|
         ["tag_#{tag}", { type: "noul",
                          instructions: "Does the topic tag `#{tag}` apply to `article`?",
-                         criteria: { true: "The article is substantially about: #{description}",
-                                     false: "The article only mentions this in passing, or not at all." } }]
+                         criteria: { "true" => "The article is substantially about: #{description}",
+                                     "false" => "The article only mentions this in passing, or not at all." } }]
       end
     end
 

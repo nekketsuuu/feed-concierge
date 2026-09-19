@@ -31,8 +31,8 @@ module FeedConcierge
       super.merge(published_at: published_at.iso8601)
     end
 
-    def self.from_h(h)
-      new(**h.transform_keys(&:to_sym).merge(published_at: Clock.parse(h["published_at"])))
+    def self.from_h(hash)
+      new(**hash.transform_keys(&:to_sym).merge(published_at: Clock.parse(hash["published_at"])))
     end
   end
 end

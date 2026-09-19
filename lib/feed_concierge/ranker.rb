@@ -43,9 +43,9 @@ module FeedConcierge
 
     private
 
-    def relevance_of(j)
-      weights = @config["weights"].fetch(j["question_set"] || "default")
-      weights.sum { |id, w| w * Judge.normalize(j, id, choice_weights: @config["choice_weights"] || {}) }
+    def relevance_of(judgment)
+      weights = @config["weights"].fetch(judgment["question_set"] || "default")
+      weights.sum { |id, w| w * Judge.normalize(judgment, id, choice_weights: @config["choice_weights"] || {}) }
     end
 
     # Halves every exposure_half_life_days after the article first appeared on the page.
@@ -57,8 +57,8 @@ module FeedConcierge
 
     def freshness_of(age_hours, evergreen:)
       f = @config["freshness"]
-      half_life = f["half_life_hours"] + f["evergreen_half_life_bonus_hours"] * evergreen
-      f["floor"] + (1 - f["floor"]) * 2**(-age_hours / half_life)
+      half_life = f["half_life_hours"] + (f["evergreen_half_life_bonus_hours"] * evergreen)
+      f["floor"] + ((1 - f["floor"]) * (2**(-age_hours / half_life)))
     end
   end
 end
