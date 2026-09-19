@@ -23,7 +23,8 @@ Code owns the rest (`lib/feed_concierge/ranker.rb`, weights in `config/settings.
 relevance = 0.5 * interest/4 + 0.2 * substance/3 + 0.3 * worth_reading
 freshness = floor + (1 - floor) * 2^(-age_hours / half_life)     # half_life grows with evergreen
 exposure  = exposure_decay ^ (times already shown on the page)
-score     = relevance * freshness * exposure
+popular   = floor + (1 - floor) * min(1, log(1 + points) / log(1 + reference_points[source]))
+score     = relevance * freshness * exposure * popular
 ```
 
 Judgments are cached in `data/scores.json`, so each article costs one Jev request ever.

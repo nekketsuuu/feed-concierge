@@ -9,5 +9,5 @@ ranked = FeedConcierge::Ranker.new(FeedConcierge.settings["ranking"]).rank(store
 FeedConcierge::Site.new(output_dir, title: FeedConcierge.settings.dig("site", "title"), source_labels: FeedConcierge.settings.dig("site", "source_labels") || {})
                  .build(ranked, generated_at: Time.now, judged_count: store.each_article.size)
 ranked.each_with_index do |r, i|
-  puts format("%2d %.3f rel=%.2f fresh=%.2f exp=%.2f  %s", i + 1, r.score, r.relevance, r.freshness, r.exposure, r.article.title)
+  puts format("%2d %.3f rel=%.2f fresh=%.2f pop=%.2f exp=%.2f  %s", i + 1, r.score, r.relevance, r.freshness, r.popularity, r.exposure, r.article.title)
 end

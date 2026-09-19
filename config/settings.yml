@@ -35,6 +35,15 @@ ranking:
     half_life_hours: 18
     evergreen_half_life_bonus_hours: 30
     floor: 0.25
+  # Community votes, log-scaled against a per-source reference so HN and Lobsters are comparable.
+  # reference_points maps to popularity 1.0; the factor applied to the score is floor + (1 - floor) * popularity.
+  # Sources without votes (plain RSS) get the "unknown" popularity.
+  popularity:
+    floor: 0.6
+    unknown: 0.7
+    reference_points:
+      hacker_news: 150
+      lobsters: 40
   # Each build in which an article appeared in the top list multiplies its score by this factor.
   exposure_decay: 0.85
   top_n: 40
