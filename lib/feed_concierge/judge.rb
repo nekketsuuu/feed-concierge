@@ -11,7 +11,7 @@ module FeedConcierge
   # Tag questions (one Noul per tag in config/tags.yml) are stored under "tags".
   class Judge
     # Bump when questions change so cached judgments are redone on the next build.
-    VERSION = 3
+    VERSION = 4
 
     INTEREST_LEVELS = [
       "The article is about a topic the reader profile explicitly says they are not interested in, or is unrelated to anything in the profile.",

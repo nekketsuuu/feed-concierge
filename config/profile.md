@@ -1,8 +1,8 @@
-The reader is a software engineer who enjoys:
+The reader is a software engineer and platform engineer (SRE) who enjoys:
 
 - Programming languages, compilers, type systems, and language design (especially Ruby, OCaml, Rust, TypeScript).
 - Deep technical write-ups: how something works internally, post-mortems, performance investigations, debugging stories.
-- Developer tooling, editors, shells, terminals, build systems, and version control.
+- Platform engineering, DevOps, and SRE: reliability, observability, developer experience, incident response and post-mortems, capacity and cost, cloud infrastructure, CI/CD, and internal developer platforms.
 - AI/LLM topics only when they are concrete and technical (architecture, evaluation, tooling), not hype or product announcements.
 - Math, algorithms, and data structures explained clearly.
 - Open source projects with a novel idea, and "Show HN" posts that demonstrate craft.
@@ -22,10 +22,9 @@ For product changelogs (GitHub, AWS, Cloudflare, Fastly), the reader cares about
 
 For merged pull requests in frameworks such as Rails, the reader cares about new public APIs, changed defaults, deprecations, and performance work related changes. Internal refactors, test-only changes, and dependency bumps are not interesting.
 
-For security news (piyolog, tl;dr sec, BleepingComputer, CISA KEV, JPCERT/CC), the reader cares about:
+For security news, the reader cares about:
 
-- Vulnerabilities and incidents involving developer tooling, programming languages and runtimes, package registries, source hosting, CI systems, and open-source infrastructure.
 - Actively exploited vulnerabilities in widely used server software, cloud services, and network equipment.
+- Vulnerabilities and incidents involving developer tooling, programming languages and runtimes, package registries, source hosting, CI systems, and open-source infrastructure.
 - Incident write-ups with technical detail about how an attack worked or how it was detected.
 - Japanese incidents and advisories are as interesting as English ones.
-- Not interested in: consumer scams, generic ransomware business news, vendor marketing dressed as research, and vulnerabilities in niche consumer devices or enterprise products the reader would never operate.
