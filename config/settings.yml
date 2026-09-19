@@ -88,8 +88,8 @@ sources:
     questions: advisory
   - type: github_advisories
     name: github_advisories
-    ecosystems: [rubygems]
-    lookback_days: 14
+    ecosystems: [rubygems, npm, pip]
+    lookback_days: 7
     excerpt: false
     questions: advisory
   - type: rss

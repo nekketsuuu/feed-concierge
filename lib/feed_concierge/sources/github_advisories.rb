@@ -10,6 +10,7 @@ module FeedConcierge
     # ecosystems (for example rubygems). GITHUB_TOKEN is sent when present.
     class GithubAdvisories
       PAGE_SIZE = 100
+      MAX_PAGES = 3
 
       def initialize(name: "github_advisories", ecosystems: ["rubygems"], lookback_days: 14, description_max_chars: 1500)
         @name = name
@@ -20,8 +21,7 @@ module FeedConcierge
 
       def articles
         cutoff = Time.now - (@lookback_days * 86_400)
-        @ecosystems.flat_map { |ecosystem| JSON.parse(get(ecosystem)) }
-                   .select { |adv| Clock.parse(adv["published_at"]) >= cutoff }
+        @ecosystems.flat_map { |ecosystem| recent_advisories(ecosystem, cutoff) }
                    .map { |adv| to_article(adv) }
                    .uniq(&:id)
                    .sort_by { |a| -a.published_at.to_i }
@@ -29,8 +29,17 @@ module FeedConcierge
 
       private
 
-      def get(ecosystem)
-        query = URI.encode_www_form(ecosystem: ecosystem, per_page: PAGE_SIZE, sort: "published", direction: "desc")
+      # Pages are newest first, so stop as soon as a page runs past the cutoff.
+      def recent_advisories(ecosystem, cutoff)
+        (1..MAX_PAGES).each_with_object([]) do |page, found|
+          advisories = JSON.parse(get(ecosystem, page))
+          found.concat(advisories.select { |adv| Clock.parse(adv["published_at"]) >= cutoff })
+          break found if advisories.size < PAGE_SIZE || Clock.parse(advisories.last["published_at"]) < cutoff
+        end
+      end
+
+      def get(ecosystem, page)
+        query = URI.encode_www_form(ecosystem: ecosystem, per_page: PAGE_SIZE, page: page, sort: "published", direction: "desc")
         uri = URI("https://api.github.com/advisories?#{query}")
         headers = { "User-Agent" => "feed-concierge/0.1", "Accept" => "application/vnd.github+json" }
         headers["Authorization"] = "Bearer #{ENV['GITHUB_TOKEN']}" unless ENV["GITHUB_TOKEN"].to_s.empty?

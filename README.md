@@ -9,7 +9,7 @@ and publishes the ranked list to GitHub Pages.
 Every article is judged once by Jev with a question set chosen per source
 (`questions:` in `config/settings.yml`, see `lib/feed_concierge/judge.rb`). The reader
 profile from `config/profile.md` is part of the state. CISA KEV entries, JPCERT/CC weekly report items, and GitHub
-security advisories use the `advisory` set, which asks whether the reader's stack is affected and
+security advisories (rubygems, npm, pip) use the `advisory` set, which asks whether the reader's stack is affected and
 what kind of component it is, instead of rating interest and substance of the prose.
 
 Every request also carries one Noul per tag in `config/tags.yml`.
