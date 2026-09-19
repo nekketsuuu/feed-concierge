@@ -26,8 +26,7 @@ exposure  = 0.5 ^ (days since first shown on the page / exposure_half_life_days)
 score     = relevance * freshness * exposure
 ```
 
-Articles reporting the same CVE ids collapse into the best-scoring one. `freshness.by_question_set`
-overrides the curve per question set, so advisories decay more slowly than news.
+Articles reporting the same CVE ids collapse into the best-scoring one.
 
 The page lists every article with `score >= min_score`, newest-scored first, up to `top_n`.
 
