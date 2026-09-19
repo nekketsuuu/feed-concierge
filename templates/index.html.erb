@@ -15,6 +15,7 @@
   .meta { color: var(--muted); font-size: .8em; margin-left: .5rem; white-space: nowrap; }
   .tag { display: inline-block; font-size: .72em; line-height: 1.5; padding: 0 .45em; margin-left: .35rem; border-radius: 4px; border: 1px solid; vertical-align: 2px; color: #333; background: #fffcd7; border-color: #d5d458; }
   footer { color: var(--muted); font-size: .75em; margin-top: 1.5rem; }
+  .debug { display: block; font: .75em/1.5 ui-monospace, monospace; color: var(--muted); white-space: pre-wrap; margin: .2rem 0 0 1rem; }
 </style>
 </head>
 <body>
@@ -23,9 +24,31 @@
 </header>
 <ul>
 <%- ranked.each do |r| -%>
-  <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= local(r.article.published_at).iso8601 %>"><%= date_label(r.article.published_at) %></time></span></li>
+  <li data-id="<%= h(r.article.id) %>"><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= local(r.article.published_at).iso8601 %>"><%= date_label(r.article.published_at) %></time></span></li>
 <%- end -%>
 </ul>
-<footer>Updated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a></footer>
+<footer>Updated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a> · <a href="?debug=1">debug</a></footer>
+<script>
+  // ?debug=1 loads data.json and prints each article's score breakdown under it.
+  if (new URLSearchParams(location.search).get("debug")) {
+    fetch("data.json").then(r => r.json()).then(rows => {
+      const f = n => Number(n).toFixed(2);
+      for (const row of rows) {
+        const li = document.querySelector(`li[data-id="${CSS.escape(row.id)}"]`);
+        if (!li) continue;
+        const parts = row.components.map(c => `${c.id} ${f(c.value)}×${c.weight}=${f(c.contribution)}`).join("  ");
+        const tags = Object.entries(row.tag_probabilities).map(([t, p]) => `${t} ${f(p)}`).join(" ");
+        const j = row.judgment;
+        const choices = Object.keys(j).filter(k => k.endsWith("_probabilities")).map(k =>
+          `${k.replace("_probabilities", "")}: ` + Object.entries(j[k]).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([o, p]) => `${o} ${f(p)}`).join(", ")).join("  ");
+        const el = document.createElement("span");
+        el.className = "debug";
+        el.textContent = `score ${f(row.score)} = relevance ${f(row.relevance)} × freshness ${f(row.freshness)} × exposure ${f(row.exposure)}  (${row.age_hours}h, ${row.source}, ${j.question_set})\n` +
+          `relevance: ${parts}\n` + (choices ? `${choices}\n` : "") + `tags: ${tags}`;
+        li.appendChild(el);
+      }
+    });
+  }
+</script>
 </body>
 </html>

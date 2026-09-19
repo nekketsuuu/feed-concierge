@@ -34,7 +34,10 @@ module FeedConcierge
         comments_url: item.article.comments_url,
         published_at: item.article.published_at.iso8601, points: item.article.points, comments: item.article.comment_count,
         score: item.score.round(4), relevance: item.relevance.round(4), freshness: item.freshness.round(4),
-        exposure: item.exposure.round(4), tags: tags_for(item), judgment: item.entry["judgment"]
+        exposure: item.exposure.round(4), age_hours: item.age_hours.round(1), tags: tags_for(item),
+        components: item.components.map { |c| c.transform_values { |v| v.is_a?(Float) ? v.round(3) : v } },
+        tag_probabilities: (item.entry.dig("judgment", "tags") || {}).sort_by { |_, p| -p }.first(6).to_h,
+        judgment: item.entry["judgment"]
       }
     end
 

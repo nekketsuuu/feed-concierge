@@ -4,7 +4,7 @@ module FeedConcierge
   # Combines Jev's answers with freshness and exposure. Every number here is code-owned
   # so weights can be tuned without re-querying Jev.
   class Ranker
-    Ranked = Data.define(:article, :entry, :relevance, :freshness, :exposure, :score, :age_hours)
+    Ranked = Data.define(:article, :entry, :relevance, :components, :freshness, :exposure, :score, :age_hours)
 
     def initialize(config, now: Time.now)
       @config = config
@@ -22,11 +22,12 @@ module FeedConcierge
 
     def evaluate(article, entry)
       j = entry["judgment"]
-      relevance = relevance_of(j)
+      components = components_of(j)
+      relevance = components.sum { |c| c[:contribution] }
       age_hours = [(@now - article.published_at) / 3600.0, 0].max
       freshness = freshness_of(age_hours, evergreen: j["evergreen"].to_f)
       exposure = exposure_of(entry)
-      Ranked.new(article: article, entry: entry, relevance: relevance, freshness: freshness,
+      Ranked.new(article: article, entry: entry, relevance: relevance, components: components, freshness: freshness,
                  exposure: exposure, score: relevance * freshness * exposure, age_hours: age_hours)
     end
 
@@ -43,9 +44,13 @@ module FeedConcierge
 
     private
 
-    def relevance_of(judgment)
+    # One entry per weighted question: the normalized answer, its weight, and their product.
+    def components_of(judgment)
       weights = @config["weights"].fetch(judgment["question_set"] || "default")
-      weights.sum { |id, w| w * Judge.normalize(judgment, id, choice_weights: @config["choice_weights"] || {}) }
+      weights.map do |id, weight|
+        value = Judge.normalize(judgment, id, choice_weights: @config["choice_weights"] || {})
+        { id: id, value: value, weight: weight, contribution: weight * value }
+      end
     end
 
     # Halves every exposure_half_life_days after the article first appeared on the page.
