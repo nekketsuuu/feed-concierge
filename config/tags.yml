@@ -1,5 +1,3 @@
-# Tag vocabulary, loosely following Lobsters. Each description is what Jev reads when deciding
-# whether the tag applies, so describe the concrete subject matter rather than a vibe.
 tags:
   a11y: "Accessibility or assistive technology."
   ai: "Machine learning or AI models, training, inference, evaluation, or how such systems work internally."
