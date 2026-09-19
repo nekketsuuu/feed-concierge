@@ -7,8 +7,11 @@ and publishes the ranked list to GitHub Pages.
 
 ## How ranking works
 
-For every article Jev answers four questions in one request
-(see `lib/feed_concierge/judge.rb`), with the reader profile from `config/profile.md` in the state:
+Every article is judged once by Jev with a *question set* chosen per source
+(`questions:` in `config/settings.yml`, see `lib/feed_concierge/judge.rb`). The reader
+profile from `config/profile.md` is part of the state.
+
+`default` (articles):
 
 | id | type | meaning |
 | --- | --- | --- |
@@ -17,10 +20,18 @@ For every article Jev answers four questions in one request
 | `worth_reading` | Noul | probability the reader would be glad they opened it |
 | `evergreen` | Noul | probability it is still worth reading in a month |
 
+`ticket` (issue trackers such as bugs.ruby-lang.org):
+
+| id | type | meaning |
+| --- | --- | --- |
+| `kind` | Choice | language_change / design_discussion / behavior_bug / crash_report / build_platform / housekeeping |
+| `user_impact` | Score 0–3 | how much of the user base would notice the change or defect |
+| `interest`, `worth_reading`, `evergreen` | as above | |
+
 Code owns the rest (`lib/feed_concierge/ranker.rb`, weights in `config/settings.yml`):
 
 ```
-relevance = 0.5 * interest/4 + 0.2 * substance/3 + 0.3 * worth_reading
+relevance = Σ weights[set][q] * normalized(q)     # score/max, noul as is, choice = Σ p(option) * choice_weights
 freshness = floor + (1 - floor) * 2^(-age_hours / half_life)     # half_life grows with evergreen
 exposure  = exposure_decay ^ (times already shown on the page)
 score     = relevance * freshness * exposure

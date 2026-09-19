@@ -7,7 +7,7 @@ require_relative "sources/redmine"
 module FeedConcierge
   module Sources
     REGISTRY = { "hacker_news" => HackerNews, "lobsters" => Lobsters, "rss" => Rss, "redmine" => Redmine }.freeze
-    NON_CONSTRUCTOR_KEYS = %w[type excerpt].freeze
+    NON_CONSTRUCTOR_KEYS = %w[type excerpt questions].freeze
 
     # Builds sources from config/settings.yml entries like:
     #   - type: hacker_news
@@ -24,7 +24,12 @@ module FeedConcierge
       configs.reject { |cfg| cfg.fetch("excerpt", true) }.map { |cfg| cfg["name"] || cfg["type"] }
     end
 
-    # Sources are fetched in config order; when several list the same link, the first wins.
+    # Source name -> Judge question set name (config `questions:`, default "default").
+def self.question_sets(configs)
+  configs.to_h { |cfg| [cfg["name"] || cfg["type"], cfg.fetch("questions", "default")] }
+end
+
+# Sources are fetched in config order; when several list the same link, the first wins.
     # A broken source is logged and skipped so the rest of the build still runs.
     def self.fetch_all(configs, logger: $stderr)
       articles = build(configs).flat_map do |source|

@@ -6,6 +6,7 @@ module FeedConcierge
       @output_dir = output_dir
       @judge = Judge.new(client)
       @skip_excerpt = Sources.without_excerpt(settings["sources"])
+      @question_sets = Sources.question_sets(settings["sources"])
       @log = logger
     end
 
@@ -13,7 +14,9 @@ module FeedConcierge
       articles = Sources.fetch_all(@settings["sources"], logger: @log)
       @log.puts "fetched #{articles.size} articles"
 
-      pending = articles.reject { |a| @store.judged?(a.id) || @store.judged_url?(a.canonical_url) }
+      pending = articles.reject do |a|
+        @store.judged?(a.id, question_set: question_set_for(a)) || (@store[a.id].nil? && @store.judged_url?(a.canonical_url))
+      end
       articles.each { |a| @store.refresh_stats(a) }
       judge_all(pending)
 
@@ -43,7 +46,8 @@ module FeedConcierge
           while (article = queue.pop)
             begin
               excerpt = fetch_excerpt(article)
-              results << [article, excerpt, @judge.judge(article, excerpt: excerpt, reader_profile: profile)]
+              judgment = @judge.judge(article, excerpt: excerpt, reader_profile: profile, question_set: question_set_for(article))
+              results << [article, excerpt, judgment]
             rescue JevClient::Error => e
               @log.puts "  skipped #{article.id}: #{e.message}"
             end
@@ -57,6 +61,10 @@ module FeedConcierge
         @store.remember(article, judgment: judgment, excerpt_used: !excerpt.nil?)
         @log.puts format("  %-60.60s interest=%.2f worth=%.2f", article.title, judgment["interest"].to_f, judgment["worth_reading"].to_f)
       end
+    end
+
+    def question_set_for(article)
+      @question_sets.fetch(article.source, "default")
     end
 
     def fetch_excerpt(article)

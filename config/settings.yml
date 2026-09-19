@@ -20,6 +20,7 @@ sources:
     base_url: https://bugs.ruby-lang.org
     lookback_days: 3
     excerpt: false
+    questions: ticket
 
 model: jev-latest
 concurrency: 6
@@ -30,11 +31,26 @@ article_excerpt:
   timeout_seconds: 8
 
 ranking:
-  # Relevance is a weighted sum of normalized Jev answers (each in 0..1).
+  # Relevance is a weighted sum of normalized Jev answers (each in 0..1), per question set.
   weights:
-    interest: 0.5
-    substance: 0.2
-    worth_reading: 0.3
+    default:
+      interest: 0.5
+      substance: 0.2
+      worth_reading: 0.3
+    ticket:
+      kind: 0.4
+      user_impact: 0.25
+      interest: 0.15
+      worth_reading: 0.2
+  # How much each Choice option is worth (0..1) when normalizing a choice answer.
+  choice_weights:
+    kind:
+      language_change: 1.0
+      design_discussion: 0.9
+      behavior_bug: 0.6
+      crash_report: 0.2
+      build_platform: 0.15
+      housekeeping: 0.05
   # Freshness decays with age since publication. Evergreen articles decay slower.
   freshness:
     half_life_hours: 18

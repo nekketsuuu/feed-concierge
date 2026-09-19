@@ -1,6 +1,6 @@
 module FeedConcierge
-  # Combines Jev's answers with freshness and exposure. Every number here is
-  # code-owned so weights can be tuned without re-querying Jev.
+  # Combines Jev's answers with freshness and exposure. Every number here is code-owned
+  # so weights can be tuned without re-querying Jev.
   class Ranker
     Ranked = Struct.new(:article, :entry, :relevance, :freshness, :exposure, :score, :age_hours, keyword_init: true)
 
@@ -42,10 +42,8 @@ module FeedConcierge
     private
 
     def relevance_of(j)
-      w = @config["weights"]
-      w["interest"] * (j["interest"].to_f / Judge.interest_max) +
-        w["substance"] * (j["substance"].to_f / Judge.substance_max) +
-        w["worth_reading"] * j["worth_reading"].to_f
+      weights = @config["weights"].fetch(j["question_set"] || "default")
+      weights.sum { |id, w| w * Judge.normalize(j, id, choice_weights: @config["choice_weights"] || {}) }
     end
 
     def freshness_of(age_hours, evergreen:)
