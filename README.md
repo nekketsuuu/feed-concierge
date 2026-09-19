@@ -57,15 +57,17 @@ Configured under `sources:` in `config/settings.yml`. Three source types exist:
 | `hacker_news` | hnrss.org feeds | points, comment count, comments link |
 | `lobsters` | lobste.rs JSON endpoints | score, tags, comment count, comments link |
 | `rss` | any RSS feed (`name:` + `feeds:`), used for LWN.net and Phoronix | feed description as summary |
+| `redmine` | tickets with recent activity on a Redmine tracker (bugs.ruby-lang.org) | tracker, status, top description; last activity time as publication time |
 
 The same link submitted to several aggregators is judged once; the first source in config
-order wins. To add a new type, write a class under `lib/feed_concierge/sources/` that
+order wins. Set `excerpt: false` on a source to judge from feed data only, without fetching
+the linked page. To add a new type, write a class under `lib/feed_concierge/sources/` that
 returns `Article` structs from `#articles`, register it in `lib/feed_concierge/sources.rb`,
 and prefix article ids with the source name so they stay globally unique.
 
 ## Tuning
 
 - `config/profile.md`: describe what you like and dislike. This is the "prompt".
-- `config/settings.yml`: sources, weights, freshness half-life, exposure decay, top N.
+- `config/settings.yml`: sources, weights, freshness half-life, exposure decay, top N, per-source caps.
 - `lib/feed_concierge/judge.rb`: question wording and Score levels. Jev reads literally, so
   describe concrete situations per level rather than degrees.

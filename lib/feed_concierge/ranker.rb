@@ -14,6 +14,7 @@ module FeedConcierge
       ranked.select { |r| r.relevance >= @config["min_relevance"] }
             .sort_by { |r| -r.score }
             .uniq { |r| r.article.canonical_url }
+            .then { |list| cap_per_source(list) }
             .first(@config["top_n"])
     end
 
@@ -25,6 +26,17 @@ module FeedConcierge
       exposure = @config["exposure_decay"]**entry["shown_count"].to_i
       Ranked.new(article: article, entry: entry, relevance: relevance, freshness: freshness,
                  exposure: exposure, score: relevance * freshness * exposure, age_hours: age_hours)
+    end
+
+    def cap_per_source(list)
+      limits = @config["max_per_source"] || {}
+      counts = Hash.new(0)
+      list.select do |r|
+        limit = limits[r.article.source]
+        next true unless limit
+
+        (counts[r.article.source] += 1) <= limit
+      end
     end
 
     private

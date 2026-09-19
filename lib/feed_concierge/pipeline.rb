@@ -5,6 +5,7 @@ module FeedConcierge
       @store = Store.new(store_path)
       @output_dir = output_dir
       @judge = Judge.new(client)
+      @skip_excerpt = Sources.without_excerpt(settings["sources"])
       @log = logger
     end
 
@@ -60,7 +61,7 @@ module FeedConcierge
 
     def fetch_excerpt(article)
       cfg = @settings["article_excerpt"]
-      return nil unless cfg["enabled"]
+      return nil unless cfg["enabled"] && !@skip_excerpt.include?(article.source)
 
       Excerpt.fetch(article.url, max_chars: cfg["max_chars"], timeout: cfg["timeout_seconds"])
     end

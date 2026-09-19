@@ -15,6 +15,11 @@ sources:
     name: phoronix
     feeds:
       - https://www.phoronix.com/rss.php
+  - type: redmine
+    name: ruby_bugs
+    base_url: https://bugs.ruby-lang.org
+    lookback_days: 3
+    excerpt: false
 
 model: jev-latest
 concurrency: 6
@@ -38,6 +43,9 @@ ranking:
   # Each build in which an article appeared in the top list multiplies its score by this factor.
   exposure_decay: 0.85
   top_n: 40
+  # Optional per-source caps so one busy source cannot fill the page.
+  max_per_source:
+    ruby_bugs: 8
   # Articles below this relevance never make the page even when fresh.
   min_relevance: 0.2
 
@@ -48,3 +56,4 @@ site:
     lobsters: Lobsters
     lwn: LWN
     phoronix: Phoronix
+    ruby_bugs: ruby-bugs
