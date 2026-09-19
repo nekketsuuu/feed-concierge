@@ -28,7 +28,7 @@
   <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= r.article.published_at.utc.iso8601 %>"><%= r.article.published_at.utc.strftime("%m-%d %H:%M") %></time></span></li>
 <%- end -%>
 </ul>
-<footer><a href="data.json">data.json</a></footer>
+<footer><a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a></footer>
 <script>
   for (const t of document.querySelectorAll("time")) {
     const d = new Date(t.dateTime);

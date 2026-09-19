@@ -6,9 +6,10 @@ module FeedConcierge
   class Site
     TEMPLATE = File.join(ROOT, "templates", "index.html.erb")
 
-    def initialize(output_dir, title:, tag_config:)
+    def initialize(output_dir, title:, repository_url:, tag_config:)
       @output_dir = output_dir
       @title = title
+      @repository_url = repository_url
       @tag_config = tag_config
     end
 
@@ -22,6 +23,7 @@ module FeedConcierge
 
     def render(ranked, generated_at, judged_count)
       title = @title
+      repository_url = @repository_url
       ERB.new(File.read(TEMPLATE), trim_mode: "-").result(binding)
     end
 
