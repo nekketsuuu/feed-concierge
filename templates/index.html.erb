@@ -133,9 +133,9 @@
       rel.appendChild(slotBar(row)); box.appendChild(rel);
       const fresh = node("freshness", row.freshness, `age ${dur(fr.age_hours)} · half-life ${days(fr.half_life_hours)} = ${days(fr.base_half_life_hours)} + ${days(fr.bonus_hours)} × evergreen`);
       fresh.appendChild(curve(fr));
-      // evergreen is a Jev answer; shown as its own bar so it compares across articles.
+      // evergreen as its own bar so it compares across articles.
       fresh.appendChild(node("evergreen", fr.evergreen,
-        `Jev answer · adds ${days(fr.bonus_hours * fr.evergreen)} to the ${days(fr.base_half_life_hours)} half-life · freshness without it ${f(fr.if_evergreen_zero)}, fully evergreen ${f(fr.if_evergreen_one)}`));
+        `adds ${days(fr.bonus_hours * fr.evergreen)} to the ${days(fr.base_half_life_hours)} half-life · freshness without it ${f(fr.if_evergreen_zero)}, fully evergreen ${f(fr.if_evergreen_one)}`));
       box.appendChild(fresh);
       li.appendChild(box);
     }
