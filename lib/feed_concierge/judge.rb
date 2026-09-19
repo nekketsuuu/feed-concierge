@@ -29,6 +29,15 @@ module FeedConcierge
       housekeeping: "Backport tracking, documentation wording, typos, test flakiness, release process, or other administrative work."
     }.freeze
 
+CHANGE_KINDS = {
+  new_capability: "Introduces a new product, feature, API, or capability that did not exist before.",
+  breaking_or_deprecation: "Announces a breaking change, deprecation, end of support, or a changed default that requires users to act.",
+  pricing_or_limits: "Changes pricing, the free tier, quotas, or limits.",
+  incremental_improvement: "Improves an existing feature: performance, UI, integrations, more options, or expanded support for versions and platforms.",
+  regional_availability: "An existing feature or service becomes available in additional regions, countries, or data centres, with no new functionality.",
+  fix_or_maintenance: "Bug fixes, security patches, version bumps, or documentation updates."
+}.freeze
+
     USER_IMPACT_LEVELS = [
       "Only affects contrived code, fuzzer inputs, or an internal detail no ordinary program touches.",
       "Affects a specific niche: one platform, one rarely used method, or an unusual configuration.",
@@ -69,6 +78,20 @@ module FeedConcierge
         worth_reading: WORTH_READING,
         evergreen: EVERGREEN
       },
+"changelog" => {
+  change_kind: {
+    type: "choice",
+    instructions: "`article` is an entry from a product changelog or announcement feed. Which kind of change does it announce?",
+    criteria: CHANGE_KINDS
+  },
+  interest: {
+    type: "score",
+    instructions: "How well does the change announced in `article` match the interests described in `reader_profile`?",
+    criteria: INTEREST_LEVELS
+  },
+  worth_reading: WORTH_READING,
+  evergreen: EVERGREEN
+},
       "ticket" => {
         kind: {
           type: "choice",

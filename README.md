@@ -20,6 +20,9 @@ profile from `config/profile.md` is part of the state.
 | `worth_reading` | Noul | probability the reader would be glad they opened it |
 | `evergreen` | Noul | probability it is still worth reading in a month |
 
+`changelog` (product changelogs) replaces `substance` with a `change_kind` Choice: new_capability /
+breaking_or_deprecation / pricing_or_limits / incremental_improvement / regional_availability / fix_or_maintenance.
+
 `ticket` (issue trackers such as bugs.ruby-lang.org):
 
 | id | type | meaning |
@@ -69,6 +72,9 @@ Configured under `sources:` in `config/settings.yml`. Three source types exist:
 | `lobsters` | lobste.rs JSON endpoints | score, tags, comment count, comments link |
 | `rss` | any RSS feed (`name:` + `feeds:`), used for LWN.net and Phoronix | feed description as summary |
 | `redmine` | tickets with recent activity on a Redmine tracker (bugs.ruby-lang.org) | tracker, status, top description; last activity time as publication time |
+
+Product changelogs (GitHub Changelog, AWS What's New, Cloudflare, Fastly) use the `rss` type with
+`questions: changelog` and `max_age_days:` to ignore old entries in large feeds.
 
 The same link submitted to several aggregators is judged once; the first source in config
 order wins. Set `excerpt: false` on a source to judge from feed data only, without fetching

@@ -21,6 +21,36 @@ sources:
     lookback_days: 3
     excerpt: false
     questions: ticket
+  - type: rss
+    name: github_changelog
+    feeds:
+      - https://github.blog/changelog/feed/
+    summary_max_chars: 1200
+    excerpt: false
+    questions: changelog
+  - type: rss
+    name: aws_whats_new
+    feeds:
+      - https://aws.amazon.com/about-aws/whats-new/recent/feed/
+    summary_max_chars: 1200
+    excerpt: false
+    questions: changelog
+  - type: rss
+    name: cloudflare_changelog
+    feeds:
+      - https://developers.cloudflare.com/changelog/rss/index.xml
+    summary_max_chars: 1200
+    max_age_days: 7
+    excerpt: false
+    questions: changelog
+  - type: rss
+    name: fastly_changelog
+    feeds:
+      - https://www.fastly.com/documentation/reference/changes/feed.xml
+    summary_max_chars: 1200
+    max_age_days: 14
+    excerpt: false
+    questions: changelog
 
 model: jev-latest
 concurrency: 6
@@ -42,6 +72,10 @@ ranking:
       user_impact: 0.25
       interest: 0.15
       worth_reading: 0.2
+    changelog:
+      interest: 0.5
+      change_kind: 0.3
+      worth_reading: 0.2
   # How much each Choice option is worth (0..1) when normalizing a choice answer.
   choice_weights:
     kind:
@@ -51,6 +85,13 @@ ranking:
       crash_report: 0.2
       build_platform: 0.15
       housekeeping: 0.05
+    change_kind:
+      new_capability: 1.0
+      breaking_or_deprecation: 0.9
+      pricing_or_limits: 0.6
+      incremental_improvement: 0.5
+      fix_or_maintenance: 0.3
+      regional_availability: 0.15
   # Freshness decays with age since publication. Evergreen articles decay slower.
   freshness:
     half_life_hours: 18
@@ -73,3 +114,7 @@ site:
     lwn: LWN
     phoronix: Phoronix
     ruby_bugs: ruby-bugs
+    github_changelog: GitHub
+    aws_whats_new: AWS
+    cloudflare_changelog: Cloudflare
+    fastly_changelog: Fastly
