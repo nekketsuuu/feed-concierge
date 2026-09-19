@@ -55,10 +55,12 @@ module FeedConcierge
       0.5**(days_shown / @config["exposure_half_life_days"])
     end
 
+    # A logistic curve in age: flat for the first day or so, halfway down at half_life_hours,
+    # then a long tail. Evergreen articles get a longer half-life.
     def freshness_of(age_hours, evergreen:)
       f = @config["freshness"]
       half_life = f["half_life_hours"] + (f["evergreen_half_life_bonus_hours"] * evergreen)
-      f["floor"] + ((1 - f["floor"]) * (2**(-age_hours / half_life)))
+      f["floor"] + ((1 - f["floor"]) / (1 + ((age_hours / half_life)**f["steepness"])))
     end
   end
 end

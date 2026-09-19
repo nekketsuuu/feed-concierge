@@ -20,7 +20,7 @@ Code owns the rest (`lib/feed_concierge/ranker.rb`, weights in `config/settings.
 
 ```
 relevance = Σ weights[set][q] * normalized(q)     # score/max, noul as is, choice = Σ p(option) * choice_weights
-freshness = floor + (1 - floor) * 2^(-age_hours / half_life)     # half_life grows with evergreen
+freshness = floor + (1 - floor) / (1 + (age_hours / half_life)^steepness)   # half_life grows with evergreen
 exposure  = 0.5 ^ (days since first shown on the page / exposure_half_life_days)
 score     = relevance * freshness * exposure
 ```

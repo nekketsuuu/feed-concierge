@@ -253,10 +253,12 @@ ranking:
       bug_fix: 0.5
       internal_refactor: 0.3
       docs_tests_ci: 0.1
-  # Freshness decays with age since publication. Evergreen articles decay slower.
+  # Freshness follows floor + (1 - floor) / (1 + (age / half_life)^steepness): nearly flat for the
+  # first day, halfway down at half_life, then a long tail. Evergreen articles get a longer half-life.
   freshness:
-    half_life_hours: 18
-    evergreen_half_life_bonus_hours: 30
+    half_life_hours: 60
+    evergreen_half_life_bonus_hours: 48
+    steepness: 2
     floor: 0.25
   # Once an article has appeared on the page, its score halves every this many days.
   exposure_half_life_days: 5
