@@ -14,7 +14,20 @@
   li a { text-decoration: none; }
   li a:hover { text-decoration: underline; }
   .meta { color: var(--muted); font-size: .8em; margin-left: .5rem; white-space: nowrap; }
-  .tag { font-size: .75em; color: var(--muted); border: 1px solid rgba(127,127,127,.4); border-radius: 3px; padding: 0 .3em; margin-left: .3rem; }
+  .tag { display: inline-block; font-size: .72em; line-height: 1.5; padding: 0 .45em; margin-left: .35rem; border-radius: 4px; border: 1px solid; vertical-align: 2px; color: #333; background: #fffcd7; border-color: #d5d458; }
+  .tag-compsci { background: #dfeefc; border-color: #86b4e3; }
+  .tag-field { background: #e1f5df; border-color: #7fc47a; }
+  .tag-interaction { background: #f1e3f8; border-color: #c48ad9; }
+  .tag-practices { background: #fde7d6; border-color: #eba06e; }
+  .tag-tools { background: #dbf3f1; border-color: #6fc2ba; }
+  @media (prefers-color-scheme: dark) {
+    .tag { color: #eee; background: #4a4520; border-color: #8a8230; }
+    .tag-compsci { background: #1f3a55; border-color: #4a7fb5; }
+    .tag-field { background: #234323; border-color: #4f8f4a; }
+    .tag-interaction { background: #3f2650; border-color: #8e5aa8; }
+    .tag-practices { background: #4f3220; border-color: #b0693a; }
+    .tag-tools { background: #1f4442; border-color: #4a8f88; }
+  }
   footer { color: var(--muted); font-size: .75em; margin-top: 1.5rem; }
 </style>
 </head>
@@ -25,7 +38,7 @@
 </header>
 <ul>
 <%- ranked.each do |r| -%>
-  <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= r.article.published_at.utc.iso8601 %>"><%= r.article.published_at.utc.strftime("%m-%d %H:%M") %></time></span><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%></li>
+  <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag tag-<%= h(FeedConcierge::Judge.tag_category(tag)) %>"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= r.article.published_at.utc.iso8601 %>"><%= r.article.published_at.utc.strftime("%m-%d %H:%M") %></time></span></li>
 <%- end -%>
 </ul>
 <footer><a href="data.json">data.json</a></footer>

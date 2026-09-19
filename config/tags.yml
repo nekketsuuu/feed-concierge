@@ -1,43 +1,44 @@
-# Tag vocabulary, loosely following Lobsters. Each description is what Jev reads when deciding
-# whether the tag applies, so describe the concrete subject matter rather than a vibe.
+# Tag vocabulary, loosely following Lobsters, grouped by category (used for colours on the page).
+# Each description is what Jev reads when deciding whether the tag applies, so describe the
+# concrete subject matter rather than a vibe.
 tags:
-  # compsci
-  ai: "Machine learning or AI models, training, inference, evaluation, or how such systems work internally."
-  compsci: "Algorithms, data structures, complexity, or other theoretical computer science."
-  distributed: "Distributed systems: consensus, replication, coordination, or multi-node fault tolerance."
-  formalmethods: "Formal verification, proofs of software, model checking, or specification languages."
-  graphics: "Graphics programming: rendering, GPUs, shaders, or image processing."
-  networking: "Network protocols, routing, DNS, TCP/IP, HTTP internals, or network infrastructure."
-  osdev: "Operating system internals: kernels, drivers, schedulers, file systems, or memory management."
-  plt: "Programming language theory, type systems, semantics, or language design decisions."
-  # field
-  cryptography: "Cryptographic algorithms, protocols, or their implementation and analysis."
-  hardware: "CPUs, chips, boards, devices, or other physical hardware and its design."
-  math: "Mathematics as the main subject."
-  science: "Natural science research or findings outside computing."
-  # interaction
-  a11y: "Accessibility or assistive technology."
-  design: "Visual or interaction design of user interfaces."
-  visualization: "Data visualization or charting."
-  # practices
-  api: "Designing, implementing, or changing a programmatic API."
-  debugging: "A debugging investigation, post-mortem, or debugging techniques and tools."
-  devops: "Deployment, CI/CD, infrastructure automation, observability, or operations."
-  performance: "Measuring or improving speed, latency, throughput, or memory use."
-  privacy: "Personal data, tracking, surveillance, or privacy protections."
-  reversing: "Reverse engineering of software, firmware, or protocols."
-  scaling: "Scaling systems or software architecture for growth."
-  security: "Vulnerabilities, exploits, attacks, or defensive security."
-  testing: "Software testing, fuzzing, or test infrastructure."
-  # tools
-  compilers: "Compilers, interpreters, JITs, or build toolchains and their internals."
-  databases: "Databases, query engines, storage engines, or SQL."
-  editors: "Code editors, IDEs, or editor tooling."
-  vcs: "Git or other version control systems and workflows."
-  vibecoding: "Using AI coding assistants or agents as a tool for software development."
-  # extras used by this feed's sources
-  cloud: "A cloud provider's service, feature, or platform (for example AWS, Cloudflare, or Fastly)."
-  web: "Web development, browsers, or web standards."
-  linux: "The Linux kernel, distributions, or the Linux desktop."
-  release: "A software release or version announcement as the main content."
-  historical: "History of computing or a retrospective on past technology."
+  compsci:
+    ai: "Machine learning or AI models, training, inference, evaluation, or how such systems work internally."
+    compsci: "Algorithms, data structures, complexity, or other theoretical computer science."
+    distributed: "Distributed systems: consensus, replication, coordination, or multi-node fault tolerance."
+    formalmethods: "Formal verification, proofs of software, model checking, or specification languages."
+    graphics: "Graphics programming: rendering, GPUs, shaders, or image processing."
+    networking: "Network protocols, routing, DNS, TCP/IP, HTTP internals, or network infrastructure."
+    osdev: "Operating system internals: kernels, drivers, schedulers, file systems, or memory management."
+    plt: "Programming language theory, type systems, semantics, or language design decisions."
+  field:
+    cryptography: "Cryptographic algorithms, protocols, or their implementation and analysis."
+    hardware: "CPUs, chips, boards, devices, or other physical hardware and its design."
+    math: "Mathematics as the main subject."
+    science: "Natural science research or findings outside computing."
+  interaction:
+    a11y: "Accessibility or assistive technology."
+    design: "Visual or interaction design of user interfaces."
+    visualization: "Data visualization or charting."
+  practices:
+    api: "Designing, implementing, or changing a programmatic API."
+    debugging: "A debugging investigation, post-mortem, or debugging techniques and tools."
+    devops: "Deployment, CI/CD, infrastructure automation, observability, or operations."
+    performance: "Measuring or improving speed, latency, throughput, or memory use."
+    privacy: "Personal data, tracking, surveillance, or privacy protections."
+    reversing: "Reverse engineering of software, firmware, or protocols."
+    scaling: "Scaling systems or software architecture for growth."
+    security: "Vulnerabilities, exploits, attacks, or defensive security."
+    testing: "Software testing, fuzzing, or test infrastructure."
+  tools:
+    compilers: "Compilers, interpreters, JITs, or build toolchains and their internals."
+    databases: "Databases, query engines, storage engines, or SQL."
+    editors: "Code editors, IDEs, or editor tooling."
+    vcs: "Git or other version control systems and workflows."
+    vibecoding: "Using AI coding assistants or agents as a tool for software development."
+  extras:
+    cloud: "A cloud provider's service, feature, or platform (for example AWS, Cloudflare, or Fastly)."
+    web: "Web development, browsers, or web standards."
+    linux: "The Linux kernel, distributions, or the Linux desktop."
+    release: "A software release or version announcement as the main content."
+    historical: "History of computing or a retrospective on past technology."

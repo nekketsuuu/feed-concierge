@@ -147,8 +147,16 @@ module FeedConcierge
       }
     }.freeze
 
+    def self.tag_categories
+      @tag_categories ||= YAML.safe_load_file(File.join(ROOT, "config", "tags.yml")).fetch("tags")
+    end
+
     def self.tag_vocabulary
-      @tag_vocabulary ||= YAML.safe_load_file(File.join(ROOT, "config", "tags.yml")).fetch("tags")
+      @tag_vocabulary ||= tag_categories.values.reduce({}, :merge)
+    end
+
+    def self.tag_category(tag)
+      tag_categories.find { |_, tags| tags.key?(tag) }&.first
     end
 
     # One Noul per tag, asked alongside every question set. Probabilities are stored so the
