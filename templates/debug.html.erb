@@ -17,6 +17,8 @@
   .panel-head .summary { color: var(--muted); }
   .panel details { margin-top: .3rem; }
   .panel summary { cursor: pointer; color: var(--muted); }
+  .group { margin-top: .35rem; }
+  .group h3 { font-size: 1em; font-weight: 600; margin: 0 0 .1rem; color: inherit; }
   .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: .2rem 1.2rem; margin-top: .3rem; }
   .control { display: grid; grid-template-columns: 8.5em 1fr 3em; gap: .4rem; align-items: center; font-variant-numeric: tabular-nums; }
   .control input { width: 100%; margin: 0; }
@@ -67,8 +69,8 @@
     <span class="summary" id="summary"></span>
     <button id="reset" type="button">reset</button>
   </div>
-  <details open><summary>relevance weights (per question set)</summary><div class="controls" id="controls-weights"></div></details>
-  <details><summary>choice option weights</summary><div class="controls" id="controls-choices"></div></details>
+  <details open><summary>relevance weights (per question set)</summary><div id="controls-weights"></div></details>
+  <details><summary>choice option weights (per question)</summary><div id="controls-choices"></div></details>
   <details open><summary>freshness &amp; page</summary><div class="controls" id="controls-general"></div></details>
 </div>
 <ol id="list"></ol>
@@ -215,11 +217,15 @@
     control(general, "steepness", () => config.freshness.steepness, v => config.freshness.steepness = v, 1, 4, 0.5);
     control(general, "min score", () => config.min_score, v => config.min_score = v, 0, 0.9, 0.05);
     control(general, "top n", () => config.top_n, v => config.top_n = v, 10, 300, 10);
+    // One heading and grid per question set / question, so related sliders sit together.
+    const group = (parent, name) => { const g = el("div", "group"); g.appendChild(el("h3", null, name)); const c = el("div", "controls"); g.appendChild(c); parent.appendChild(g); return c; };
     for (const [set, ws] of Object.entries(config.weights)) {
-      for (const id of Object.keys(ws)) control(weights, `${set} / ${id}`, () => config.weights[set][id], v => config.weights[set][id] = v, 0, 1, 0.05);
+      const c = group(weights, set);
+      for (const id of Object.keys(ws)) control(c, id, () => config.weights[set][id], v => config.weights[set][id] = v, 0, 1, 0.05);
     }
     for (const [question, ws] of Object.entries(config.choice_weights)) {
-      for (const option of Object.keys(ws)) control(choices, `${question} / ${option}`, () => config.choice_weights[question][option], v => config.choice_weights[question][option] = v, 0, 1, 0.05);
+      const c = group(choices, question);
+      for (const option of Object.keys(ws)) control(c, option, () => config.choice_weights[question][option], v => config.choice_weights[question][option] = v, 0, 1, 0.05);
     }
   };
   document.getElementById("reset").addEventListener("click", () => { config = JSON.parse(JSON.stringify(defaults)); buildControls(); render(); });
