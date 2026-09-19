@@ -9,7 +9,7 @@ module HnConcierge
 
     class Error < StandardError; end
 
-    def initialize(api_key: ENV.fetch("TYPESAFE_API_KEY"), model: "jev-latest", max_retries: 5)
+    def initialize(api_key: ENV.fetch("TYPESAFE_AI_API_KEY"), model: "jev-latest", max_retries: 5)
       @api_key = api_key
       @model = model
       @max_retries = max_retries

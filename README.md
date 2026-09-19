@@ -33,7 +33,7 @@ Changing weights only needs `bin/rerank`.
 
 ```
 bundle install
-export TYPESAFE_API_KEY=...
+export TYPESAFE_AI_API_KEY=...
 bin/build            # fetch feeds, judge new articles, write site/index.html
 bin/rerank           # rebuild the page from the cache with current weights
 HN_CONCIERGE_FAKE_JEV=1 bin/build   # dry run without an API key
@@ -41,7 +41,7 @@ HN_CONCIERGE_FAKE_JEV=1 bin/build   # dry run without an API key
 
 ## Deploying
 
-1. Push to GitHub and set repository secret `TYPESAFE_API_KEY`.
+1. Push to GitHub and set repository secret `TYPESAFE_AI_API_KEY`.
 2. Settings → Pages → Source: **GitHub Actions**.
 3. Run the "Build and publish" workflow once manually; afterwards it runs on the cron schedule.
 

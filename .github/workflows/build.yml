@@ -34,7 +34,7 @@ jobs:
 
       - name: Build site
         env:
-          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+          TYPESAFE_AI_API_KEY: ${{ secrets.TYPESAFE_AI_API_KEY }}
         run: bundle exec bin/build
 
       - uses: actions/upload-pages-artifact@v3

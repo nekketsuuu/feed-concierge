@@ -8,8 +8,8 @@ client =
   if ENV["HN_CONCIERGE_FAKE_JEV"]
     warn "HN_CONCIERGE_FAKE_JEV is set: using fake answers, no API calls"
     HnConcierge::FakeJevClient.new
-  elsif ENV["TYPESAFE_API_KEY"].to_s.empty?
-    abort "TYPESAFE_API_KEY is not set (or set HN_CONCIERGE_FAKE_JEV=1 for a dry run)"
+  elsif ENV["TYPESAFE_AI_API_KEY"].to_s.empty?
+    abort "TYPESAFE_AI_API_KEY is not set (or set HN_CONCIERGE_FAKE_JEV=1 for a dry run)"
   else
     HnConcierge::JevClient.new(model: HnConcierge.settings["model"])
   end
