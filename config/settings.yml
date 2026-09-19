@@ -235,7 +235,7 @@ sources:
     name: claude_blog
     url: https://claude.com/blog
     item_regex: '<div role="listitem"[^>]*>(?<block>(?:(?!role="listitem").)*?href="(?<href>/blog/[^"]+)")'
-    title_regex: '<h[23][^>]*>(?<title>[^<]+)</h[23]>'
+    title_regex: 'fs-list-field="heading"[^>]*>(?<title>[^<]+)<|<h[23][^>]*>(?<title>[^<]+)</h[23]>'
     max_age_days: 14
   - type: listing
     name: alignment_blog
