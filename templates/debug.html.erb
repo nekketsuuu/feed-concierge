@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= h(title) %> · debug</title>
+<style>
+  :root { color-scheme: light dark; --muted: #777; --bar-fill: #2a78d6; --bar-track: #cde2fb; }
+  @media (prefers-color-scheme: dark) { :root { --bar-fill: #3987e5; --bar-track: #0d366b; } }
+  body { font: 15px/1.45 system-ui, sans-serif; max-width: 860px; margin: 1.5rem auto; padding: 0 1rem; }
+  h1 { font-size: 1.1em; margin: 0; }
+  a { text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  /* Controls: sliders grouped by what they tune; the list re-ranks live. */
+  .panel { position: sticky; top: 0; background: Canvas; padding: .6rem 0 .4rem; border-bottom: 1px solid rgba(127,127,127,.3); z-index: 1; font-size: .8em; }
+  .panel-head { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+  .panel-head .summary { color: var(--muted); }
+  .panel details { margin-top: .3rem; }
+  .panel summary { cursor: pointer; color: var(--muted); }
+  .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: .2rem 1.2rem; margin-top: .3rem; }
+  .control { display: grid; grid-template-columns: 8.5em 1fr 3em; gap: .4rem; align-items: center; font-variant-numeric: tabular-nums; }
+  .control input { width: 100%; margin: 0; }
+  .control .val { text-align: right; }
+  button { font: inherit; font-size: .95em; padding: 0 .5em; }
+  /* List rows: rank, movement against the published page, then the article and its explain tree. */
+  ol { list-style: none; padding: 0; margin: 1rem 0; }
+  li { padding: .45rem 0; border-bottom: 1px solid rgba(127,127,127,.2); }
+  .row { display: grid; grid-template-columns: 2.5em 3em 1fr; gap: .5rem; align-items: baseline; }
+  .rank { color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+  .delta { font-size: .8em; font-variant-numeric: tabular-nums; }
+  .delta.up { color: #0a7a2f; } .delta.down { color: #b23a3a; } .delta.new { color: var(--bar-fill); }
+  .meta { color: var(--muted); font-size: .8em; margin-left: .5rem; white-space: nowrap; }
+  .dbg { margin: .35rem 0 .2rem 5.5em; font-size: .78em; color: var(--muted); }
+  .dbg span, .dbg div { font-variant-numeric: tabular-nums; }
+  .wf { display: flex; gap: 2px; height: 14px; margin: .25rem 0 .1rem; }
+  .wf-kept { background: var(--bar-fill); border-radius: 0 4px 4px 0; }
+  .wf-loss { background: var(--bar-track); border-radius: 0 4px 4px 0; }
+  .wf-legend { margin-top: .1rem; }
+  .wf-legend b { color: inherit; font-weight: 600; }
+  .node { margin-top: .4rem; padding-left: .6rem; border-left: 2px solid rgba(127,127,127,.25); }
+  .node .node { border-left: 0; padding-left: 0; margin-top: .25rem; }
+  .node-head { display: grid; grid-template-columns: 6em 120px auto; column-gap: .6rem; align-items: center; }
+  .node-head span:first-child { color: inherit; }
+  .node-how { margin: .1rem 0 0; }
+  .bar { position: relative; height: 11px; background: var(--bar-track); border-radius: 0 4px 4px 0; }
+  .node .node .bar { height: 7px; }
+  .bar i { display: block; height: 100%; background: var(--bar-fill); border-radius: 0 4px 4px 0; }
+  .curve { display: block; margin-top: .2rem; overflow: visible; }
+  .curve-axis { stroke: rgba(127,127,127,.35); stroke-width: 1; }
+  .curve-faint { fill: none; stroke: var(--bar-track); stroke-width: 2; stroke-linejoin: round; }
+  .curve-line { fill: none; stroke: var(--bar-fill); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .curve-dot { fill: var(--bar-fill); stroke: Canvas; stroke-width: 2; }
+  .curve-text { font-size: 9px; fill: var(--muted); }
+  .curve-end { text-anchor: end; }
+  .slots { margin: .2rem 0 0; }
+  .slots-bars, .slots-labels { display: flex; gap: 2px; }
+  .slot { height: 7px; background: var(--bar-track); border-radius: 0 4px 4px 0; overflow: hidden; }
+  .slot i { display: block; height: 100%; background: var(--bar-fill); border-radius: 0 4px 4px 0; }
+  .slot-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  footer { color: var(--muted); font-size: .75em; margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="panel-head">
+    <h1><a href="index.html"><%= h(title) %></a> · debug</h1>
+    <span class="summary" id="summary"></span>
+    <button id="reset" type="button">reset</button>
+  </div>
+  <details open><summary>freshness &amp; page</summary><div class="controls" id="controls-general"></div></details>
+  <details><summary>relevance weights</summary><div class="controls" id="controls-weights"></div></details>
+</div>
+<ol id="list"></ol>
+<footer>Generated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a></footer>
+<script type="application/json" id="debug-data"><%= debug_data %></script>
+<script>
+  // Re-ranks every candidate in the browser from its raw answers, so weights and the freshness
+  // curve can be tuned here before touching settings.yml. Movement is against the published page.
+  const data = JSON.parse(document.getElementById("debug-data").textContent);
+  const defaults = JSON.parse(JSON.stringify(data.config));
+  let config = JSON.parse(JSON.stringify(defaults));
+  const f = n => Number(n).toFixed(2);
+  const pct = v => `${Math.max(0, Math.min(1, v)) * 100}%`;
+  const days = h => `${Number.isInteger(h / 24) ? h / 24 : (h / 24).toFixed(1).replace(/\.0$/, "")}d`;
+  const dur = h => h < 48 ? `${Math.round(h)}h` : days(h);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const fillOf = value => { const i = el("i"); i.style.width = pct(value); return i; };
+  const flexRow = (cls, parts) => {
+    const row = el("div", cls);
+    for (const [width, node, title] of parts) { node.style.flexBasis = pct(width); node.style.flexShrink = "0"; if (title) node.title = title; row.appendChild(node); }
+    return row;
+  };
+
+  // --- scoring, mirroring lib/feed_concierge/ranker.rb ---
+  const fresh = (ageHours, halfLifeHours) => config.freshness.floor + (1 - config.freshness.floor) / (1 + Math.pow(ageHours / halfLifeHours, config.freshness.steepness));
+  const halfLifeOf = row => (config.freshness.half_life_days + config.freshness.bonus_days * row.evergreen) * 24;
+  const score = row => {
+    const weights = config.weights[row.question_set];
+    const components = row.components.map(c => ({ ...c, weight: weights[c.id], contribution: weights[c.id] * c.value }));
+    const relevance = components.reduce((s, c) => s + c.contribution, 0);
+    const freshness = fresh(row.age_hours, halfLifeOf(row));
+    return { row, components, relevance, freshness, score: relevance * freshness };
+  };
+  const page = () => {
+    const scored = data.rows.map(score).filter(x => x.score >= config.min_score).sort((a, b) => b.score - a.score);
+    const seen = new Set(), perSource = {}, out = [];
+    for (const x of scored) {
+      if (seen.has(x.row.dedup_key)) continue;
+      const cap = config.max_per_source[x.row.source];
+      if (cap != null && (perSource[x.row.source] || 0) >= cap) continue;
+      seen.add(x.row.dedup_key); perSource[x.row.source] = (perSource[x.row.source] || 0) + 1;
+      out.push(x);
+      if (out.length >= config.top_n) break;
+    }
+    return out;
+  };
+
+  // --- explain tree (same drawing as before) ---
+  const waterfall = x => {
+    let running = 1, parts = [], notes = [];
+    for (const [name, factor] of [["relevance", x.relevance], ["freshness", x.freshness]]) { const loss = running * (1 - factor); parts.push([loss, el("div", "wf-loss"), `${name} removed ${f(loss)}`]); notes.push(`−${f(loss)} ${name}`); running *= factor; }
+    parts.unshift([running, el("div", "wf-kept"), `score ${f(running)}`]);
+    const wrap = el("div"); wrap.appendChild(flexRow("wf", parts));
+    const legend = el("div", "wf-legend"); legend.appendChild(el("b", null, `score ${f(running)}`)); legend.appendChild(el("span", null, ` · ${notes.join(" · ")}`)); wrap.appendChild(legend);
+    return wrap;
+  };
+  const node = (name, value, how) => {
+    const n = el("div", "node");
+    const head = el("div", "node-head"); head.appendChild(el("span", null, name));
+    const b = el("div", "bar"); b.title = f(value); b.appendChild(fillOf(value)); head.appendChild(b); head.appendChild(el("span", null, f(value)));
+    n.appendChild(head); if (how) n.appendChild(el("div", "node-how", how));
+    return n;
+  };
+  const curve = x => {
+    const W = 220, H = 44, PAD = 6, DAYS = 14, ns = "http://www.w3.org/2000/svg";
+    const hl = halfLifeOf(x.row), base = config.freshness.half_life_days * 24;
+    const px = h => PAD + (Math.min(h, DAYS * 24) / (DAYS * 24)) * (W - 2 * PAD);
+    const py = v => PAD + (1 - v) * (H - 2 * PAD);
+    const path = h0 => Array.from({ length: 57 }, (_, i) => { const h = i * DAYS * 24 / 56; return `${i ? "L" : "M"}${px(h).toFixed(1)},${py(fresh(h, h0)).toFixed(1)}`; }).join(" ");
+    const svg = document.createElementNS(ns, "svg"); svg.setAttribute("class", "curve"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("width", W); svg.setAttribute("height", H);
+    const add = (tag, attrs) => { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); svg.appendChild(e); return e; };
+    add("line", { x1: PAD, x2: W - PAD, y1: py(0), y2: py(0), class: "curve-axis" });
+    add("line", { x1: px(hl), x2: px(hl), y1: py(0), y2: py(1), class: "curve-axis" });
+    add("path", { d: path(base), class: "curve-faint" });
+    add("path", { d: path(hl), class: "curve-line" });
+    add("circle", { cx: px(x.row.age_hours), cy: py(fresh(x.row.age_hours, hl)), r: 4, class: "curve-dot" });
+    add("text", { x: px(hl) + 3, y: py(0) - 3, class: "curve-text" }).textContent = `half-life ${days(hl)}`;
+    add("text", { x: W - PAD, y: py(0) - 3, class: "curve-text curve-end" }).textContent = `${DAYS}d`;
+    return svg;
+  };
+  const slotBar = x => {
+    const bars = [], labels = [];
+    for (const c of x.components) {
+      const probs = x.row.choices[`${c.id}_probabilities`];
+      const title = probs ? `${c.id}: ` + Object.entries(probs).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([o, p]) => `${o} ${f(p)}`).join(", ") : `${c.id}: answer ${f(c.value)}, weight ${c.weight}`;
+      const slot = el("div", "slot"); slot.appendChild(fillOf(c.value));
+      bars.push([c.weight, slot, title]); labels.push([c.weight, el("div", "slot-label", `${c.id} ${f(c.value)}`), title]);
+    }
+    const wrap = el("div", "slots"); wrap.appendChild(flexRow("slots-bars", bars)); wrap.appendChild(flexRow("slots-labels", labels));
+    return wrap;
+  };
+  const explain = x => {
+    const fr = config.freshness, hl = halfLifeOf(x.row), base = fr.half_life_days * 24, bonus = fr.bonus_days * 24;
+    const box = el("div", "dbg");
+    box.appendChild(waterfall(x));
+    const rel = node("relevance", x.relevance, "Σ weight × answer"); rel.appendChild(slotBar(x)); box.appendChild(rel);
+    const fn = node("freshness", x.freshness, `age ${dur(x.row.age_hours)} · half-life ${days(hl)} = ${days(base)} + ${days(bonus)} × evergreen`);
+    fn.appendChild(curve(x));
+    fn.appendChild(node("evergreen", x.row.evergreen, `adds ${days(bonus * x.row.evergreen)} to the ${days(base)} half-life · freshness without it ${f(fresh(x.row.age_hours, base))}, fully evergreen ${f(fresh(x.row.age_hours, base + bonus))}`));
+    box.appendChild(fn);
+    return box;
+  };
+
+  // --- list ---
+  const render = () => {
+    const list = document.getElementById("list"); list.textContent = "";
+    const rows = page();
+    rows.forEach((x, i) => {
+      const li = el("li");
+      const row = el("div", "row");
+      row.appendChild(el("span", "rank", String(i + 1)));
+      const before = x.row.baseline_rank, move = before == null ? "new" : before - (i + 1);
+      const delta = el("span", "delta " + (move === "new" ? "new" : move > 0 ? "up" : move < 0 ? "down" : ""), move === "new" ? "new" : move > 0 ? `▲${move}` : move < 0 ? `▼${-move}` : "–");
+      delta.title = before == null ? "not on the published page" : `published rank ${before}`;
+      row.appendChild(delta);
+      const body = el("span"); const a = el("a", null, x.row.title); a.href = x.row.url; body.appendChild(a);
+      body.appendChild(el("span", "meta", `${x.row.domain || ""} · ${x.row.date} · ${x.row.source}`));
+      row.appendChild(body); li.appendChild(row); li.appendChild(explain(x)); list.appendChild(li);
+    });
+    const dropped = data.rows.filter(r => r.baseline_rank != null && !rows.some(x => x.row.id === r.id)).length;
+    document.getElementById("summary").textContent = `${rows.length} shown of ${data.rows.length} candidates · ${dropped} left the page · ${rows.filter(x => x.row.baseline_rank == null).length} entered`;
+  };
+
+  // --- controls ---
+  const control = (parent, label, get, set, min, max, step) => {
+    const c = el("div", "control"); c.appendChild(el("span", null, label));
+    const input = el("input"); input.type = "range"; input.min = min; input.max = max; input.step = step; input.value = get();
+    const val = el("span", "val", String(get()));
+    input.addEventListener("input", () => { set(Number(input.value)); val.textContent = input.value; render(); });
+    c.appendChild(input); c.appendChild(val); parent.appendChild(c);
+  };
+  const buildControls = () => {
+    const general = document.getElementById("controls-general"), weights = document.getElementById("controls-weights");
+    general.textContent = ""; weights.textContent = "";
+    control(general, "half-life (d)", () => config.freshness.half_life_days, v => config.freshness.half_life_days = v, 0.5, 21, 0.5);
+    control(general, "evergreen bonus (d)", () => config.freshness.bonus_days, v => config.freshness.bonus_days = v, 0, 14, 0.5);
+    control(general, "floor", () => config.freshness.floor, v => config.freshness.floor = v, 0, 0.9, 0.05);
+    control(general, "steepness", () => config.freshness.steepness, v => config.freshness.steepness = v, 1, 4, 0.5);
+    control(general, "min score", () => config.min_score, v => config.min_score = v, 0, 0.9, 0.05);
+    control(general, "top n", () => config.top_n, v => config.top_n = v, 10, 300, 10);
+    for (const [set, ws] of Object.entries(config.weights)) {
+      for (const id of Object.keys(ws)) control(weights, `${set} / ${id}`, () => config.weights[set][id], v => config.weights[set][id] = v, 0, 1, 0.05);
+    }
+  };
+  document.getElementById("reset").addEventListener("click", () => { config = JSON.parse(JSON.stringify(defaults)); buildControls(); render(); });
+  buildControls(); render();
+</script>
+</body>
+</html>

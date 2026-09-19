@@ -23,10 +23,12 @@ module FeedConcierge
       judge_all(pending)
 
       @store.prune!(retention_days: @settings["retention_days"])
-      ranked = Ranker.new(@settings["ranking"]).rank(@store)
+      ranker = Ranker.new(@settings["ranking"])
+      candidates = ranker.candidates(@store)
+      ranked = ranker.page_from(candidates)
       site = Site.new(@output_dir, site: @settings.fetch("site"), tag_config: @settings.fetch("tags"),
                                    ranking_config: @settings.fetch("ranking"))
-      site.build(ranked, generated_at: Time.now, judged_count: @store.each_article.size)
+      site.build(ranked, candidates: candidates, generated_at: Time.now, judged_count: @store.each_article.size)
       @store.save
       @log.puts "ranked #{ranked.size} articles -> #{@output_dir}"
       ranked

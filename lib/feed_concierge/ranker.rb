@@ -12,12 +12,23 @@ module FeedConcierge
     end
 
     def rank(store)
-      ranked = store.each_article.map { |article, entry| evaluate(article, entry) }
-      ranked.select { |r| r.relevance >= @config["min_relevance"] && r.score >= @config["min_score"] }
-            .sort_by { |r| -r.score }
-            .uniq { |r| r.article.dedup_key }
-            .then { |list| cap_per_source(list) }
-            .first(@config["top_n"])
+      page_from(candidates(store))
+    end
+
+    # Every judged article that clears min_relevance, best first; the debug page re-ranks these.
+    def candidates(store)
+      store.each_article.map { |article, entry| evaluate(article, entry) }
+           .select { |r| r.relevance >= @config["min_relevance"] }
+           .sort_by { |r| -r.score }
+    end
+
+    # Applies the page rules to sorted candidates: score threshold, one entry per CVE or URL,
+    # per-source caps, and the overall cap.
+    def page_from(candidates)
+      candidates.select { |r| r.score >= @config["min_score"] }
+                .uniq { |r| r.article.dedup_key }
+                .then { |list| cap_per_source(list) }
+                .first(@config["top_n"])
     end
 
     def evaluate(article, entry)

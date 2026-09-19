@@ -27,8 +27,9 @@ The page lists every article with `score >= min_score`, newest-scored first, up 
 
 Judgments are cached in `data/scores.json` for `retention_days`, so each article costs one Jev
 request per retention window; after that it is forgotten.
-Changing weights only needs `bin/regenerate`. Open the page with `?debug=1` (linked in the footer)
-to see each article's ranking factors; the data is embedded in the page so it also works from file://.
+Changing weights only needs `bin/regenerate`. `site/debug.html` (linked in the footer) explains every
+candidate's score and has sliders for the weights and the freshness curve that re-rank the list in the
+browser; the data is embedded in the page so it also works from file://.
 
 ## Running locally
 

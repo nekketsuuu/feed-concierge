@@ -7,11 +7,13 @@ require_relative "../lib/feed_concierge"
 
 store = FeedConcierge::Store.new(ENV.fetch("FEED_CONCIERGE_STORE", File.join(FeedConcierge::ROOT, "data", "scores.json")))
 output_dir = ENV.fetch("FEED_CONCIERGE_OUTPUT", File.join(FeedConcierge::ROOT, "site"))
-ranked = FeedConcierge::Ranker.new(FeedConcierge.settings["ranking"]).rank(store)
+ranker = FeedConcierge::Ranker.new(FeedConcierge.settings["ranking"])
+candidates = ranker.candidates(store)
+ranked = ranker.page_from(candidates)
 settings = FeedConcierge.settings
 site = FeedConcierge::Site.new(output_dir, site: settings.fetch("site"), tag_config: settings.fetch("tags"),
                                            ranking_config: settings.fetch("ranking"))
-site.build(ranked, generated_at: Time.now, judged_count: store.each_article.size)
+site.build(ranked, candidates: candidates, generated_at: Time.now, judged_count: store.each_article.size)
 ranked.each_with_index do |r, i|
   puts format("%2d %.3f rel=%.2f fresh=%.2f  %s", i + 1, r.score, r.relevance, r.freshness, r.article.title)
 end
