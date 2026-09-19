@@ -23,7 +23,7 @@ module FeedConcierge
       relevance = relevance_of(j)
       age_hours = [(@now - article.published_at) / 3600.0, 0].max
       freshness = freshness_of(age_hours, evergreen: j["evergreen"].to_f)
-      exposure = @config["exposure_decay"]**entry["shown_count"].to_i
+      exposure = exposure_of(entry)
       Ranked.new(article: article, entry: entry, relevance: relevance, freshness: freshness,
                  exposure: exposure, score: relevance * freshness * exposure, age_hours: age_hours)
     end
@@ -44,6 +44,13 @@ module FeedConcierge
     def relevance_of(j)
       weights = @config["weights"].fetch(j["question_set"] || "default")
       weights.sum { |id, w| w * Judge.normalize(j, id, choice_weights: @config["choice_weights"] || {}) }
+    end
+
+    # Halves every exposure_half_life_days after the article first appeared on the page.
+    def exposure_of(entry)
+      first_shown = entry["first_shown_at"] or return 1.0
+      days_shown = [(@now - Time.parse(first_shown)) / 86_400.0, 0].max
+      0.5**(days_shown / @config["exposure_half_life_days"])
     end
 
     def freshness_of(age_hours, evergreen:)

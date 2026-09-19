@@ -59,6 +59,9 @@ sources:
     excerpt: false
     questions: pull_request
 
+# Articles are forgotten (judgment and exposure) this many days after they were first seen.
+retention_days: 10
+
 model: jev-latest
 concurrency: 6
 
@@ -116,8 +119,8 @@ ranking:
     half_life_hours: 18
     evergreen_half_life_bonus_hours: 30
     floor: 0.25
-  # Each build in which an article appeared in the top list multiplies its score by this factor.
-  exposure_decay: 0.85
+  # Once an article has appeared on the page, its score halves every this many days.
+  exposure_half_life_days: 5
   top_n: 40
   # Optional per-source caps so one busy source cannot fill the page.
   max_per_source:

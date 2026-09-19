@@ -20,7 +20,7 @@ module FeedConcierge
       articles.each { |a| @store.refresh_stats(a) }
       judge_all(pending)
 
-      @store.prune!
+      @store.prune!(retention_days: @settings["retention_days"])
       ranked = Ranker.new(@settings["ranking"]).rank(@store)
       Site.new(@output_dir, title: @settings.dig("site", "title"), repository_url: @settings.dig("site", "repository_url"), tag_config: @settings.fetch("tags")).build(
         ranked, generated_at: Time.now, judged_count: @store.each_article.size
