@@ -209,6 +209,50 @@ sources:
     feeds:
       - https://rubyflow.com/rss
     max_age_days: 14
+  - type: listing
+    name: anthropic_news
+    require_date: true
+    url: https://www.anthropic.com/news
+    item_regex: '<a [^>]*href="(?<href>/news/[^"]+)"[^>]*>(?<block>.*?)</a>'
+    title_regex: '</div>\s*<span[^>]*>\s*(?<title>[^<]+)</span>'
+    max_age_days: 14
+  - type: listing
+    name: anthropic_research
+    require_date: true
+    url: https://www.anthropic.com/research
+    item_regex: '<a [^>]*href="(?<href>/research/[^"]+)"[^>]*>(?<block>.*?)</a>'
+    title_regex: '</div>\s*<span[^>]*>\s*(?<title>[^<]+)</span>'
+    max_age_days: 14
+  - type: listing
+    name: anthropic_engineering
+    require_date: true
+    url: https://www.anthropic.com/engineering
+    item_regex: '<article[^>]*>\s*<a [^>]*href="(?<href>/engineering/[^"]+)"[^>]*>(?<block>.*?)</a>'
+    title_regex: '<h[23][^>]*>(?<title>[^<]+)</h[23]>'
+    summary_regex: '<p[^>]*>(?<summary>[^<]+)</p>'
+    max_age_days: 14
+  - type: listing
+    name: claude_blog
+    url: https://claude.com/blog
+    item_regex: '<div role="listitem"[^>]*>(?<block>(?:(?!role="listitem").)*?href="(?<href>/blog/[^"]+)")'
+    title_regex: '<h[23][^>]*>(?<title>[^<]+)</h[23]>'
+    max_age_days: 14
+  - type: listing
+    name: alignment_blog
+    url: https://alignment.anthropic.com/
+    item_regex: '<a (?=[^>]*class="paper")[^>]*href="(?<href>[^"]+)"[^>]*>(?<block>.*?)</a>'
+    title_regex: '<h3>(?<title>[^<]+)</h3>'
+    summary_regex: '<div class="description">(?<summary>.*?)</div>'
+    # The index only prints a month heading per group, so posts carry the first of that month.
+    date_regex: '<div class="date">(?<date>[^<]+)</div>'
+    date_before: true
+    max_age_days: 40
+    excerpt: false
+  - type: rss
+    name: transformer_circuits
+    feeds:
+      - https://transformer-circuits.pub/feed.xml
+    max_age_days: 30
 
 # Articles are forgotten this many days after they were first seen.
 retention_days: 10

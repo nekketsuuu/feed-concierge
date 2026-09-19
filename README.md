@@ -45,4 +45,6 @@ Click the "debug" link at the bottom of the page.
 
 - `config/profile.md`: describe what you like and dislike. This is the "prompt".
 - `config/settings.yml`: sources, weights, freshness half-life, retention, score threshold and cap, per-source caps.
+  Sites without a feed (anthropic.com, claude.com, the Alignment Science Blog) use the `listing` type, which
+  scrapes an index page with regexes given in the config; items without a date are dated when first seen.
 - `lib/feed_concierge/judge.rb`: question wording and Score levels. Jev reads literally, so describe concrete situations per level rather than degrees.

@@ -29,6 +29,7 @@ module FeedConcierge
     def remember(article, judgment:, excerpt_used:)
       entry = (@entries[article.id] ||= { "first_seen_at" => Time.now.utc.iso8601 })
       entry["article"] = article.to_h.transform_keys(&:to_s)
+      entry["article"]["published_at"] ||= entry["first_seen_at"]
       entry["judgment"] = judgment
       entry["judged_at"] = Time.now.utc.iso8601
       entry["excerpt_used"] = excerpt_used
@@ -37,8 +38,8 @@ module FeedConcierge
     def refresh_stats(article)
       entry = @entries[article.id] or return
       entry["article"].merge!("title" => article.title, "tags" => article.tags,
-                              "points" => article.points, "comment_count" => article.comment_count,
-                              "published_at" => article.published_at.iso8601)
+                              "points" => article.points, "comment_count" => article.comment_count)
+      entry["article"]["published_at"] = article.published_at.iso8601 if article.published_at
     end
 
     def each_article

@@ -13,7 +13,10 @@ module FeedConcierge
       return value if value.is_a?(Time)
 
       text = value.to_s.strip
-      text.match?(ZONE_SUFFIX) ? Time.parse(text) : Time.parse("#{text} UTC")
+      return Time.parse(text) if text.match?(ZONE_SUFFIX)
+
+      local = Time.parse(text)
+      Time.utc(local.year, local.month, local.day, local.hour, local.min, local.sec)
     end
   end
 end
