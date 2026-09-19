@@ -41,6 +41,19 @@ module FeedConcierge
       }
     end
 
+    # Ranking factors embedded in the page for ?debug=1, since browsers refuse fetch() on file:// pages.
+    def debug_json(ranked)
+      rows = ranked.map do |item|
+        choices = item.entry["judgment"].select { |k, _| k.end_with?("_probabilities") }
+        { id: item.article.id, source: item.article.source, question_set: item.entry.dig("judgment", "question_set"),
+          age_hours: item.age_hours.round, score: item.score.round(3), relevance: item.relevance.round(3),
+          freshness: item.freshness.round(3), exposure: item.exposure.round(3),
+          components: item.components.map { |c| c.transform_values { |v| v.is_a?(Float) ? v.round(3) : v } },
+          choices: choices }
+      end
+      JSON.generate(rows).gsub("</", "<\/")
+    end
+
     def h(text) = ERB::Util.html_escape(text)
 
     def tags_for(item)

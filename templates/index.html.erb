@@ -41,8 +41,9 @@
 <%- end -%>
 </ul>
 <footer>Updated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a> · <a href="?debug=1">debug</a></footer>
+<script type="application/json" id="debug-data"><%= debug_json(ranked) %></script>
 <script>
-  // ?debug=1 loads data.json and draws the ranking factors of every article.
+  // ?debug=1 draws the ranking factors of every article from the embedded JSON above.
   if (new URLSearchParams(location.search).get("debug")) {
     const f = n => Number(n).toFixed(2);
     const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -62,7 +63,7 @@
       const bars = el("div", "slots-bars"), labels = el("div", "slots-labels");
       for (const c of components) {
         const slot = el("div", "slot"); slot.style.flexBasis = `${c.weight * 100}%`;
-        const probs = judgment[`${c.id}_probabilities`];
+        const probs = judgment.choices[`${c.id}_probabilities`];
         slot.title = probs
           ? `${c.id}: ${Object.entries(probs).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([o, p]) => `${o} ${f(p)}`).join(", ")}`
           : `${c.id}: ${f(c.value)} of weight ${c.weight}`;
@@ -73,18 +74,19 @@
       wrap.appendChild(bars); wrap.appendChild(labels);
       return wrap;
     };
-    fetch("data.json").then(r => r.json()).then(rows => {
+    {
+      const rows = JSON.parse(document.getElementById("debug-data").textContent);
       for (const row of rows) {
         const li = document.querySelector(`li[data-id="${CSS.escape(row.id)}"]`);
         if (!li) continue;
         const box = el("div", "dbg");
-        box.appendChild(el("div", null, `${row.source} · ${row.judgment.question_set} · ${Math.round(row.age_hours)}h · score ${f(row.score)}`));
+        box.appendChild(el("div", null, `${row.source} · ${row.question_set} · ${row.age_hours}h · score ${f(row.score)}`));
         box.appendChild(factorRows([["relevance", row.relevance], ["freshness", row.freshness], ["exposure", row.exposure]]));
         box.appendChild(el("div", "dbg-h", "relevance by question (slot width = weight, fill = answer)"));
-        box.appendChild(slotBar(row.components, row.judgment));
+        box.appendChild(slotBar(row.components, row));
         li.appendChild(box);
       }
-    });
+    }
   }
 </script>
 </body>
