@@ -58,7 +58,7 @@ module FeedConcierge
         Article.new(
           id: "#{@name}:#{pr["number"]}",
           source: @name,
-          title: "##{pr["number"]} #{pr["title"].to_s.strip}",
+          title: "#{@repo}##{pr["number"]} #{pr["title"].to_s.strip}",
           url: pr["html_url"],
           author: pr.dig("user", "login"),
           published_at: Time.parse(pr["merged_at"]),
