@@ -86,6 +86,14 @@ sources:
     max_age_days: 14
     excerpt: false
     questions: advisory
+  - type: rss
+    name: aws_security_bulletins
+    feeds:
+      - https://aws.amazon.com/security/security-bulletins/rss/feed/
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+    questions: advisory
   - type: github_advisories
     name: github_advisories
     ecosystems: [rubygems, npm, pip]
@@ -260,7 +268,8 @@ ranking:
       language_runtime_or_package: 1.0
       library_dependency: 1.0
       server_software: 0.9
-      cloud_or_dev_tooling: 0.8
+      cloud_platform: 1.0
+      dev_tooling: 0.7
       network_appliance: 0.2
       enterprise_or_consumer_product: 0.1
     pr_kind:
@@ -277,6 +286,11 @@ ranking:
     evergreen_half_life_bonus_hours: 48
     steepness: 2
     floor: 0.25
+    # Per question set overrides of the keys above.
+    by_question_set:
+      advisory:
+        half_life_hours: 240
+        floor: 0.4
   # Once an article has appeared on the page, its score halves every this many days.
   exposure_half_life_days: 5
   # The page lists every article whose score reaches min_score, up to top_n of them.
@@ -289,6 +303,7 @@ ranking:
     cisa_kev: 8
     jpcert_weekly: 8
     github_advisories: 8
+    aws_security_bulletins: 8
     bleepingcomputer: 8
   # Articles below this relevance never make the page even when fresh.
   min_relevance: 0.2

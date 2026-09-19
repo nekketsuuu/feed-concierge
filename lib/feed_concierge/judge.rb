@@ -13,7 +13,7 @@ module FeedConcierge
     # Bump when questions change so cached judgments are redone on the next build.
     VERSION = 4
     # Bump one set's version to re-judge only the sources that use it (wording changes).
-    SET_VERSIONS = { "advisory" => 2 }.freeze
+    SET_VERSIONS = { "advisory" => 3 }.freeze
 
     INTEREST_LEVELS = [
       "The article is about a topic the reader profile explicitly says they are not interested in, or is unrelated to anything in the profile.",
@@ -69,7 +69,8 @@ module FeedConcierge
       language_runtime_or_package: "A programming language runtime or a package from a language ecosystem such as a gem, npm package, or PyPI package.",
       library_dependency: "A general-purpose library that applications link or embed, such as image, media, compression, TLS, XML, or database client libraries.",
       server_software: "A database, cache, web server, message broker, mail server, or other server software that applications run alongside.",
-      cloud_or_dev_tooling: "A cloud service, container or orchestration tool, CI system, source hosting, editor, or other developer tooling.",
+      cloud_platform: "A cloud provider's service, agent, SDK, or managed runtime that production workloads run on, such as compute, storage, database, identity, or fleet-management services.",
+      dev_tooling: "A container or orchestration tool, CI system, source hosting, editor, coding agent, or other developer tooling.",
       network_appliance: "A router, firewall, VPN gateway, email gateway, or other network appliance.",
       enterprise_or_consumer_product: "An enterprise application, industrial or medical system, consumer device, or mobile phone firmware."
     }.freeze

@@ -27,6 +27,13 @@ module FeedConcierge
       url
     end
 
+    # The same vulnerability reported by several sources collapses onto its CVE ids;
+    # everything else falls back to the canonical URL.
+    def dedup_key
+      cves = title.scan(/CVE-\d{4}-\d{4,}/i).map(&:upcase).uniq.sort
+      cves.empty? ? canonical_url : "cve:#{cves.join('+')}"
+    end
+
     def to_h
       super.merge(published_at: published_at.iso8601)
     end

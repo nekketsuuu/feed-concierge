@@ -8,8 +8,8 @@ and publishes the ranked list to GitHub Pages.
 
 Every article is judged once by Jev with a question set chosen per source
 (`questions:` in `config/settings.yml`, see `lib/feed_concierge/judge.rb`). The reader
-profile from `config/profile.md` is part of the state. CISA KEV entries, JPCERT/CC weekly report items, and GitHub
-security advisories (rubygems, npm, pip) use the `advisory` set, which asks whether the reader's stack is affected and
+profile from `config/profile.md` is part of the state. CISA KEV entries, JPCERT/CC weekly report items, AWS security
+bulletins, and GitHub security advisories (rubygems, npm, pip) use the `advisory` set, which asks whether the reader's stack is affected and
 what kind of component it is, instead of rating interest and substance of the prose.
 
 Every request also carries one Noul per tag in `config/tags.yml`.
@@ -25,6 +25,9 @@ freshness = floor + (1 - floor) / (1 + (age_hours / half_life)^steepness)   # ha
 exposure  = 0.5 ^ (days since first shown on the page / exposure_half_life_days)
 score     = relevance * freshness * exposure
 ```
+
+Articles reporting the same CVE ids collapse into the best-scoring one. `freshness.by_question_set`
+overrides the curve per question set, so advisories decay more slowly than news.
 
 The page lists every article with `score >= min_score`, newest-scored first, up to `top_n`.
 

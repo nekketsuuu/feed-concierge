@@ -15,7 +15,7 @@ module FeedConcierge
       ranked = store.each_article.map { |article, entry| evaluate(article, entry) }
       ranked.select { |r| r.relevance >= @config["min_relevance"] && r.score >= @config["min_score"] }
             .sort_by { |r| -r.score }
-            .uniq { |r| r.article.canonical_url }
+            .uniq { |r| r.article.dedup_key }
             .then { |list| cap_per_source(list) }
             .first(@config["top_n"])
     end
@@ -24,7 +24,7 @@ module FeedConcierge
       j = entry["judgment"]
       relevance = relevance_of(j)
       age_hours = [(@now - article.published_at) / 3600.0, 0].max
-      freshness = freshness_of(age_hours, evergreen: j["evergreen"].to_f)
+      freshness = freshness_of(age_hours, evergreen: j["evergreen"].to_f, question_set: j["question_set"])
       exposure = exposure_of(entry)
       Ranked.new(article: article, entry: entry, relevance: relevance, freshness: freshness,
                  exposure: exposure, score: relevance * freshness * exposure, age_hours: age_hours)
@@ -56,9 +56,10 @@ module FeedConcierge
     end
 
     # A logistic curve in age: flat for the first day or so, halfway down at half_life_hours,
-    # then a long tail. Evergreen articles get a longer half-life.
-    def freshness_of(age_hours, evergreen:)
-      f = @config["freshness"]
+    # then a long tail. Evergreen articles get a longer half-life, and a question set can
+    # override the curve (advisories stay actionable longer than news).
+    def freshness_of(age_hours, evergreen:, question_set: nil)
+      f = @config["freshness"].merge(@config["freshness"].dig("by_question_set", question_set) || {})
       half_life = f["half_life_hours"] + (f["evergreen_half_life_bonus_hours"] * evergreen)
       f["floor"] + ((1 - f["floor"]) / (1 + ((age_hours / half_life)**f["steepness"])))
     end
