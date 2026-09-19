@@ -6,10 +6,9 @@ module FeedConcierge
   class Site
     TEMPLATE = File.join(ROOT, "templates", "index.html.erb")
 
-    def initialize(output_dir, title:, source_labels: {})
+    def initialize(output_dir, title:)
       @output_dir = output_dir
       @title = title
-      @source_labels = source_labels
     end
 
     def build(ranked, generated_at:, judged_count:)
@@ -22,7 +21,6 @@ module FeedConcierge
 
     def render(ranked, generated_at, judged_count)
       title = @title
-      source_labels = @source_labels
       ERB.new(File.read(TEMPLATE), trim_mode: "-").result(binding)
     end
 
@@ -37,10 +35,5 @@ module FeedConcierge
 
     def h(text) = ERB::Util.html_escape(text)
 
-    def age_label(hours)
-      hours < 1 ? "#{(hours * 60).round}m" : hours < 48 ? "#{hours.round}h" : "#{(hours / 24).round}d"
-    end
-
-    def pct(value) = "#{(value.to_f * 100).round}%"
   end
 end

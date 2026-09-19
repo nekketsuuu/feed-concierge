@@ -128,14 +128,3 @@ ranking:
 
 site:
   title: "Feed Concierge"
-  source_labels:
-    hacker_news: HN
-    lobsters: Lobsters
-    lwn: LWN
-    phoronix: Phoronix
-    ruby_bugs: ruby-bugs
-    github_changelog: GitHub
-    aws_whats_new: AWS
-    cloudflare_changelog: Cloudflare
-    fastly_changelog: Fastly
-    rails_prs: rails PR

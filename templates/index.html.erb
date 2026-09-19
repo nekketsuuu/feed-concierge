@@ -5,50 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><%= h(title) %></title>
 <style>
-  :root { color-scheme: light dark; --muted: #777; --bar: #6b8e23; --bg-card: rgba(127,127,127,.08); }
-  body { font: 15px/1.5 system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
-  header { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
-  header p { color: var(--muted); margin: 0; font-size: .85em; }
-  ol { list-style: none; padding: 0; margin: 1.5rem 0; }
-  li { padding: .8rem 1rem; margin-bottom: .6rem; border-radius: 8px; background: var(--bg-card); }
-  li h2 { font-size: 1.05em; margin: 0 0 .25rem; }
-  li h2 a { text-decoration: none; }
-  li h2 a:hover { text-decoration: underline; }
-  .meta { font-size: .8em; color: var(--muted); display: flex; gap: .8rem; flex-wrap: wrap; }
-  .meta a { color: inherit; }
-  .source { font-weight: 600; }
-  .bars { display: flex; gap: .8rem; margin-top: .4rem; font-size: .75em; color: var(--muted); }
-  .bar { display: inline-block; width: 60px; height: 6px; background: rgba(127,127,127,.25); border-radius: 3px; vertical-align: middle; margin-left: .3rem; }
-  .bar span { display: block; height: 100%; background: var(--bar); border-radius: 3px; }
-  footer { color: var(--muted); font-size: .8em; margin-top: 2rem; }
+  :root { color-scheme: light dark; --muted: #777; }
+  body { font: 16px/1.45 system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+  h1 { font-size: 1.2em; margin: 0; }
+  header p { color: var(--muted); margin: .2rem 0 0; font-size: .8em; }
+  ul { list-style: none; padding: 0; margin: 1.2rem 0; }
+  li { padding: .45rem 0; border-bottom: 1px solid rgba(127,127,127,.2); }
+  li a { text-decoration: none; }
+  li a:hover { text-decoration: underline; }
+  .meta { color: var(--muted); font-size: .8em; margin-left: .5rem; white-space: nowrap; }
+  footer { color: var(--muted); font-size: .75em; margin-top: 1.5rem; }
 </style>
 </head>
 <body>
 <header>
   <h1><%= h(title) %></h1>
-  <p>Updated <%= generated_at.utc.strftime("%Y-%m-%d %H:%M UTC") %> · <%= ranked.size %> shown of <%= judged_count %> judged</p>
+  <p>Updated <time datetime="<%= generated_at.utc.iso8601 %>"><%= generated_at.utc.strftime("%Y-%m-%d %H:%M UTC") %></time></p>
 </header>
-<ol>
-<%- ranked.each_with_index do |r, i| -%>
-  <li>
-    <h2><%= i + 1 %>. <a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a></h2>
-    <div class="meta">
-      <span class="source"><%= h(source_labels.fetch(r.article.source, r.article.source)) %></span>
-      <span><%= h(r.article.domain) %></span>
-      <%- if r.article.points -%><span><%= r.article.points %> pts</span><%- end -%>
-      <%- if r.article.comments_url -%><a href="<%= h(r.article.comments_url) %>"><%= r.article.comment_count %> comments</a><%- end -%>
-      <span><%= age_label(r.age_hours) %> ago</span>
-      <span>score <%= r.score.round(3) %></span>
-    </div>
-    <div class="bars">
-      <span title="interest / substance / worth_reading">relevance<i class="bar"><span style="width:<%= pct(r.relevance) %>"></span></i> <%= pct(r.relevance) %></span>
-      <span>fresh<i class="bar"><span style="width:<%= pct(r.freshness) %>"></span></i> <%= pct(r.freshness) %></span>
-      <span>evergreen<i class="bar"><span style="width:<%= pct(r.entry.dig("judgment", "evergreen")) %>"></span></i> <%= pct(r.entry.dig("judgment", "evergreen")) %></span>
-      <%- if r.exposure < 1 -%><span>seen ×<%= r.entry["shown_count"] %></span><%- end -%>
-    </div>
-  </li>
+<ul>
+<%- ranked.each do |r| -%>
+  <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= r.article.published_at.utc.iso8601 %>"><%= r.article.published_at.utc.strftime("%m-%d %H:%M") %></time></span></li>
 <%- end -%>
-</ol>
-<footer>Ranked by <a href="https://typesafe.ai/">TypeSafe Jev</a>. Raw scores: <a href="data.json">data.json</a>.</footer>
+</ul>
+<footer><a href="data.json">data.json</a></footer>
+<script>
+  for (const t of document.querySelectorAll("time")) {
+    const d = new Date(t.dateTime);
+    const pad = n => String(n).padStart(2, "0");
+    t.textContent = `${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+</script>
 </body>
 </html>
