@@ -82,7 +82,7 @@
         const box = el("div", "dbg");
         box.appendChild(el("div", null, `${row.source} · ${row.question_set} · ${row.age_hours}h`));
         box.appendChild(factorRows([["score", row.score], ["relevance", row.relevance], ["freshness", row.freshness], ["exposure", row.exposure]]));
-        box.appendChild(el("div", "dbg-h", "relevance by question (slot width = weight, fill = answer)"));
+        box.appendChild(el("div", "dbg-h", "relevance by question"));
         box.appendChild(slotBar(row.components, row));
         li.appendChild(box);
       }
