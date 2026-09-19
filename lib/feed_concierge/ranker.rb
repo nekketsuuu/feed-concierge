@@ -31,6 +31,26 @@ module FeedConcierge
                  exposure: exposure, score: relevance * freshness * exposure, age_hours: age_hours)
     end
 
+    # How freshness and exposure were derived, plus what-if values, for the debug view.
+    def explain(item)
+      f = @config["freshness"]
+      evergreen = item.entry.dig("judgment", "evergreen").to_f
+      first_shown = item.entry["first_shown_at"]
+      {
+        freshness: {
+          age_hours: item.age_hours.round, evergreen: evergreen.round(2),
+          half_life_hours: (f["half_life_hours"] + (f["evergreen_half_life_bonus_hours"] * evergreen)).round,
+          base_half_life_hours: f["half_life_hours"], bonus_hours: f["evergreen_half_life_bonus_hours"], floor: f["floor"],
+          if_evergreen_zero: freshness_of(item.age_hours, evergreen: 0.0).round(3),
+          if_evergreen_one: freshness_of(item.age_hours, evergreen: 1.0).round(3)
+        },
+        exposure: {
+          days_shown: first_shown ? ((@now - Time.parse(first_shown)) / 86_400.0).round(1) : nil,
+          half_life_days: @config["exposure_half_life_days"]
+        }
+      }
+    end
+
     def cap_per_source(list)
       limits = @config["max_per_source"] || {}
       counts = Hash.new(0)
