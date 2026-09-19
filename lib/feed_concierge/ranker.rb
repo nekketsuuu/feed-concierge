@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module FeedConcierge
-  # Combines Jev's answers with freshness and exposure. Every number here is code-owned
+  # Combines Jev's answers with freshness. Every number here is code-owned
   # so weights can be tuned without re-querying Jev.
   class Ranker
-    Ranked = Data.define(:article, :entry, :relevance, :components, :freshness, :exposure, :score, :age_hours)
+    Ranked = Data.define(:article, :entry, :relevance, :components, :freshness, :score, :age_hours)
 
     def initialize(config, now: Time.now)
       @config = config
@@ -26,16 +26,14 @@ module FeedConcierge
       relevance = components.sum { |c| c[:contribution] }
       age_hours = [(@now - article.published_at) / 3600.0, 0].max
       freshness = freshness_of(age_hours, evergreen: j["evergreen"].to_f)
-      exposure = exposure_of(entry)
       Ranked.new(article: article, entry: entry, relevance: relevance, components: components, freshness: freshness,
-                 exposure: exposure, score: relevance * freshness * exposure, age_hours: age_hours)
+                 score: relevance * freshness, age_hours: age_hours)
     end
 
-    # How freshness and exposure were derived, plus what-if values, for the debug view.
+    # How freshness was derived, plus what-if values, for the debug view.
     def explain(item)
       f = @config["freshness"]
       evergreen = item.entry.dig("judgment", "evergreen").to_f
-      first_shown = item.entry["first_shown_at"]
       {
         freshness: {
           age_hours: item.age_hours.round, evergreen: evergreen.round(2),
@@ -43,10 +41,6 @@ module FeedConcierge
           base_half_life_hours: f["half_life_hours"], bonus_hours: f["evergreen_half_life_bonus_hours"], floor: f["floor"],
           if_evergreen_zero: freshness_of(item.age_hours, evergreen: 0.0).round(3),
           if_evergreen_one: freshness_of(item.age_hours, evergreen: 1.0).round(3)
-        },
-        exposure: {
-          days_shown: first_shown ? ((@now - Time.parse(first_shown)) / 86_400.0).round(1) : nil,
-          half_life_days: @config["exposure_half_life_days"]
         }
       }
     end
@@ -71,13 +65,6 @@ module FeedConcierge
         value = Judge.normalize(judgment, id, choice_weights: @config["choice_weights"] || {})
         { id: id, value: value, weight: weight, contribution: weight * value }
       end
-    end
-
-    # Halves every exposure_half_life_days after the article first appeared on the page.
-    def exposure_of(entry)
-      first_shown = entry["first_shown_at"] or return 1.0
-      days_shown = [(@now - Time.parse(first_shown)) / 86_400.0, 0].max
-      0.5**(days_shown / @config["exposure_half_life_days"])
     end
 
     # A logistic curve in age: flat for the first day or so, halfway down at half_life_hours,

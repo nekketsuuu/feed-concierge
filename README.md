@@ -20,14 +20,13 @@ Code owns the rest (`lib/feed_concierge/ranker.rb`, weights in `config/settings.
 ```
 relevance = Σ weights[set][q] * normalized(q)     # score/max, noul as is, choice = Σ p(option) * choice_weights
 freshness = floor + (1 - floor) / (1 + (age_hours / half_life)^steepness)   # half_life grows with evergreen
-exposure  = 0.5 ^ (days since first shown on the page / exposure_half_life_days)
-score     = relevance * freshness * exposure
+score     = relevance * freshness
 ```
 
 The page lists every article with `score >= min_score`, newest-scored first, up to `top_n`.
 
 Judgments are cached in `data/scores.json` for `retention_days`, so each article costs one Jev
-request per retention window; after that it is forgotten and its exposure resets.
+request per retention window; after that it is forgotten.
 Changing weights only needs `bin/regenerate`. Open the page with `?debug=1` (linked in the footer)
 to see each article's ranking factors; the data is embedded in the page so it also works from file://.
 
@@ -45,5 +44,5 @@ FEED_CONCIERGE_FAKE_JEV=1 bin/build  # dry run without an API key
 ## Tuning
 
 - `config/profile.md`: describe what you like and dislike. This is the "prompt".
-- `config/settings.yml`: sources, weights, freshness half-life, exposure half-life, retention, score threshold and cap, per-source caps.
+- `config/settings.yml`: sources, weights, freshness half-life, retention, score threshold and cap, per-source caps.
 - `lib/feed_concierge/judge.rb`: question wording and Score levels. Jev reads literally, so describe concrete situations per level rather than degrees.

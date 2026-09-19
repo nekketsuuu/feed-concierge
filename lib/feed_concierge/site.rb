@@ -35,7 +35,7 @@ module FeedConcierge
         comments_url: item.article.comments_url,
         published_at: item.article.published_at.iso8601, points: item.article.points, comments: item.article.comment_count,
         score: item.score.round(4), relevance: item.relevance.round(4), freshness: item.freshness.round(4),
-        exposure: item.exposure.round(4), age_hours: item.age_hours.round(1), tags: tags_for(item),
+        age_hours: item.age_hours.round(1), tags: tags_for(item),
         components: item.components.map { |c| c.transform_values { |v| v.is_a?(Float) ? v.round(3) : v } },
         tag_probabilities: (item.entry.dig("judgment", "tags") || {}).sort_by { |_, p| -p }.first(6).to_h,
         judgment: item.entry["judgment"]
@@ -49,7 +49,7 @@ module FeedConcierge
         choices = item.entry["judgment"].select { |k, _| k.end_with?("_probabilities") }
         { id: item.article.id, source: item.article.source, question_set: item.entry.dig("judgment", "question_set"),
           age_hours: item.age_hours.round, score: item.score.round(3), relevance: item.relevance.round(3),
-          freshness: item.freshness.round(3), exposure: item.exposure.round(3),
+          freshness: item.freshness.round(3),
           components: item.components.map { |c| c.transform_values { |v| v.is_a?(Float) ? v.round(3) : v } },
           choices: choices, explain: ranker.explain(item) }
       end

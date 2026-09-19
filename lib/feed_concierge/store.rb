@@ -4,8 +4,7 @@ require "json"
 require "fileutils"
 
 module FeedConcierge
-  # Persists per-article judgments so each article is sent to Jev only once,
-  # and remembers when an article first appeared on the page.
+  # Persists per-article judgments so each article is sent to Jev only once.
   class Store
     attr_reader :path
 
@@ -42,20 +41,12 @@ module FeedConcierge
                               "published_at" => article.published_at.iso8601)
     end
 
-    def mark_shown(ids, now: Time.now)
-      ids.each do |id|
-        entry = @entries[id] or next
-        entry["first_shown_at"] ||= now.utc.iso8601
-        entry["shown_count"] = entry["shown_count"].to_i + 1
-      end
-    end
-
     def each_article
       @entries.each_value.map { |e| [Article.from_h(e["article"]), e] }
     end
 
     # Entries older than the retention window are forgotten entirely, so an article that is
-    # still in a feed after that is judged again and starts with a clean exposure.
+    # still in a feed after that is judged again.
     def prune!(retention_days:, now: Time.now)
       cutoff = now - (retention_days * 86_400)
       @entries.delete_if { |_, e| Time.parse(e["first_seen_at"]) < cutoff }

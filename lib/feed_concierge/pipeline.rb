@@ -27,7 +27,6 @@ module FeedConcierge
       site = Site.new(@output_dir, site: @settings.fetch("site"), tag_config: @settings.fetch("tags"),
                                    ranking_config: @settings.fetch("ranking"))
       site.build(ranked, generated_at: Time.now, judged_count: @store.each_article.size)
-      @store.mark_shown(ranked.map { |r| r.article.id })
       @store.save
       @log.puts "ranked #{ranked.size} articles -> #{@output_dir}"
       ranked

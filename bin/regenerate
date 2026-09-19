@@ -13,5 +13,5 @@ site = FeedConcierge::Site.new(output_dir, site: settings.fetch("site"), tag_con
                                            ranking_config: settings.fetch("ranking"))
 site.build(ranked, generated_at: Time.now, judged_count: store.each_article.size)
 ranked.each_with_index do |r, i|
-  puts format("%2d %.3f rel=%.2f fresh=%.2f exp=%.2f  %s", i + 1, r.score, r.relevance, r.freshness, r.exposure, r.article.title)
+  puts format("%2d %.3f rel=%.2f fresh=%.2f  %s", i + 1, r.score, r.relevance, r.freshness, r.article.title)
 end
