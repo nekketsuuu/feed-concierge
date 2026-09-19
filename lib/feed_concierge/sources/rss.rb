@@ -6,8 +6,8 @@ require "cgi"
 
 module FeedConcierge
   module Sources
-    # Plain RSS/Atom feeds without aggregator metadata (no points or comment counts).
-    # The feed's own content (content:encoded, else description) is kept as a summary.
+    # Plain RSS 2.0, RSS 1.0, or Atom feeds without aggregator metadata (no points or comment
+    # counts). The feed's own content is kept as a summary.
     class Rss
       def initialize(name:, feeds:, summary_max_chars: 600, max_age_days: nil)
         @name = name
@@ -33,23 +33,63 @@ module FeedConcierge
       end
 
       def to_article(item)
-        link = item.link.to_s
+        link = link_of(item)
         return if link.empty?
 
         Article.new(
-          id: "#{@name}:#{item.respond_to?(:guid) && item.guid ? item.guid.content : link}",
+          id: "#{@name}:#{id_of(item) || link}",
           source: @name,
-          title: item.title.to_s.strip,
+          title: text_of(item.title).strip,
           url: link,
-          author: item.respond_to?(:dc_creator) ? item.dc_creator.to_s : nil,
-          published_at: (item.respond_to?(:pubDate) && item.pubDate) || (item.respond_to?(:date) && item.date) || Time.now,
+          author: author_of(item),
+          published_at: published_at_of(item),
           summary: strip_html(body_of(item))[0, @summary_max_chars]
         )
       end
 
+      def link_of(item)
+        return item.link.to_s unless item.respond_to?(:links)
+
+        link = item.links.find { |l| l.rel.nil? || l.rel == "alternate" } || item.links.first
+        link&.href.to_s
+      end
+
+      def id_of(item)
+        return item.guid&.content if item.respond_to?(:guid)
+
+        item.id&.content if item.respond_to?(:id)
+      end
+
+      def author_of(item)
+        creator = item.respond_to?(:dc_creator) ? item.dc_creator.to_s : ""
+        return creator unless creator.empty?
+
+        item.author.name.content if item.respond_to?(:author) && item.author.respond_to?(:name)
+      end
+
+      def published_at_of(item)
+        %i[pubDate published updated date].each do |field|
+          next unless item.respond_to?(field)
+
+          value = item.public_send(field)
+          value = value.content if value.respond_to?(:content)
+          return value if value
+        end
+        Time.now
+      end
+
       def body_of(item)
-        encoded = item.respond_to?(:content_encoded) ? item.content_encoded.to_s : ""
-        encoded.empty? ? item.description.to_s : encoded
+        candidates = []
+        candidates << item.content_encoded if item.respond_to?(:content_encoded)
+        candidates << item.description if item.respond_to?(:description)
+        candidates << item.content if item.respond_to?(:content)
+        candidates << item.summary if item.respond_to?(:summary)
+        candidates.map { |c| text_of(c) }.find { |t| !t.empty? } || ""
+      end
+
+      def text_of(value)
+        value = value.content if value.respond_to?(:content)
+        value.to_s
       end
 
       def strip_html(html)

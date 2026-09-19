@@ -84,6 +84,115 @@ sources:
     name: jpcert_weekly
     max_age_days: 14
     excerpt: false
+  - type: rss
+    name: spotify_engineering
+    feeds:
+      - https://engineering.atspotify.com/feed/
+    max_age_days: 14
+  - type: rss
+    name: webdev
+    feeds:
+      - https://web.dev/feed.xml
+    max_age_days: 14
+  - type: rss
+    name: kubernetes_blog
+    feeds:
+      - https://kubernetes.io/feed.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: rubygems_blog
+    feeds:
+      - https://blog.rubygems.org/atom.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: 37signals_dev
+    feeds:
+      - https://dev.37signals.com/feed/posts.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: evil_martians
+    feeds:
+      - https://evilmartians.com/chronicles.atom
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: shopify_engineering
+    feeds:
+      - https://shopify.engineering/blog.atom
+    max_age_days: 14
+  - type: rss
+    name: opentelemetry_blog
+    feeds:
+      - https://opentelemetry.io/blog/index.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: figma_blog
+    feeds:
+      - https://www.figma.com/blog/feed/atom.xml
+    max_age_days: 14
+  - type: rss
+    name: rails_at_scale
+    feeds:
+      - https://railsatscale.com/feed.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: netflix_tech
+    feeds:
+      - https://netflixtechblog.com/feed
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: sentry_blog
+    feeds:
+      - https://blog.sentry.io/feed.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: martin_fowler
+    feeds:
+      - https://martinfowler.com/feed.atom
+    summary_max_chars: 1500
+    max_age_days: 14
+  - type: rss
+    name: jxck
+    feeds:
+      - https://blog.jxck.io/feeds/atom.xml
+    max_age_days: 14
+  - type: rss
+    name: aws_blog
+    feeds:
+      - https://aws.amazon.com/blogs/storage/feed/
+      - https://aws.amazon.com/blogs/database/feed/
+      - https://aws.amazon.com/blogs/compute/feed/
+      - https://aws.amazon.com/blogs/architecture/feed/
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: tenderlove
+    feeds:
+      - https://tenderlovemaking.com/atom.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: rubyflow
+    feeds:
+      - https://rubyflow.com/rss
+    max_age_days: 14
 
 # Articles are forgotten (judgment and exposure) this many days after they were first seen.
 retention_days: 10
