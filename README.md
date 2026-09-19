@@ -48,6 +48,8 @@ exposure  = 0.5 ^ (days since first shown on the page / exposure_half_life_days)
 score     = relevance * freshness * exposure
 ```
 
+The page lists every article with `score >= min_score`, newest-scored first, up to `top_n`.
+
 Judgments are cached in `data/scores.json` for `retention_days`, so each article costs one Jev
 request per retention window; after that it is forgotten and its exposure resets.
 Changing weights only needs `bin/rerank`.
@@ -98,6 +100,6 @@ and prefix article ids with the source name so they stay globally unique.
 ## Tuning
 
 - `config/profile.md`: describe what you like and dislike. This is the "prompt".
-- `config/settings.yml`: sources, weights, freshness half-life, exposure half-life, retention, top N, per-source caps.
+- `config/settings.yml`: sources, weights, freshness half-life, exposure half-life, retention, score threshold and cap, per-source caps.
 - `lib/feed_concierge/judge.rb`: question wording and Score levels. Jev reads literally, so
   describe concrete situations per level rather than degrees.

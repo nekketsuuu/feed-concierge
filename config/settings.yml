@@ -147,14 +147,16 @@ ranking:
     floor: 0.25
   # Once an article has appeared on the page, its score halves every this many days.
   exposure_half_life_days: 5
-  top_n: 40
+  # The page lists every article whose score reaches min_score, up to top_n of them.
+  min_score: 0.35
+  top_n: 100
   # Optional per-source caps so one busy source cannot fill the page.
   max_per_source:
-    ruby_bugs: 8
-    rails_prs: 6
-    cisa_kev: 5
-    jpcert_weekly: 5
-    bleepingcomputer: 5
+    ruby_bugs: 15
+    rails_prs: 10
+    cisa_kev: 8
+    jpcert_weekly: 8
+    bleepingcomputer: 8
   # Articles below this relevance never make the page even when fresh.
   min_relevance: 0.2
 

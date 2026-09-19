@@ -13,7 +13,7 @@ module FeedConcierge
 
     def rank(store)
       ranked = store.each_article.map { |article, entry| evaluate(article, entry) }
-      ranked.select { |r| r.relevance >= @config["min_relevance"] }
+      ranked.select { |r| r.relevance >= @config["min_relevance"] && r.score >= @config["min_score"] }
             .sort_by { |r| -r.score }
             .uniq { |r| r.article.canonical_url }
             .then { |list| cap_per_source(list) }
