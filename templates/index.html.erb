@@ -100,10 +100,10 @@
       const box = el("div", "dbg");
       box.appendChild(el("div", null, `${row.source} · ${row.question_set} · ${row.age_hours}h`));
       box.appendChild(waterfall(row));
-      const rel = node("relevance", row.relevance, "Σ weight × answer; slot width = weight, fill = answer");
+      const rel = node("relevance", row.relevance, "Σ weight × answer");
       rel.appendChild(slotBar(row)); box.appendChild(rel);
       box.appendChild(node("freshness", row.freshness,
-        `age ${fr.age_hours}h · half-life ${fr.half_life_hours}h = ${fr.base_half_life_hours}h + ${fr.bonus_hours}h × evergreen ${f(fr.evergreen)} · floor ${fr.floor} · ` +
+        `age ${fr.age_hours}h · half-life ${fr.half_life_hours}h = ${fr.base_half_life_hours}h + ${fr.bonus_hours}h × evergreen ${f(fr.evergreen)} · ` +
         `if evergreen were 0 → ${f(fr.if_evergreen_zero)}, 1 → ${f(fr.if_evergreen_one)}`));
       box.appendChild(node("exposure", row.exposure,
         ex.days_shown == null ? "never shown on the page yet" : `first shown ${ex.days_shown}d ago · halves every ${ex.half_life_days}d`));
