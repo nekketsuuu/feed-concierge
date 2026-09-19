@@ -1,0 +1,52 @@
+name: Build and publish
+
+on:
+  schedule:
+    - cron: "17 */2 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: build
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Restore judgment cache
+        uses: actions/cache@v4
+        with:
+          path: data/scores.json
+          key: scores-${{ github.run_id }}
+          restore-keys: scores-
+
+      - name: Build site
+        env:
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+        run: bundle exec bin/build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

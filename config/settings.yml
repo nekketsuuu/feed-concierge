@@ -1,0 +1,31 @@
+feeds:
+  - https://hnrss.org/frontpage?count=60
+  - https://hnrss.org/best?count=30
+
+model: jev-latest
+concurrency: 6
+
+article_excerpt:
+  enabled: true
+  max_chars: 1500
+  timeout_seconds: 8
+
+ranking:
+  # Relevance is a weighted sum of normalized Jev answers (each in 0..1).
+  weights:
+    interest: 0.5
+    substance: 0.2
+    worth_reading: 0.3
+  # Freshness decays with age since the HN post. Evergreen articles decay slower.
+  freshness:
+    half_life_hours: 18
+    evergreen_half_life_bonus_hours: 30
+    floor: 0.25
+  # Each build in which an article appeared in the top list multiplies its score by this factor.
+  exposure_decay: 0.85
+  top_n: 40
+  # Articles below this relevance never make the page even when fresh.
+  min_relevance: 0.2
+
+site:
+  title: "HN Concierge"

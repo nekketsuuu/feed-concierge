@@ -1,0 +1,20 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rexml (3.4.4)
+    rss (0.3.3)
+      rexml
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rexml
+  rss
+
+CHECKSUMS
+  rexml (3.4.4) sha256=19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142
+  rss (0.3.3) sha256=37ef1ec4d691d67edbe92159079a4e89a0965e6a6b32246009ae3d734d12d1ab
+
+BUNDLED WITH
+  4.0.10

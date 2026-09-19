@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+require_relative "../lib/hn_concierge"
+
+store_path = ENV.fetch("HN_CONCIERGE_STORE", File.join(HnConcierge::ROOT, "data", "scores.json"))
+output_dir = ENV.fetch("HN_CONCIERGE_OUTPUT", File.join(HnConcierge::ROOT, "site"))
+
+client =
+  if ENV["HN_CONCIERGE_FAKE_JEV"]
+    warn "HN_CONCIERGE_FAKE_JEV is set: using fake answers, no API calls"
+    HnConcierge::FakeJevClient.new
+  elsif ENV["TYPESAFE_API_KEY"].to_s.empty?
+    abort "TYPESAFE_API_KEY is not set (or set HN_CONCIERGE_FAKE_JEV=1 for a dry run)"
+  else
+    HnConcierge::JevClient.new(model: HnConcierge.settings["model"])
+  end
+
+HnConcierge::Pipeline.new(store_path: store_path, output_dir: output_dir, client: client).run
