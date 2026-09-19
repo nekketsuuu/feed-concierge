@@ -31,7 +31,7 @@ module FeedConcierge
         id: r.article.id, source: r.article.source, title: r.article.title, url: r.article.url, comments_url: r.article.comments_url,
         published_at: r.article.published_at.iso8601, points: r.article.points, comments: r.article.comment_count,
         score: r.score.round(4), relevance: r.relevance.round(4), freshness: r.freshness.round(4),
-        exposure: r.exposure.round(4), popularity: r.popularity.round(4), judgment: r.entry["judgment"]
+        exposure: r.exposure.round(4), judgment: r.entry["judgment"]
       }
     end
 
