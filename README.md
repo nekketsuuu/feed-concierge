@@ -1,8 +1,8 @@
 # Feed Concierge
 
 A personal, static "concierge feed". A cron job fetches articles from configured sources,
-asks [TypeSafe Jev](https://docs.typesafe.ai/) a few typed questions about each new article,
-and publishes the ranked list to GitHub Pages.
+asks [TypeSafe Jev](https://docs.typesafe.ai/) a few questions about each new article,
+calculates a score for each post, and publishes the ranked list to GitHub Pages.
 
 ## How ranking works
 
