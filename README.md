@@ -41,6 +41,8 @@ FEED_CONCIERGE_FAKE_JEV=1 bin/build  # dry run without an API key
 
 ## Tuning
 
+Click the "debug" link at the bottom of the page.
+
 - `config/profile.md`: describe what you like and dislike. This is the "prompt".
 - `config/settings.yml`: sources, weights, freshness half-life, retention, score threshold and cap, per-source caps.
 - `lib/feed_concierge/judge.rb`: question wording and Score levels. Jev reads literally, so describe concrete situations per level rather than degrees.
