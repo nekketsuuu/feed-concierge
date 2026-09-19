@@ -57,7 +57,8 @@ module FeedConcierge
     def debug_json(ranked, candidates)
       rank = ranked.each_with_index.to_h { |item, i| [item.article.id, i + 1] }
       f = @ranking_config["freshness"]
-      config = { weights: @ranking_config["weights"], min_score: @ranking_config["min_score"],
+      config = { weights: @ranking_config["weights"], choice_weights: @ranking_config["choice_weights"] || {},
+                 min_score: @ranking_config["min_score"],
                  top_n: @ranking_config["top_n"],
                  max_per_source: @ranking_config["max_per_source"] || {},
                  freshness: { half_life_days: f["half_life_hours"] / 24.0,

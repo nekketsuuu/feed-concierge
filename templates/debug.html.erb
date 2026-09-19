@@ -68,7 +68,8 @@
     <button id="reset" type="button">reset</button>
   </div>
   <details open><summary>freshness &amp; page</summary><div class="controls" id="controls-general"></div></details>
-  <details><summary>relevance weights</summary><div class="controls" id="controls-weights"></div></details>
+  <details open><summary>relevance weights (per question set)</summary><div class="controls" id="controls-weights"></div></details>
+  <details><summary>choice option weights</summary><div class="controls" id="controls-choices"></div></details>
 </div>
 <ol id="list"></ol>
 <footer>Generated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a></footer>
@@ -94,9 +95,15 @@
   // --- scoring, mirroring lib/feed_concierge/ranker.rb ---
   const fresh = (ageHours, halfLifeHours) => config.freshness.floor + (1 - config.freshness.floor) / (1 + Math.pow(ageHours / halfLifeHours, config.freshness.steepness));
   const halfLifeOf = row => (config.freshness.half_life_days + config.freshness.bonus_days * row.evergreen) * 24;
+  // Choice answers are re-derived from their probabilities so option weights can be tuned too.
+  const answerOf = (row, c) => {
+    const probs = row.choices[`${c.id}_probabilities`], weights = config.choice_weights[c.id];
+    if (!probs || !weights) return c.value;
+    return Object.entries(probs).reduce((s, [option, p]) => s + p * (weights[option] ?? 0), 0);
+  };
   const score = row => {
     const weights = config.weights[row.question_set];
-    const components = row.components.map(c => ({ ...c, weight: weights[c.id], contribution: weights[c.id] * c.value }));
+    const components = row.components.map(c => { const value = answerOf(row, c); return { id: c.id, value, weight: weights[c.id], contribution: weights[c.id] * value }; });
     const relevance = components.reduce((s, c) => s + c.contribution, 0);
     const freshness = fresh(row.age_hours, halfLifeOf(row));
     return { row, components, relevance, freshness, score: relevance * freshness };
@@ -200,8 +207,8 @@
     c.appendChild(input); c.appendChild(val); parent.appendChild(c);
   };
   const buildControls = () => {
-    const general = document.getElementById("controls-general"), weights = document.getElementById("controls-weights");
-    general.textContent = ""; weights.textContent = "";
+    const general = document.getElementById("controls-general"), weights = document.getElementById("controls-weights"), choices = document.getElementById("controls-choices");
+    general.textContent = ""; weights.textContent = ""; choices.textContent = "";
     control(general, "half-life (d)", () => config.freshness.half_life_days, v => config.freshness.half_life_days = v, 0.5, 21, 0.5);
     control(general, "evergreen bonus (d)", () => config.freshness.bonus_days, v => config.freshness.bonus_days = v, 0, 14, 0.5);
     control(general, "floor", () => config.freshness.floor, v => config.freshness.floor = v, 0, 0.9, 0.05);
@@ -210,6 +217,9 @@
     control(general, "top n", () => config.top_n, v => config.top_n = v, 10, 300, 10);
     for (const [set, ws] of Object.entries(config.weights)) {
       for (const id of Object.keys(ws)) control(weights, `${set} / ${id}`, () => config.weights[set][id], v => config.weights[set][id] = v, 0, 1, 0.05);
+    }
+    for (const [question, ws] of Object.entries(config.choice_weights)) {
+      for (const option of Object.keys(ws)) control(choices, `${question} / ${option}`, () => config.choice_weights[question][option], v => config.choice_weights[question][option] = v, 0, 1, 0.05);
     }
   };
   document.getElementById("reset").addEventListener("click", () => { config = JSON.parse(JSON.stringify(defaults)); buildControls(); render(); });
