@@ -4,7 +4,7 @@ module FeedConcierge
   # Combines Jev's answers with freshness and exposure. Every number here is code-owned
   # so weights can be tuned without re-querying Jev.
   class Ranker
-    Ranked = Struct.new(:article, :entry, :relevance, :freshness, :exposure, :score, :age_hours, keyword_init: true)
+    Ranked = Data.define(:article, :entry, :relevance, :freshness, :exposure, :score, :age_hours)
 
     def initialize(config, now: Time.now)
       @config = config

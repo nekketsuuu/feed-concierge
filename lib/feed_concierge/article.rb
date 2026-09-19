@@ -3,8 +3,12 @@
 require "uri"
 
 module FeedConcierge
-  Article = Struct.new(:id, :source, :title, :url, :comments_url, :author, :points, :comment_count,
-                       :published_at, :summary, :tags, keyword_init: true) do
+  Article = Data.define(:id, :source, :title, :url, :comments_url, :author, :points, :comment_count,
+                        :published_at, :summary, :tags) do
+    def initialize(comments_url: nil, author: nil, points: nil, comment_count: nil, summary: nil, tags: nil, **rest)
+      super
+    end
+
     def domain
       URI(url).host&.delete_prefix("www.")
     rescue URI::InvalidURIError
