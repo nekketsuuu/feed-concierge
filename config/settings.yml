@@ -126,5 +126,10 @@ ranking:
   # Articles below this relevance never make the page even when fresh.
   min_relevance: 0.2
 
+# Jev answers one yes/no question per tag in config/tags.yml; tags at or above this probability are shown.
+tags:
+  min_probability: 0.7
+  max_per_article: 3
+
 site:
   title: "Feed Concierge"

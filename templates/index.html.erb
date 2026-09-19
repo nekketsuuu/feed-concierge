@@ -14,6 +14,7 @@
   li a { text-decoration: none; }
   li a:hover { text-decoration: underline; }
   .meta { color: var(--muted); font-size: .8em; margin-left: .5rem; white-space: nowrap; }
+  .tag { font-size: .75em; color: var(--muted); border: 1px solid rgba(127,127,127,.4); border-radius: 3px; padding: 0 .3em; margin-left: .3rem; }
   footer { color: var(--muted); font-size: .75em; margin-top: 1.5rem; }
 </style>
 </head>
@@ -24,7 +25,7 @@
 </header>
 <ul>
 <%- ranked.each do |r| -%>
-  <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= r.article.published_at.utc.iso8601 %>"><%= r.article.published_at.utc.strftime("%m-%d %H:%M") %></time></span></li>
+  <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= r.article.published_at.utc.iso8601 %>"><%= r.article.published_at.utc.strftime("%m-%d %H:%M") %></time></span><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%></li>
 <%- end -%>
 </ul>
 <footer><a href="data.json">data.json</a></footer>

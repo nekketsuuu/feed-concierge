@@ -1,11 +1,14 @@
 require "net/http"
 require "json"
 require "uri"
+require "openssl"
 
 module FeedConcierge
   class JevClient
     ENDPOINT = URI("https://api.typesafe.ai/v1/systemone")
-    RETRYABLE = %w[429 529 500 502 503].freeze
+    RETRYABLE_STATUSES = %w[429 529 500 502 503].freeze
+    NETWORK_ERRORS = [SocketError, Timeout::Error, Errno::ECONNRESET, Errno::ECONNREFUSED,
+                      Errno::EHOSTUNREACH, Errno::ENETUNREACH, EOFError, OpenSSL::SSL::SSLError].freeze
 
     class Error < StandardError; end
 
@@ -18,24 +21,24 @@ module FeedConcierge
     def system_one(state:, questions:)
       payload = { state: state, model: @model, questions: questions }
       attempt = 0
-      begin
+      loop do
         response = post(payload)
         return JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
 
-        if RETRYABLE.include?(response.code) && attempt < @max_retries
-          attempt += 1
-          sleep(backoff(attempt, response["retry-after"]))
-          raise RetryRequest
-        end
-        raise Error, "TypeSafe API #{response.code}: #{response.body[0, 500]}"
-      rescue RetryRequest
-        retry
+        retryable = RETRYABLE_STATUSES.include?(response.code)
+        raise Error, "TypeSafe API #{response.code}: #{response.body[0, 500]}" unless retryable && attempt < @max_retries
+
+        attempt += 1
+        sleep(backoff(attempt, response["retry-after"]))
+      rescue *NETWORK_ERRORS => e
+        raise Error, "TypeSafe API unreachable: #{e.class}: #{e.message[0, 200]}" if attempt >= @max_retries
+
+        attempt += 1
+        sleep(backoff(attempt, nil))
       end
     end
 
     private
-
-    class RetryRequest < StandardError; end
 
     def post(payload)
       Net::HTTP.start(ENDPOINT.host, ENDPOINT.port, use_ssl: true, open_timeout: 15, read_timeout: 60) do |http|
@@ -67,6 +70,10 @@ module FeedConcierge
             { "type" => "score", "score" => (r * (levels - 1)).round(2), "confidence" => 0.6 }
           when "noul"
             { "type" => "noul", "noul" => r.round(3) }
+          when "choice"
+            options = question[:criteria].keys.map(&:to_s)
+            probs = options.each_with_index.to_h { |o, i| [o, i.zero? ? 1.0 : 0.0] }
+            { "type" => "choice", "choice" => options.first, "probabilities" => probs, "confidence" => 0.9 }
           end
         [id.to_s, answer]
       end

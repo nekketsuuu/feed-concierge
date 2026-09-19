@@ -16,10 +16,10 @@ module FeedConcierge
 
     def [](id) = @entries[id]
 
-    # An article is re-judged when its source switches to a different question set.
+    # An article is re-judged when its source switches to a different question set or the questions change.
     def judged?(id, question_set: "default")
       judgment = @entries.dig(id, "judgment") or return false
-      (judgment["question_set"] || "default") == question_set
+      (judgment["question_set"] || "default") == question_set && judgment["version"] == Judge::VERSION
     end
 
 def judged_url?(canonical_url)

@@ -1,10 +1,16 @@
+require "yaml"
+
 module FeedConcierge
   # Asks Jev a fixed set of questions about one article. All questions go in one request
   # (speculative fan-out); code combines the answers later in Ranker.
   #
   # Question sets are chosen per source (config `questions:`). Answers are stored flat:
   # score -> <id>, <id>_confidence; noul -> <id>; choice -> <id>, <id>_probabilities.
+  # Tag questions (one Noul per tag in config/tags.yml) are stored under "tags".
   class Judge
+    # Bump when questions change so cached judgments are redone on the next build.
+    VERSION = 2
+
     INTEREST_LEVELS = [
       "The article is about a topic the reader profile explicitly says they are not interested in, or is unrelated to anything in the profile.",
       "The article is loosely adjacent to the reader's interests but the main topic is not one they listed.",
@@ -29,14 +35,14 @@ module FeedConcierge
       housekeeping: "Backport tracking, documentation wording, typos, test flakiness, release process, or other administrative work."
     }.freeze
 
-CHANGE_KINDS = {
-  new_capability: "Introduces a new product, feature, API, or capability that did not exist before.",
-  breaking_or_deprecation: "Announces a breaking change, deprecation, end of support, or a changed default that requires users to act.",
-  pricing_or_limits: "Changes pricing, the free tier, quotas, or limits.",
-  incremental_improvement: "Improves an existing feature: performance, UI, integrations, more options, or expanded support for versions and platforms.",
-  regional_availability: "An existing feature or service becomes available in additional regions, countries, or data centres, with no new functionality.",
-  fix_or_maintenance: "Bug fixes, security patches, version bumps, or documentation updates."
-}.freeze
+    CHANGE_KINDS = {
+      new_capability: "Introduces a new product, feature, API, or capability that did not exist before.",
+      breaking_or_deprecation: "Announces a breaking change, deprecation, end of support, or a changed default that requires users to act.",
+      pricing_or_limits: "Changes pricing, the free tier, quotas, or limits.",
+      incremental_improvement: "Improves an existing feature: performance, UI, integrations, more options, or expanded support for versions and platforms.",
+      regional_availability: "An existing feature or service becomes available in additional regions, countries, or data centres, with no new functionality.",
+      fix_or_maintenance: "Bug fixes, security patches, version bumps, or documentation updates."
+    }.freeze
 
     PR_KINDS = {
       new_feature: "Adds a new public API, option, generator, or capability that users of the framework can call or configure.",
@@ -87,20 +93,20 @@ CHANGE_KINDS = {
         worth_reading: WORTH_READING,
         evergreen: EVERGREEN
       },
-"changelog" => {
-  change_kind: {
-    type: "choice",
-    instructions: "`article` is an entry from a product changelog or announcement feed. Which kind of change does it announce?",
-    criteria: CHANGE_KINDS
-  },
-  interest: {
-    type: "score",
-    instructions: "How well does the change announced in `article` match the interests described in `reader_profile`?",
-    criteria: INTEREST_LEVELS
-  },
-  worth_reading: WORTH_READING,
-  evergreen: EVERGREEN
-},
+      "changelog" => {
+        change_kind: {
+          type: "choice",
+          instructions: "`article` is an entry from a product changelog or announcement feed. Which kind of change does it announce?",
+          criteria: CHANGE_KINDS
+        },
+        interest: {
+          type: "score",
+          instructions: "How well does the change announced in `article` match the interests described in `reader_profile`?",
+          criteria: INTEREST_LEVELS
+        },
+        worth_reading: WORTH_READING,
+        evergreen: EVERGREEN
+      },
       "pull_request" => {
         pr_kind: {
           type: "choice",
@@ -141,12 +147,32 @@ CHANGE_KINDS = {
       }
     }.freeze
 
+    def self.tag_vocabulary
+      @tag_vocabulary ||= YAML.safe_load_file(File.join(ROOT, "config", "tags.yml")).fetch("tags")
+    end
+
+    # One Noul per tag, asked alongside every question set. Probabilities are stored so the
+    # display threshold can be tuned without re-judging.
+    def self.tag_questions
+      tag_vocabulary.to_h do |tag, description|
+        ["tag_#{tag}", { type: "noul",
+                         instructions: "Does the topic tag `#{tag}` apply to `article`?",
+                         criteria: { true: "The article is substantially about: #{description}",
+                                     false: "The article only mentions this in passing, or not at all." } }]
+      end
+    end
+
+    # Tags whose probability clears the threshold, most likely first.
+    def self.tags_for(judgment, min_probability:, max:)
+      (judgment["tags"] || {}).select { |_, p| p >= min_probability }.sort_by { |_, p| -p }.first(max).map(&:first)
+    end
+
     def initialize(client)
       @client = client
     end
 
     def judge(article, excerpt:, reader_profile:, question_set: "default")
-      questions = QUESTION_SETS.fetch(question_set)
+      questions = QUESTION_SETS.fetch(question_set).merge(self.class.tag_questions)
       state = {
         reader_profile: reader_profile,
         article: {
@@ -162,9 +188,13 @@ CHANGE_KINDS = {
       }
       response = @client.system_one(state: state, questions: questions)
       answers = response.fetch("answers")
-      judgment = { "model" => response["model"], "question_set" => question_set }
+      judgment = { "model" => response["model"], "question_set" => question_set, "version" => VERSION, "tags" => {} }
       questions.each_key do |id|
         answer = answers.fetch(id.to_s)
+        if id.to_s.start_with?("tag_")
+          judgment["tags"][id.to_s.delete_prefix("tag_")] = answer["noul"]
+          next
+        end
         case answer["type"]
         when "score"
           judgment[id.to_s] = answer["score"]

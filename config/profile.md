@@ -18,6 +18,6 @@ For product changelogs (GitHub, AWS, Cloudflare, Fastly), the reader cares about
 
 - New capabilities, APIs, and breaking changes or deprecations that affect how developers build things.
 - Announcements that a service or feature is now available in the Asia Pacific (Tokyo) region, also written as ap-northeast-1. Availability in any other region is not interesting.
-- Not interested in: partner or marketplace listings, certifications and compliance badges, training or event announcements, and features that only exist in enterprise sales tiers.
+- Not interested in: partner or marketplace listings (except for Anthropic), certifications and compliance badges, training or event announcements, and features that only exist in enterprise sales tiers.
 
-For merged pull requests in frameworks such as Rails, the reader cares about new public APIs, changed defaults, deprecations, and performance work, and about Ractor or concurrency related changes. Internal refactors, test-only changes, and dependency bumps are not interesting.
+For merged pull requests in frameworks such as Rails, the reader cares about new public APIs, changed defaults, deprecations, and performance work related changes. Internal refactors, test-only changes, and dependency bumps are not interesting.

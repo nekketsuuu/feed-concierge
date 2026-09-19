@@ -22,7 +22,7 @@ module FeedConcierge
 
       @store.prune!
       ranked = Ranker.new(@settings["ranking"]).rank(@store)
-      Site.new(@output_dir, title: @settings.dig("site", "title")).build(
+      Site.new(@output_dir, title: @settings.dig("site", "title"), tag_config: @settings.fetch("tags")).build(
         ranked, generated_at: Time.now, judged_count: @store.each_article.size
       )
       @store.mark_shown(ranked.map { |r| r.article.id })

@@ -34,6 +34,11 @@ performance / bug_fix / internal_refactor / docs_tests_ci) plus `user_impact`, `
 | `user_impact` | Score 0–3 | how much of the user base would notice the change or defect |
 | `interest`, `worth_reading`, `evergreen` | as above | |
 
+Every request also carries one Noul per tag in `config/tags.yml` (a Lobsters-like vocabulary).
+Tags whose probability clears `tags.min_probability` are shown on the page, at most
+`tags.max_per_article` per article. Bump `Judge::VERSION` after changing questions to re-judge
+cached articles.
+
 Code owns the rest (`lib/feed_concierge/ranker.rb`, weights in `config/settings.yml`):
 
 ```
