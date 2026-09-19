@@ -1,10 +1,10 @@
 The reader is a software engineer and platform engineer (SRE) who enjoys:
 
-- Programming languages, compilers, type systems, and language design (especially Ruby, OCaml, Rust, TypeScript).
-- Platform engineering, DevOps, and SRE: reliability, observability, developer experience, incident response and post-mortems, capacity and cost, cloud infrastructure, CI/CD, and internal developer platforms.
+- Platform engineering, DevOps, and SRE: reliability, observability, developer experience, capacity and cost, AWS core services as building blocks, CI/CD, toil reduction, SaaS for developers, and internal developer platforms.
 - Security, especially every vulnerability that could affect a developer who builds Ruby on Rails applications and mobile apps on AWS, including the SaaS and back-office tools a software company typically uses. Short advisories count as much as long write-ups.
-- Deep technical write-ups: how something works internally, post-mortems, performance investigations, debugging stories.
 - AI/LLM topics only when they are concrete and technical (architecture, evaluation, tooling), not hype or product announcements.
+- Programming languages, compilers, type systems, and language design (especially Ruby, TypeScript & Node.js, Rust, OCaml).
+- Deep technical write-ups: how something works internally, post-mortems, performance investigations, debugging stories.
 - Math, algorithms, and data structures explained clearly.
 - Open source projects with a novel idea, and "Show HN" posts that demonstrate craft.
 
