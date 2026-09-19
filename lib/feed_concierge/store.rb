@@ -37,7 +37,8 @@ module FeedConcierge
 
     def refresh_stats(article)
       entry = @entries[article.id] or return
-      entry["article"].merge!("points" => article.points, "comment_count" => article.comment_count,
+      entry["article"].merge!("title" => article.title, "tags" => article.tags,
+                              "points" => article.points, "comment_count" => article.comment_count,
                               "published_at" => article.published_at.iso8601)
     end
 

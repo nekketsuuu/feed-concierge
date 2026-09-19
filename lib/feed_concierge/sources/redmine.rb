@@ -38,12 +38,17 @@ module FeedConcierge
         "#{@base_url}/issues.json?#{URI.encode_www_form(params)}"
       end
 
+      def title_of(issue)
+        state = issue.dig("status", "is_closed") ? "closed" : "open"
+        "#{issue.dig('tracker', 'name')} ##{issue['id']}: #{issue['subject'].to_s.strip} (#{state})"
+      end
+
       def to_article(issue)
         id = issue.fetch("id")
         Article.new(
           id: "#{@name}:#{id}",
           source: @name,
-          title: "#{issue.dig("tracker", "name")} ##{id}: #{issue["subject"].to_s.strip}",
+          title: title_of(issue),
           url: "#{@base_url}/issues/#{id}",
           author: issue.dig("author", "name"),
           published_at: Clock.parse(issue["updated_on"]),
