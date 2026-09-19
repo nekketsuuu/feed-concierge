@@ -8,7 +8,6 @@
   :root { color-scheme: light dark; --muted: #777; }
   body { font: 16px/1.45 system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
   h1 { font-size: 1.2em; margin: 0; }
-  header p { color: var(--muted); margin: .2rem 0 0; font-size: .8em; }
   ul { list-style: none; padding: 0; margin: 1.2rem 0; }
   li { padding: .45rem 0; border-bottom: 1px solid rgba(127,127,127,.2); }
   li a { text-decoration: none; }
@@ -21,14 +20,13 @@
 <body>
 <header>
   <h1><%= h(title) %></h1>
-  <p>Updated <time datetime="<%= generated_at.utc.iso8601 %>"><%= generated_at.utc.strftime("%Y-%m-%d %H:%M UTC") %></time></p>
 </header>
 <ul>
 <%- ranked.each do |r| -%>
   <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= r.article.published_at.utc.iso8601 %>"><%= r.article.published_at.utc.strftime("%m-%d %H:%M") %></time></span></li>
 <%- end -%>
 </ul>
-<footer><a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a></footer>
+<footer>Updated <time datetime="<%= generated_at.utc.iso8601 %>"><%= generated_at.utc.strftime("%Y-%m-%d %H:%M UTC") %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a></footer>
 <script>
   for (const t of document.querySelectorAll("time")) {
     const d = new Date(t.dateTime);
