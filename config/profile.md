@@ -21,3 +21,11 @@ For product changelogs (GitHub, AWS, Cloudflare, Fastly), the reader cares about
 - Not interested in: partner or marketplace listings (except for Anthropic), certifications and compliance badges, training or event announcements, and features that only exist in enterprise sales tiers.
 
 For merged pull requests in frameworks such as Rails, the reader cares about new public APIs, changed defaults, deprecations, and performance work related changes. Internal refactors, test-only changes, and dependency bumps are not interesting.
+
+For security news (piyolog, tl;dr sec, BleepingComputer, CISA KEV, JPCERT/CC), the reader cares about:
+
+- Vulnerabilities and incidents involving developer tooling, programming languages and runtimes, package registries, source hosting, CI systems, and open-source infrastructure.
+- Actively exploited vulnerabilities in widely used server software, cloud services, and network equipment.
+- Incident write-ups with technical detail about how an attack worked or how it was detected.
+- Japanese incidents and advisories are as interesting as English ones.
+- Not interested in: consumer scams, generic ransomware business news, vendor marketing dressed as research, and vulnerabilities in niche consumer devices or enterprise products the reader would never operate.

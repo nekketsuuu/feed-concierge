@@ -19,7 +19,8 @@ module FeedConcierge
         end
         raise FetchError, "#{url}: HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
 
-        response.body
+        body = response.body.to_s
+        body.force_encoding("UTF-8").valid_encoding? ? body : body.encode("UTF-8", invalid: :replace, undef: :replace)
       end
     end
   end

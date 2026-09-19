@@ -58,6 +58,32 @@ sources:
     base_branch: main
     excerpt: false
     questions: pull_request
+  - type: rss
+    name: piyolog
+    feeds:
+      - https://piyolog.hatenadiary.jp/rss
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: tldrsec
+    feeds:
+      - https://tldrsec.com/feed.xml
+    summary_max_chars: 3000
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: bleepingcomputer
+    feeds:
+      - https://www.bleepingcomputer.com/feed/
+  - type: cisa_kev
+    name: cisa_kev
+    lookback_days: 7
+    excerpt: false
+  - type: jpcert_weekly
+    name: jpcert_weekly
+    max_age_days: 14
+    excerpt: false
 
 # Articles are forgotten (judgment and exposure) this many days after they were first seen.
 retention_days: 10
@@ -126,6 +152,9 @@ ranking:
   max_per_source:
     ruby_bugs: 8
     rails_prs: 6
+    cisa_kev: 5
+    jpcert_weekly: 5
+    bleepingcomputer: 5
   # Articles below this relevance never make the page even when fresh.
   min_relevance: 0.2
 

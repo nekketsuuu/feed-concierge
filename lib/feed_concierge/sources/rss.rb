@@ -51,7 +51,8 @@ module FeedConcierge
       end
 
       def strip_html(html)
-        CGI.unescapeHTML(html.gsub(/<[^>]+>/, " ")).gsub(/\s+/, " ").strip
+        text = html.gsub(%r{<(style|script)\b.*?</\1>}mi, " ").gsub(/<[^>]+>/, " ")
+        CGI.unescapeHTML(text).gsub(/\s+/, " ").strip
       end
     end
   end
