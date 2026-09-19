@@ -55,6 +55,16 @@ module FeedConcierge
       docs_tests_ci: "Documentation, comments, tests, CI configuration, dependency bumps, or release chores."
     }.freeze
 
+    COMPONENT_KINDS = {
+      os_or_kernel: "An operating system, kernel, or base system component such as a libc, shell, or init system.",
+      language_runtime_or_package: "A programming language runtime or a package from a language ecosystem such as a gem, npm package, or PyPI package.",
+      library_dependency: "A general-purpose library that applications link or embed, such as image, media, compression, TLS, XML, or database client libraries.",
+      server_software: "A database, cache, web server, message broker, mail server, or other server software that applications run alongside.",
+      cloud_or_dev_tooling: "A cloud service, container or orchestration tool, CI system, source hosting, editor, or other developer tooling.",
+      network_appliance: "A router, firewall, VPN gateway, email gateway, or other network appliance.",
+      enterprise_or_consumer_product: "An enterprise application, industrial or medical system, consumer device, or mobile phone firmware."
+    }.freeze
+
     USER_IMPACT_LEVELS = [
       "Only affects contrived code, fuzzer inputs, or an internal detail no ordinary program touches.",
       "Affects a specific niche: one platform, one rarely used method, or an unusual configuration.",
@@ -95,12 +105,22 @@ module FeedConcierge
         worth_reading: WORTH_READING,
         evergreen: EVERGREEN
       },
-      # Short advisories (CVE catalog entries) have no prose to rate, so substance is left out.
+      # Advisories (CVE catalog entries, weekly report items) have no prose to rate, so instead of
+      # interest and substance they are judged on whether they touch the reader's stack and on the
+      # kind of component that is affected.
       "advisory" => {
-        interest: {
-          type: "score",
-          instructions: "How well does the vulnerability described in `article` match the interests described in `reader_profile`?",
-          criteria: INTEREST_LEVELS
+        affects_stack: {
+          type: "noul",
+          instructions: "Does the vulnerability in `article` affect software that the developer described in `reader_profile` runs or depends on?",
+          criteria: {
+            "true" => "The affected product is an operating system or kernel, a language runtime or package, a library that web or mobile applications depend on, a cloud service, or a developer tool that such a developer would use.",
+            "false" => "The affected product is network equipment, an enterprise or industrial product, a consumer device, or software that developer would not operate."
+          }
+        },
+        component_kind: {
+          type: "choice",
+          instructions: "What kind of component does the vulnerability in `article` affect?",
+          criteria: COMPONENT_KINDS
         },
         worth_reading: WORTH_READING,
         evergreen: EVERGREEN
@@ -219,6 +239,17 @@ module FeedConcierge
         end
       end
       judgment.merge("input_tokens" => response.dig("usage", "input_tokens"))
+    end
+
+    # True when a cached judgment answers every question in the named set, so a set whose
+    # questions changed is re-judged without a VERSION bump.
+    def self.complete?(judgment, question_set)
+      QUESTION_SETS.fetch(question_set).all? do |id, question|
+        next false unless judgment.key?(id.to_s)
+        next true unless question[:type] == "choice"
+
+        question[:criteria].keys.map(&:to_s).all? { |option| judgment.dig("#{id}_probabilities", option) }
+      end
     end
 
     # Maps a stored answer to 0..1 so Ranker can weight questions uniformly.

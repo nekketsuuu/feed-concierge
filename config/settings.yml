@@ -85,6 +85,13 @@ sources:
     name: jpcert_weekly
     max_age_days: 14
     excerpt: false
+    questions: advisory
+  - type: github_advisories
+    name: github_advisories
+    ecosystems: [rubygems]
+    lookback_days: 14
+    excerpt: false
+    questions: advisory
   - type: rss
     name: spotify_engineering
     feeds:
@@ -219,8 +226,9 @@ ranking:
       interest: 0.15
       worth_reading: 0.2
     advisory:
-      interest: 0.6
-      worth_reading: 0.4
+      affects_stack: 0.45
+      component_kind: 0.35
+      worth_reading: 0.2
     changelog:
       interest: 0.5
       change_kind: 0.3
@@ -246,6 +254,14 @@ ranking:
       incremental_improvement: 0.5
       fix_or_maintenance: 0.3
       regional_availability: 0.15
+    component_kind:
+      os_or_kernel: 0.9
+      language_runtime_or_package: 1.0
+      library_dependency: 1.0
+      server_software: 0.9
+      cloud_or_dev_tooling: 0.8
+      network_appliance: 0.2
+      enterprise_or_consumer_product: 0.1
     pr_kind:
       new_feature: 1.0
       behavior_change_or_deprecation: 0.9
@@ -271,6 +287,7 @@ ranking:
     rails_prs: 10
     cisa_kev: 8
     jpcert_weekly: 8
+    github_advisories: 8
     bleepingcomputer: 8
   # Articles below this relevance never make the page even when fresh.
   min_relevance: 0.2

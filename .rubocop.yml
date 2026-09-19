@@ -14,3 +14,4 @@ Layout/LineLength:
   AllowedPatterns:
     - '\A\s*"[^"]*",?\s*\z'
     - '\A\s*\w+: "[^"]*",?\s*\z'
+    - '\A\s*"\w+" => "[^"]*",?\s*\z'
