@@ -12,6 +12,8 @@ module FeedConcierge
   class Judge
     # Bump when questions change so cached judgments are redone on the next build.
     VERSION = 4
+    # Bump one set's version to re-judge only the sources that use it (wording changes).
+    SET_VERSIONS = { "advisory" => 2 }.freeze
 
     INTEREST_LEVELS = [
       "The article is about a topic the reader profile explicitly says they are not interested in, or is unrelated to anything in the profile.",
@@ -120,8 +122,8 @@ module FeedConcierge
           type: "noul",
           instructions: "Does the vulnerability in `article` affect software that the developer described in `reader_profile` runs or depends on?",
           criteria: {
-            "true" => "The affected product is something that developer plausibly has in production or on a workstation: the operating system or kernel, the Ruby, JavaScript, or mobile toolchains, a widely used package or library in those ecosystems, a common database or server, a cloud service, or a mainstream developer tool.",
-            "false" => "The affected product is network equipment, an enterprise or industrial product, a consumer device, a niche package in an ecosystem or domain that developer does not work in (for example IoT, blockchain, data science notebooks, or a CMS plugin), or software that developer would not operate."
+            "true" => "The affected product is something that developer plausibly has in production or on a workstation: the operating system or kernel; Ruby, a gem, or a library Rails depends on; an npm package that a Ruby on Rails application commonly uses for its frontend or asset build (JavaScript frameworks, bundlers, CSS tooling, HTML or Markdown processing); a pip package commonly used to build API or web applications (web frameworks, HTTP servers and clients, async runtimes, validation, ORMs, task queues); mobile SDKs; a common database or server; a cloud service; or a mainstream developer tool.",
+            "false" => "The affected product is network equipment, an enterprise or industrial product, a consumer device, an npm or pip package for a domain that developer does not work in (for example IoT, industrial protocols, blockchain, data science notebooks, desktop or game tooling, or a CMS plugin), or software that developer would not operate."
           }
         },
         component_kind: {
@@ -232,7 +234,8 @@ module FeedConcierge
       }
       response = @client.system_one(state: state, questions: questions)
       answers = response.fetch("answers")
-      judgment = { "model" => response["model"], "question_set" => question_set, "version" => VERSION, "tags" => {} }
+      judgment = { "model" => response["model"], "question_set" => question_set, "version" => VERSION,
+                   "set_version" => SET_VERSIONS.fetch(question_set, 1), "tags" => {} }
       questions.each_key do |id|
         answer = answers.fetch(id.to_s)
         if id.to_s.start_with?("tag_")
@@ -256,6 +259,8 @@ module FeedConcierge
     # True when a cached judgment answers every question in the named set, so a set whose
     # questions changed is re-judged without a VERSION bump.
     def self.complete?(judgment, question_set)
+      return false unless (judgment["set_version"] || 1) == SET_VERSIONS.fetch(question_set, 1)
+
       QUESTION_SETS.fetch(question_set).all? do |id, question|
         next false unless judgment.key?(id.to_s)
         next true unless question[:type] == "choice"

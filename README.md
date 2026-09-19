@@ -15,7 +15,7 @@ what kind of component it is, instead of rating interest and substance of the pr
 Every request also carries one Noul per tag in `config/tags.yml`.
 Tags whose probability clears `tags.min_probability` are shown on the page, at most
 `tags.max_per_article` per article. Bump `Judge::VERSION` after changing questions to re-judge
-cached articles.
+cached articles, or bump one entry of `Judge::SET_VERSIONS` to re-judge only the sources using that set.
 
 Code owns the rest (`lib/feed_concierge/ranker.rb`, weights in `config/settings.yml`):
 
