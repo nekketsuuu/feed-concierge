@@ -80,6 +80,7 @@ sources:
     name: cisa_kev
     lookback_days: 7
     excerpt: false
+    questions: advisory
   - type: jpcert_weekly
     name: jpcert_weekly
     max_age_days: 14
@@ -217,6 +218,9 @@ ranking:
       user_impact: 0.25
       interest: 0.15
       worth_reading: 0.2
+    advisory:
+      interest: 0.6
+      worth_reading: 0.4
     changelog:
       interest: 0.5
       change_kind: 0.3

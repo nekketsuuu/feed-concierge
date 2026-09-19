@@ -95,6 +95,16 @@ module FeedConcierge
         worth_reading: WORTH_READING,
         evergreen: EVERGREEN
       },
+      # Short advisories (CVE catalog entries) have no prose to rate, so substance is left out.
+      "advisory" => {
+        interest: {
+          type: "score",
+          instructions: "How well does the vulnerability described in `article` match the interests described in `reader_profile`?",
+          criteria: INTEREST_LEVELS
+        },
+        worth_reading: WORTH_READING,
+        evergreen: EVERGREEN
+      },
       "changelog" => {
         change_kind: {
           type: "choice",
