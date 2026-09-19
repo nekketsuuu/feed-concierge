@@ -80,8 +80,8 @@
         const li = document.querySelector(`li[data-id="${CSS.escape(row.id)}"]`);
         if (!li) continue;
         const box = el("div", "dbg");
-        box.appendChild(el("div", null, `${row.source} · ${row.question_set} · ${row.age_hours}h · score ${f(row.score)}`));
-        box.appendChild(factorRows([["relevance", row.relevance], ["freshness", row.freshness], ["exposure", row.exposure]]));
+        box.appendChild(el("div", null, `${row.source} · ${row.question_set} · ${row.age_hours}h`));
+        box.appendChild(factorRows([["score", row.score], ["relevance", row.relevance], ["freshness", row.freshness], ["exposure", row.exposure]]));
         box.appendChild(el("div", "dbg-h", "relevance by question (slot width = weight, fill = answer)"));
         box.appendChild(slotBar(row.components, row));
         li.appendChild(box);
