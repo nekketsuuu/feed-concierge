@@ -1,4 +1,3 @@
-require "net/http"
 require "rss"
 require "uri"
 
@@ -17,7 +16,7 @@ module FeedConcierge
       private
 
       def fetch(url)
-        body = Net::HTTP.get(URI(url))
+        body = Http.get(url)
         RSS::Parser.parse(body, false).items.filter_map { |item| to_article(item) }
       end
 

@@ -18,6 +18,10 @@ module FeedConcierge
 
     def judged?(id) = @entries.dig(id, "judgment") ? true : false
 
+def judged_url?(canonical_url)
+  @entries.each_value.any? { |e| e["judgment"] && Article.from_h(e["article"]).canonical_url == canonical_url }
+end
+
     def remember(article, judgment:, excerpt_used:)
       entry = (@entries[article.id] ||= { "first_seen_at" => Time.now.utc.iso8601, "shown_count" => 0 })
       entry["article"] = article.to_h.transform_keys(&:to_s)

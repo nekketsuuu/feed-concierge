@@ -16,6 +16,7 @@
   li h2 a:hover { text-decoration: underline; }
   .meta { font-size: .8em; color: var(--muted); display: flex; gap: .8rem; flex-wrap: wrap; }
   .meta a { color: inherit; }
+  .source { font-weight: 600; }
   .bars { display: flex; gap: .8rem; margin-top: .4rem; font-size: .75em; color: var(--muted); }
   .bar { display: inline-block; width: 60px; height: 6px; background: rgba(127,127,127,.25); border-radius: 3px; vertical-align: middle; margin-left: .3rem; }
   .bar span { display: block; height: 100%; background: var(--bar); border-radius: 3px; }
@@ -32,9 +33,10 @@
   <li>
     <h2><%= i + 1 %>. <a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a></h2>
     <div class="meta">
+      <span class="source"><%= h(source_labels.fetch(r.article.source, r.article.source)) %></span>
       <span><%= h(r.article.domain) %></span>
-      <span><%= r.article.points %> pts</span>
-      <a href="<%= h(r.article.comments_url) %>"><%= r.article.comment_count %> comments</a>
+      <%- if r.article.points -%><span><%= r.article.points %> pts</span><%- end -%>
+      <%- if r.article.comments_url -%><a href="<%= h(r.article.comments_url) %>"><%= r.article.comment_count %> comments</a><%- end -%>
       <span><%= age_label(r.age_hours) %> ago</span>
       <span>score <%= r.score.round(3) %></span>
     </div>

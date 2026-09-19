@@ -1,7 +1,7 @@
 # Feed Concierge
 
 A personal, static "concierge feed". A GitHub Actions job fetches articles from configured
-sources (currently Hacker News RSS), asks [TypeSafe Jev](https://docs.typesafe.ai/) a few
+sources (Hacker News, Lobsters, LWN.net, Phoronix), asks [TypeSafe Jev](https://docs.typesafe.ai/) a few
 typed questions about each new article, combines the answers with freshness in plain Ruby,
 and publishes the ranked list to GitHub Pages.
 
@@ -48,12 +48,20 @@ FEED_CONCIERGE_FAKE_JEV=1 bin/build   # dry run without an API key
 The judgment cache lives in the Actions cache (`actions/cache`). If it is evicted the next
 run simply re-judges the current feed, which costs well under a cent.
 
-## Adding a source
+## Sources
 
-Add a class under `lib/feed_concierge/sources/` that returns `Article` structs from
-`#articles`, register it in `lib/feed_concierge/sources.rb`, and list it in
-`config/settings.yml` under `sources:`. Article ids must be globally unique, so prefix
-them with the source name.
+Configured under `sources:` in `config/settings.yml`. Three source types exist:
+
+| type | what it reads | extra metadata |
+| --- | --- | --- |
+| `hacker_news` | hnrss.org feeds | points, comment count, comments link |
+| `lobsters` | lobste.rs JSON endpoints | score, tags, comment count, comments link |
+| `rss` | any RSS feed (`name:` + `feeds:`), used for LWN.net and Phoronix | feed description as summary |
+
+The same link submitted to several aggregators is judged once; the first source in config
+order wins. To add a new type, write a class under `lib/feed_concierge/sources/` that
+returns `Article` structs from `#articles`, register it in `lib/feed_concierge/sources.rb`,
+and prefix article ids with the source name so they stay globally unique.
 
 ## Tuning
 
