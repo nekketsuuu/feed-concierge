@@ -46,7 +46,7 @@ module FeedConcierge
           title: "#{issue.dig("tracker", "name")} ##{id}: #{issue["subject"].to_s.strip}",
           url: "#{@base_url}/issues/#{id}",
           author: issue.dig("author", "name"),
-          published_at: Time.parse(issue["updated_on"]),
+          published_at: Clock.parse(issue["updated_on"]),
           summary: issue["description"].to_s.strip[0, @description_max_chars],
           tags: [issue.dig("tracker", "name"), issue.dig("status", "name"), issue.dig("project", "name")].compact
         )

@@ -277,3 +277,6 @@ tags:
 site:
   title: "Feed Concierge"
   repository_url: https://github.com/nekketsuuu/feed-concierge
+  # Times on the page are shown in this zone.
+  timezone: "+09:00"
+  timezone_label: JST

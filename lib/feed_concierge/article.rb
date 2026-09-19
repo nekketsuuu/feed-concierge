@@ -28,7 +28,7 @@ module FeedConcierge
     end
 
     def self.from_h(h)
-      new(**h.transform_keys(&:to_sym).merge(published_at: Time.parse(h["published_at"])))
+      new(**h.transform_keys(&:to_sym).merge(published_at: Clock.parse(h["published_at"])))
     end
   end
 end

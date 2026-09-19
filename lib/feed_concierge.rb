@@ -16,6 +16,7 @@ module FeedConcierge
   end
 end
 
+require_relative "feed_concierge/clock"
 require_relative "feed_concierge/article"
 require_relative "feed_concierge/sources"
 require_relative "feed_concierge/excerpt"

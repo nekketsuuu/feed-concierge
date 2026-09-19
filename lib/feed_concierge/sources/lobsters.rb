@@ -32,7 +32,7 @@ module FeedConcierge
           author: story["submitter_user"],
           points: story["score"],
           comment_count: story["comment_count"],
-          published_at: Time.parse(story["created_at"]),
+          published_at: Clock.parse(story["created_at"]),
           summary: story["description_plain"].to_s.strip.then { |s| s.empty? ? nil : s[0, 600] },
           tags: story["tags"]
         )

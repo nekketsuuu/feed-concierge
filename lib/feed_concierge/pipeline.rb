@@ -24,9 +24,7 @@ module FeedConcierge
 
       @store.prune!(retention_days: @settings["retention_days"])
       ranked = Ranker.new(@settings["ranking"]).rank(@store)
-      site = Site.new(@output_dir, title: @settings.dig("site", "title"),
-                                   repository_url: @settings.dig("site", "repository_url"),
-                                   tag_config: @settings.fetch("tags"))
+      site = Site.new(@output_dir, site: @settings.fetch("site"), tag_config: @settings.fetch("tags"))
       site.build(ranked, generated_at: Time.now, judged_count: @store.each_article.size)
       @store.mark_shown(ranked.map { |r| r.article.id })
       @store.save

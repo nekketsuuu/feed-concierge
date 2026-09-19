@@ -29,7 +29,7 @@ module FeedConcierge
         (1..MAX_PAGES).each do |page|
           pulls = JSON.parse(get(page))
           merged.concat(pulls.select { |pr| merged_recently?(pr, cutoff) })
-          break if pulls.size < PAGE_SIZE || Time.parse(pulls.last["updated_at"]) < cutoff
+          break if pulls.size < PAGE_SIZE || Clock.parse(pulls.last["updated_at"]) < cutoff
         end
         merged.map { |pr| to_article(pr) }.sort_by { |a| -a.published_at.to_i }
       end
@@ -37,7 +37,7 @@ module FeedConcierge
       private
 
       def merged_recently?(pr, cutoff)
-        return false unless pr["merged_at"] && Time.parse(pr["merged_at"]) >= cutoff
+        return false unless pr["merged_at"] && Clock.parse(pr["merged_at"]) >= cutoff
         return false if @base_branch && pr.dig("base", "ref") != @base_branch
 
         !@exclude_authors.include?(pr.dig("user", "login"))
@@ -63,7 +63,7 @@ module FeedConcierge
           title: "#{@repo}##{pr["number"]} #{pr["title"].to_s.strip}",
           url: pr["html_url"],
           author: pr.dig("user", "login"),
-          published_at: Time.parse(pr["merged_at"]),
+          published_at: Clock.parse(pr["merged_at"]),
           summary: clean_body(pr["body"].to_s)[0, @body_max_chars],
           tags: pr["labels"].to_a.map { |l| l["name"] }
         )

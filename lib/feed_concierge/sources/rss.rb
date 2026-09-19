@@ -73,7 +73,7 @@ module FeedConcierge
 
           value = item.public_send(field)
           value = value.content if value.respond_to?(:content)
-          return value if value
+          return Clock.parse(value) if value
         end
         Time.now
       end

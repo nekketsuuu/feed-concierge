@@ -8,10 +8,9 @@ module FeedConcierge
   class Site
     TEMPLATE = File.join(ROOT, "templates", "index.html.erb")
 
-    def initialize(output_dir, title:, repository_url:, tag_config:)
+    def initialize(output_dir, site:, tag_config:)
       @output_dir = output_dir
-      @title = title
-      @repository_url = repository_url
+      @site = site
       @tag_config = tag_config
     end
 
@@ -24,8 +23,8 @@ module FeedConcierge
     private
 
     def render(ranked, generated_at, judged_count)
-      title = @title
-      repository_url = @repository_url
+      title = @site["title"]
+      repository_url = @site["repository_url"]
       ERB.new(File.read(TEMPLATE), trim_mode: "-").result(binding)
     end
 
@@ -44,5 +43,11 @@ module FeedConcierge
     def tags_for(r)
       Judge.tags_for(r.entry["judgment"], min_probability: @tag_config["min_probability"], max: @tag_config["max_per_article"])
     end
+
+    def local(time) = time.getlocal(@site["timezone"])
+
+    def date_label(time) = local(time).strftime("%m-%d")
+
+    def datetime_label(time) = "#{local(time).strftime('%Y-%m-%d %H:%M')} #{@site['timezone_label']}"
   end
 end
