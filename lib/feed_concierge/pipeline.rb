@@ -1,6 +1,6 @@
-module HnConcierge
+module FeedConcierge
   class Pipeline
-    def initialize(settings: HnConcierge.settings, store_path:, output_dir:, client:, logger: $stderr)
+    def initialize(settings: FeedConcierge.settings, store_path:, output_dir:, client:, logger: $stderr)
       @settings = settings
       @store = Store.new(store_path)
       @output_dir = output_dir
@@ -9,7 +9,7 @@ module HnConcierge
     end
 
     def run
-      articles = Feed.fetch_all(@settings["feeds"])
+      articles = Sources.fetch_all(@settings["sources"])
       @log.puts "fetched #{articles.size} articles"
 
       pending = articles.reject { |a| @store.judged?(a.id) }
@@ -31,7 +31,7 @@ module HnConcierge
 
     def judge_all(articles)
       @log.puts "judging #{articles.size} new articles"
-      profile = HnConcierge.reader_profile
+      profile = FeedConcierge.reader_profile
       queue = Queue.new
       articles.each { |a| queue << a }
       queue.close

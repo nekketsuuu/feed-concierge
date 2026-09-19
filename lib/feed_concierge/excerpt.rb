@@ -2,7 +2,7 @@ require "net/http"
 require "uri"
 require "cgi"
 
-module HnConcierge
+module FeedConcierge
   module Excerpt
     SKIP_HOSTS = %w[news.ycombinator.com twitter.com x.com youtube.com github.com].freeze
 
@@ -26,7 +26,7 @@ module HnConcierge
     def get_with_redirects(uri, timeout, limit = 3)
       response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
                                  open_timeout: timeout, read_timeout: timeout) do |http|
-        http.request_get(uri.request_uri, "User-Agent" => "hn-concierge/0.1")
+        http.request_get(uri.request_uri, "User-Agent" => "feed-concierge/0.1")
       end
       if response.is_a?(Net::HTTPRedirection) && limit.positive? && response["location"]
         get_with_redirects(URI.join(uri, response["location"]), timeout, limit - 1)

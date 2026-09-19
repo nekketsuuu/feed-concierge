@@ -1,6 +1,8 @@
-feeds:
-  - https://hnrss.org/frontpage?count=60
-  - https://hnrss.org/best?count=30
+sources:
+  - type: hacker_news
+    feeds:
+      - https://hnrss.org/frontpage?count=60
+      - https://hnrss.org/best?count=30
 
 model: jev-latest
 concurrency: 6
@@ -28,4 +30,4 @@ ranking:
   min_relevance: 0.2
 
 site:
-  title: "HN Concierge"
+  title: "Feed Concierge"

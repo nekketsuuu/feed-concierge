@@ -1,12 +1,12 @@
 #!/usr/bin/env ruby
 # Rebuilds the page from cached judgments without fetching feeds or calling Jev.
 # Useful when tuning config/settings.yml ranking weights.
-require_relative "../lib/hn_concierge"
+require_relative "../lib/feed_concierge"
 
-store = HnConcierge::Store.new(ENV.fetch("HN_CONCIERGE_STORE", File.join(HnConcierge::ROOT, "data", "scores.json")))
-output_dir = ENV.fetch("HN_CONCIERGE_OUTPUT", File.join(HnConcierge::ROOT, "site"))
-ranked = HnConcierge::Ranker.new(HnConcierge.settings["ranking"]).rank(store)
-HnConcierge::Site.new(output_dir, title: HnConcierge.settings.dig("site", "title"))
+store = FeedConcierge::Store.new(ENV.fetch("FEED_CONCIERGE_STORE", File.join(FeedConcierge::ROOT, "data", "scores.json")))
+output_dir = ENV.fetch("FEED_CONCIERGE_OUTPUT", File.join(FeedConcierge::ROOT, "site"))
+ranked = FeedConcierge::Ranker.new(FeedConcierge.settings["ranking"]).rank(store)
+FeedConcierge::Site.new(output_dir, title: FeedConcierge.settings.dig("site", "title"))
                  .build(ranked, generated_at: Time.now, judged_count: store.each_article.size)
 ranked.each_with_index do |r, i|
   puts format("%2d %.3f rel=%.2f fresh=%.2f exp=%.2f  %s", i + 1, r.score, r.relevance, r.freshness, r.exposure, r.article.title)

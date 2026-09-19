@@ -1,4 +1,4 @@
-module HnConcierge
+module FeedConcierge
   # Asks Jev a fixed set of questions about one article. All questions go in one request
   # (speculative fan-out); code combines the answers later in Ranker.
   class Judge
@@ -58,8 +58,8 @@ module HnConcierge
         article: {
           title: article.title,
           source_domain: article.domain,
-          hn_points: article.points,
-          hn_comments: article.comment_count,
+          points: article.points,
+          comments: article.comment_count,
           excerpt: excerpt
         }.compact
       }

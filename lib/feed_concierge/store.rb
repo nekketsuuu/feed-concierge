@@ -1,7 +1,7 @@
 require "json"
 require "fileutils"
 
-module HnConcierge
+module FeedConcierge
   # Persists per-article judgments so each article is sent to Jev only once,
   # and remembers how often an article has already been shown on the page.
   class Store

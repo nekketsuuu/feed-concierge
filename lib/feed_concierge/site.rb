@@ -2,7 +2,7 @@ require "erb"
 require "fileutils"
 require "json"
 
-module HnConcierge
+module FeedConcierge
   class Site
     TEMPLATE = File.join(ROOT, "templates", "index.html.erb")
 

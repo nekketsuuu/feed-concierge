@@ -2,7 +2,7 @@ require "net/http"
 require "json"
 require "uri"
 
-module HnConcierge
+module FeedConcierge
   class JevClient
     ENDPOINT = URI("https://api.typesafe.ai/v1/systemone")
     RETRYABLE = %w[429 529 500 502 503].freeze
