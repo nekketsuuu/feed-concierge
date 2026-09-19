@@ -67,9 +67,9 @@
     <span class="summary" id="summary"></span>
     <button id="reset" type="button">reset</button>
   </div>
-  <details open><summary>freshness &amp; page</summary><div class="controls" id="controls-general"></div></details>
   <details open><summary>relevance weights (per question set)</summary><div class="controls" id="controls-weights"></div></details>
   <details><summary>choice option weights</summary><div class="controls" id="controls-choices"></div></details>
+  <details open><summary>freshness &amp; page</summary><div class="controls" id="controls-general"></div></details>
 </div>
 <ol id="list"></ol>
 <footer>Generated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a></footer>
