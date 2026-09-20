@@ -6,7 +6,7 @@ The reader is a software engineer and platform engineer (SRE) who enjoys:
 - Programming languages, compilers, type systems, and language design (especially Ruby, TypeScript & Node.js, Rust, OCaml).
 - Deep technical write-ups: how something works internally, post-mortems, performance investigations, debugging stories.
 - Math, algorithms, and data structures explained clearly.
-- Open source projects with a novel idea, and "Show HN" posts that demonstrate craft.
+- Open source projects with a novel idea.
 
 The reader is not interested in:
 
