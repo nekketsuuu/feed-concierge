@@ -24,8 +24,7 @@ score     = relevance * freshness
 ```
 
 In the browser, articles you click are remembered in localStorage (`site.clicked_ttl_days`) and demoted
-on the next load by `site.clicked_penalty`; they stay on the page, just lower. Visited titles are also
-dimmed with `:visited`, which browsers still honour for links clicked from the same site.
+on the next load by `site.clicked_penalty`; they stay on the page, just lower.
 
 The page lists every article with `score >= min_score`, newest-scored first, up to `top_n`.
 
