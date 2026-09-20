@@ -17,7 +17,7 @@
   li a { text-decoration: none; }
   li a:hover { text-decoration: underline; }
   .meta { color: var(--muted); font-size: .8em; margin-left: .5rem; white-space: nowrap; }
-  .seen-start { margin-top: 1.2rem; }
+  .seen-heading { color: var(--muted); font-size: .8em; margin-top: 1.2rem; border-bottom: 0; padding-bottom: 0; }
   .tag { display: inline-block; font-size: .72em; line-height: 1.5; padding: 0 .45em; margin-left: .35rem; border-radius: 4px; border: 1px solid; vertical-align: 2px; color: #333; background: #fffcd7; border-color: #d5d458; }
 </style>
 </head>
@@ -45,9 +45,9 @@
     const items = [...list.children];
     if (items.some(li => seen[li.dataset.url])) {
       const unseen = items.filter(li => !seen[li.dataset.url]), rest = items.filter(li => seen[li.dataset.url]);
-      rest[0].classList.add("seen-start");
+      const heading = document.createElement("li"); heading.className = "seen-heading"; heading.textContent = "seen";
       const fragment = document.createDocumentFragment();
-      for (const li of unseen.concat(rest)) fragment.appendChild(li);
+      for (const li of unseen.concat([heading], rest)) fragment.appendChild(li);
       list.appendChild(fragment);
     }
     const mark = (url, kind) => { if (kind === "passed" && seen[url]?.kind === "clicked") return; seen[url] = { kind, until: now + TTL_MS }; save(); };
