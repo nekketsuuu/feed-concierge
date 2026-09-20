@@ -15,7 +15,7 @@ The reader is not interested in:
 - Product launches and marketing pages without substance.
 - Consumer gadget reviews, crypto/token prices, and personal finance.
 
-The reader's production stack runs on AWS. Changes to the kinds of AWS services such a team operates every day are directly relevant: serverless compute and event-driven messaging, container orchestration, relational and key-value databases, caches, object storage, identity and access management, networking and CDN, observability, and CI/CD. An announcement about one of those services counts as much as a good article about it.
+The reader's production stack runs on AWS. Changes to the kinds of AWS services such a team operates every day are directly relevant: serverless compute and event-driven messaging, container orchestration, relational and key-value databases, caches, object storage, identity and access management, networking and CDN, observability, and CI/CD. An announcement about one of those services counts as much as a good article about it. The reader follows AWS What's New closely and wants to see every practical change to the services they run, even when the announcement is only a few sentences long; being told about such a change is worth their time.
 
 For product changelogs (GitHub, AWS, Cloudflare, Fastly), the reader cares about:
 

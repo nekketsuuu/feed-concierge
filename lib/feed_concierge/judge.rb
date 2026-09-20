@@ -13,7 +13,7 @@ module FeedConcierge
     # Bump when questions change so cached judgments are redone on the next build.
     VERSION = 6
     # Bump one set's version to re-judge only the sources that use it (wording changes).
-    SET_VERSIONS = { "advisory" => 3, "changelog" => 3 }.freeze
+    SET_VERSIONS = { "advisory" => 3, "changelog" => 4 }.freeze
 
     INTEREST_LEVELS = [
       "The article is about a topic the reader profile explicitly says they are not interested in, or is unrelated to anything in the profile.",
@@ -101,6 +101,17 @@ module FeedConcierge
       }
     }.freeze
 
+    # For announcements the question is whether the reader wants to hear about the change,
+    # not whether a short notice is a satisfying read.
+    CHANGE_WORTH_READING = {
+      type: "noul",
+      instructions: "Would the reader described in `reader_profile` want to be told about the change announced in `article`?",
+      criteria: {
+        "true" => "The change concerns a service or tool the reader uses, and they would want to know about it even though the announcement is short.",
+        "false" => "The reader would not care about this change, or it concerns something they do not use."
+      }
+    }.freeze
+
     EVERGREEN = {
       type: "noul",
       instructions: "Will `article` still be worth reading a month from now?",
@@ -161,7 +172,7 @@ module FeedConcierge
           instructions: "How much does the change announced in `article` matter to the reader described in `reader_profile`?",
           criteria: CHANGE_INTEREST_LEVELS
         },
-        worth_reading: WORTH_READING,
+        worth_reading: CHANGE_WORTH_READING,
         evergreen: EVERGREEN
       },
       "pull_request" => {
