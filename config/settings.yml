@@ -312,6 +312,31 @@ sources:
     feeds:
       - https://realtime.jser.info/feed.xml
     max_age_days: 14
+  - type: rss
+    name: project_zero
+    feeds:
+      - https://googleprojectzero.blogspot.com/feeds/posts/default?alt=rss
+    summary_max_chars: 1500
+    max_age_days: 30
+    excerpt: false
+  - type: rss
+    name: portswigger_research
+    feeds:
+      - https://portswigger.net/research/rss
+    max_age_days: 30
+  - type: rss
+    name: microsoft_security
+    feeds:
+      - https://www.microsoft.com/en-us/security/blog/feed/
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: nist_cybersecurity
+    feeds:
+      - https://www.nist.gov/news-events/cybersecurity/rss.xml
+      - https://www.nist.gov/blogs/cybersecurity-insights/rss.xml
+    max_age_days: 14
 
 # Articles are forgotten this many days after they were first seen.
 retention_days: 10
