@@ -13,7 +13,7 @@ module FeedConcierge
     # Bump when questions change so cached judgments are redone on the next build.
     VERSION = 5
     # Bump one set's version to re-judge only the sources that use it (wording changes).
-    SET_VERSIONS = { "advisory" => 3, "changelog" => 2 }.freeze
+    SET_VERSIONS = { "advisory" => 3, "changelog" => 3 }.freeze
 
     INTEREST_LEVELS = [
       "The article is about a topic the reader profile explicitly says they are not interested in, or is unrelated to anything in the profile.",
@@ -27,10 +27,10 @@ module FeedConcierge
     # article rubric above rewards depth and style that an announcement can never have.
     CHANGE_INTEREST_LEVELS = [
       "The product or service is one the reader would not use, or the change is irrelevant to the way they build and operate software.",
-      "The service is one the reader might use, but the change does not affect how they build or operate: a niche option, an unrelated region, or a tier they would not buy.",
-      "The service is one the reader likely uses, and the change is worth knowing about when they next touch it.",
-      "The service is central to the reader's stack, and the change affects how they build, deploy, or operate: a new capability, a lifted limit, a changed default, or an integration they would adopt.",
-      "The change directly alters something the reader depends on today, such as pricing or limits, deprecations, security defaults, or a long-requested capability in a core service."
+      "The service is one the reader might use, but the change does not affect how they build or operate: an unrelated region, a tier they would not buy, or a marketing or partner announcement.",
+      "The service is one the reader likely uses, and the change is minor: an incremental option, a small integration, or a platform variant they may not run.",
+      "The service is one the reader uses, and the change is practical for them: a new capability, a lifted limit, a changed default, an integration they would adopt, or a fix to something they rely on.",
+      "The change directly alters something the reader depends on today in a core service: pricing or limits, deprecations, security defaults, or a long-requested capability."
     ].freeze
 
     SUBSTANCE_LEVELS = [
