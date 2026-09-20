@@ -128,6 +128,10 @@
     return out;
   };
 
+  // The reference order is the default config applied in this browser, click history included,
+  // so movement only reflects slider changes.
+  const baseline = (() => { const saved = config; config = JSON.parse(JSON.stringify(defaults)); const ranks = Object.fromEntries(page().map((x, i) => [x.row.id, i + 1])); config = saved; return ranks; })();
+
   // --- explain tree (same drawing as before) ---
   const waterfall = x => {
     let running = 1, parts = [], notes = [];
@@ -198,17 +202,17 @@
       const li = el("li");
       const row = el("div", "row");
       row.appendChild(el("span", "rank", String(i + 1)));
-      const before = x.row.baseline_rank, move = before == null ? "new" : before - (i + 1);
+      const before = baseline[x.row.id], move = before == null ? "new" : before - (i + 1);
       const delta = el("span", "delta " + (move === "new" ? "new" : move > 0 ? "up" : move < 0 ? "down" : ""), move === "new" ? "new" : move > 0 ? `▲${move}` : move < 0 ? `▼${-move}` : "–");
-      delta.title = before == null ? "not on the published page" : `published rank ${before}`;
+      delta.title = before == null ? "not on the page at default settings" : `default rank ${before}`;
       row.appendChild(delta);
       const body = el("span"); const a = el("a", null, x.row.title); a.href = x.row.url; body.appendChild(a);
       body.appendChild(el("span", "meta", `${x.row.domain || ""} · ${x.row.date} · ${x.row.source}`));
       row.appendChild(body); li.appendChild(row); li.appendChild(explain(x)); list.appendChild(li);
     });
-    const dropped = data.rows.filter(r => r.baseline_rank != null && !rows.some(x => x.row.id === r.id)).length;
+    const dropped = data.rows.filter(r => baseline[r.id] != null && !rows.some(x => x.row.id === r.id)).length;
     const clickedCount = data.rows.filter(r => clicked[r.url]).length;
-    document.getElementById("summary").textContent = `${rows.length} shown of ${data.rows.length} candidates · ${dropped} left the page · ${rows.filter(x => x.row.baseline_rank == null).length} entered · ${clickedCount} clicked`;
+    document.getElementById("summary").textContent = `${rows.length} shown of ${data.rows.length} candidates · ${dropped} left the page · ${rows.filter(x => baseline[x.row.id] == null).length} entered · ${clickedCount} clicked`;
   };
 
   // --- controls ---
