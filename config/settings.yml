@@ -326,13 +326,13 @@ ranking:
   # Freshness follows floor + (1 - floor) / (1 + (age / half_life)^steepness): nearly flat for the
   # first day, halfway down at half_life, then a long tail. Evergreen articles get a longer half-life.
   freshness:
-    half_life_hours: 120
-    evergreen_half_life_bonus_hours: 48
+    half_life_hours: 24
+    evergreen_half_life_bonus_hours: 72
     steepness: 2
-    floor: 0.25
+    floor: 0.1
   # The page lists every article whose score reaches min_score, up to top_n of them.
   min_score: 0.35
-  top_n: 100
+  top_n: 200
   # Optional per-source caps so one busy source cannot fill the page.
   max_per_source:
     ruby_bugs: 15
