@@ -15,7 +15,7 @@ module FeedConcierge
       page_from(candidates(store))
     end
 
-    # Every judged article that clears min_relevance, best first; the debug page re-ranks these.
+    # Every judged article that clears min_relevance, best first; the tune page re-ranks these.
     def candidates(store)
       store.each_article.map { |article, entry| evaluate(article, entry) }
            .select { |r| r.relevance >= @config["min_relevance"] }
@@ -41,7 +41,7 @@ module FeedConcierge
                  score: relevance * freshness, age_hours: age_hours)
     end
 
-    # How freshness was derived, plus what-if values, for the debug view.
+    # How freshness was derived, plus what-if values, for the tune page.
     def explain(item)
       f = @config["freshness"]
       evergreen = item.entry.dig("judgment", "evergreen").to_f

@@ -7,7 +7,7 @@ require "json"
 module FeedConcierge
   class Site
     TEMPLATE = File.join(ROOT, "templates", "index.html.erb")
-    DEBUG_TEMPLATE = File.join(ROOT, "templates", "debug.html.erb")
+    TUNE_TEMPLATE = File.join(ROOT, "templates", "tune.html.erb")
 
     def initialize(output_dir, site:, tag_config:, ranking_config:)
       @output_dir = output_dir
@@ -19,7 +19,7 @@ module FeedConcierge
     def build(ranked, candidates:, generated_at:, judged_count:)
       FileUtils.mkdir_p(@output_dir)
       File.write(File.join(@output_dir, "index.html"), render(ranked, generated_at, judged_count))
-      File.write(File.join(@output_dir, "debug.html"), render_debug(ranked, candidates, generated_at))
+      File.write(File.join(@output_dir, "tune.html"), render_tune(ranked, candidates, generated_at))
       File.write(File.join(@output_dir, "data.json"), JSON.pretty_generate(ranked.map { |r| to_json_row(r) }))
     end
 
@@ -31,11 +31,11 @@ module FeedConcierge
       ERB.new(File.read(TEMPLATE), trim_mode: "-").result(binding)
     end
 
-    def render_debug(ranked, candidates, generated_at)
+    def render_tune(ranked, candidates, generated_at)
       title = @site["title"]
       repository_url = @site["repository_url"]
-      debug_data = debug_json(ranked, candidates)
-      ERB.new(File.read(DEBUG_TEMPLATE), trim_mode: "-").result(binding)
+      tune_data = tune_json(ranked, candidates)
+      ERB.new(File.read(TUNE_TEMPLATE), trim_mode: "-").result(binding)
     end
 
     def to_json_row(item)
@@ -51,10 +51,10 @@ module FeedConcierge
       }
     end
 
-    # Everything the debug page needs to re-rank in the browser: the ranking config and, for
+    # Everything the tune page needs to re-rank in the browser: the ranking config and, for
     # every candidate, the raw answers behind its score. Embedded in the page because browsers
     # refuse fetch() on file:// pages.
-    def debug_json(ranked, candidates)
+    def tune_json(ranked, candidates)
       rank = ranked.each_with_index.to_h { |item, i| [item.article.id, i + 1] }
       f = @ranking_config["freshness"]
       config = { weights: @ranking_config["weights"], choice_weights: @ranking_config["choice_weights"] || {},

@@ -26,6 +26,6 @@
   <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= local(r.article.published_at).iso8601 %>"><%= date_label(r.article.published_at) %></time></span></li>
 <%- end -%>
 </ul>
-<footer>Updated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a> · <a href="debug.html">debug</a></footer>
+<footer>Updated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a> · <a href="tune.html">tune</a></footer>
 </body>
 </html>

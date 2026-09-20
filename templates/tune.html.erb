@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><%= h(title) %> · debug</title>
+<title><%= h(title) %> · tune</title>
 <style>
   :root { color-scheme: light dark; --muted: #777; --bar-fill: #2a78d6; --bar-track: #cde2fb; }
   @media (prefers-color-scheme: dark) { :root { --bar-fill: #3987e5; --bar-track: #0d366b; } }
@@ -65,7 +65,7 @@
 <body>
 <div class="panel">
   <div class="panel-head">
-    <h1><a href="index.html"><%= h(title) %></a> · debug</h1>
+    <h1><a href="index.html"><%= h(title) %></a> · tune</h1>
     <span class="summary" id="summary"></span>
     <button id="reset" type="button">reset</button>
   </div>
@@ -75,11 +75,11 @@
 </div>
 <ol id="list"></ol>
 <footer>Generated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a></footer>
-<script type="application/json" id="debug-data"><%= debug_data %></script>
+<script type="application/json" id="tune-data"><%= tune_data %></script>
 <script>
   // Re-ranks every candidate in the browser from its raw answers, so weights and the freshness
   // curve can be tuned here before touching settings.yml. Movement is against the published page.
-  const data = JSON.parse(document.getElementById("debug-data").textContent);
+  const data = JSON.parse(document.getElementById("tune-data").textContent);
   const defaults = JSON.parse(JSON.stringify(data.config));
   let config = JSON.parse(JSON.stringify(defaults));
   const f = n => Number(n).toFixed(2);
