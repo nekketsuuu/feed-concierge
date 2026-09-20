@@ -336,6 +336,12 @@ sources:
     name: nist_cybersecurity_news
     url: https://www.nist.gov/cybersecurity
     item_regex: '<a href="(?<href>/news-events/news/[^"]+)">(?<block>(?:(?!</h3>).)*?<h3>\s*<span[^>]*>(?<title>[^<]+)</span>)'
+  - type: listing
+    name: uber_engineering
+    url: https://www.uber.com/blog/engineering/
+    item_regex: '<a [^>]*href="(?<href>https://www\.uber\.com/[a-z]{2}/[a-z-]+/blog/[a-z0-9-]+/)"[^>]*>(?<title>[^<]+)</a></div><div[^>]*>(?<date>[A-Z][a-z]+ \d{1,2}, \d{4})</div>'
+    require_date: true
+    max_age_days: 14
 
 # Articles are forgotten this many days after they were first seen.
 retention_days: 10

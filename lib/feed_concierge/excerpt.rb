@@ -19,7 +19,8 @@ module FeedConcierge
       return nil unless response.is_a?(Net::HTTPSuccess)
       return nil unless response["content-type"].to_s.include?("html")
 
-      text = html_to_text(response.body.to_s.force_encoding("UTF-8").scrub)
+      html = response.body.to_s.force_encoding("UTF-8").scrub
+      text = [meta_description(html), html_to_text(html)].compact.join(" ").strip
       text.empty? ? nil : text[0, max_chars]
     rescue StandardError
       nil
@@ -28,13 +29,21 @@ module FeedConcierge
     def get_with_redirects(uri, timeout, limit = 3)
       response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
                                                      open_timeout: timeout, read_timeout: timeout) do |http|
-        http.request_get(uri.request_uri, "User-Agent" => "feed-concierge/0.1")
+        http.request_get(uri.request_uri, "User-Agent" => "feed-concierge/0.1", "Accept" => Sources::Http::ACCEPT)
       end
       if response.is_a?(Net::HTTPRedirection) && limit.positive? && response["location"]
         get_with_redirects(URI.join(uri, response["location"]), timeout, limit - 1)
       else
         response
       end
+    end
+
+    # The page's own summary, when it has one, leads the excerpt.
+    def meta_description(html)
+      tag = html[/<meta\b[^>]*(?:property="og:description"|name="description")[^>]*>/i] or return nil
+      content = tag[/content="([^"]*)"/i, 1] or return nil
+      text = CGI.unescapeHTML(content).gsub(/\s+/, " ").strip
+      text.empty? ? nil : text
     end
 
     def html_to_text(html)

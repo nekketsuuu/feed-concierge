@@ -8,6 +8,9 @@ module FeedConcierge
     class FetchError < StandardError; end
 
     module Http
+      ACCEPT = "text/html,application/xhtml+xml,application/xml,application/rss+xml,application/atom+xml," \
+               "application/json;q=0.9,*/*;q=0.8"
+
       module_function
 
       # Final URL after following redirects, without fetching the body; used for tracking links.
@@ -16,7 +19,7 @@ module FeedConcierge
         hops.times do
           response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
                                                          open_timeout: 15, read_timeout: 30) do |http|
-            http.request_head(uri.request_uri, "User-Agent" => "feed-concierge/0.1")
+            http.request_head(uri.request_uri, "User-Agent" => "feed-concierge/0.1", "Accept" => ACCEPT)
           end
           return uri.to_s unless response.is_a?(Net::HTTPRedirection) && response["location"]
 
@@ -29,7 +32,7 @@ module FeedConcierge
         uri = URI(url)
         response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
                                                        open_timeout: 15, read_timeout: 30) do |http|
-          http.request_get(uri.request_uri, "User-Agent" => "feed-concierge/0.1")
+          http.request_get(uri.request_uri, "User-Agent" => "feed-concierge/0.1", "Accept" => ACCEPT)
         end
         if response.is_a?(Net::HTTPRedirection) && response["location"] && redirects_left.positive?
           return get(URI.join(uri, response["location"]).to_s, redirects_left: redirects_left - 1)
