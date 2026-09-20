@@ -42,7 +42,7 @@ module FeedConcierge
         body = encoded.empty? ? item.description.to_s : encoded
         links = anchors(body)
         links = anchors(Http.get(item.link.to_s)) if links.empty? && @fallback_to_page && item.link
-        links.first(@max_links_per_entry).filter_map { |href, anchor| to_article(href, anchor, item, links.size) }
+        links.first(@max_links_per_entry).filter_map { |href, anchor| to_article(href, anchor, item) }
       rescue FetchError, SystemCallError, Timeout::Error, OpenSSL::SSL::SSLError
         []
       end
@@ -70,11 +70,11 @@ module FeedConcierge
         true
       end
 
-      def to_article(href, anchor, item, link_count)
-        # A post that exists to point at one link (Rubyflow) already describes it in its own title and text.
-        described = @entry_describes_link && link_count == 1
+      def to_article(href, anchor, item)
+        # A post that exists to point at a link (Rubyflow) already describes it in its own title and text.
+        described = @entry_describes_link
         title = if described then text(item.title)
-                elsif anchor.size >= @min_anchor_chars then anchor
+                elsif anchor.size >= @min_anchor_chars && !anchor.match?(%r{\Ahttps?://}) then anchor
                 else page_title(href) || anchor
                 end
         return if title.empty?
