@@ -87,7 +87,7 @@
   const days = h => `${Number.isInteger(h / 24) ? h / 24 : (h / 24).toFixed(1).replace(/\.0$/, "")}d`;
   const dur = h => h < 48 ? `${Math.round(h)}h` : days(h);
   // Same seen memory as index.html (clicked, or scrolled past the top); expired entries are ignored.
-  const seen = (() => { try { const s = JSON.parse(localStorage.getItem("feed-concierge:seen") || "{}"); const now = Date.now(); return Object.fromEntries(Object.entries(s).filter(([, v]) => v && v.until > now).map(([u, v]) => [u, v.kind === "passed" ? { ...v, kind: "seen" } : v])); } catch { return {}; } })();
+  const seen = (() => { try { const s = JSON.parse(localStorage.getItem("feed-concierge:seen") || "{}"); const now = Date.now(); return Object.fromEntries(Object.entries(s).filter(([, v]) => v && v.until > now)); } catch { return {}; } })();
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const fillOf = value => { const i = el("i"); i.style.width = pct(value); return i; };
   const flexRow = (cls, parts) => {
@@ -191,10 +191,10 @@
     fn.appendChild(node("evergreen", x.row.evergreen, `adds ${days(bonus * x.row.evergreen)} to the ${days(base)} half-life · freshness without it ${f(fresh(x.row.age_hours, base))}, fully evergreen ${f(fresh(x.row.age_hours, base + bonus))}`));
     box.appendChild(fn);
     const seenNode = el("div", "node");
-    const alt = { clicked: f(x.base * config.penalties.clicked), seen: f(x.base * config.penalties.seen), none: f(x.base) };
-    seenNode.appendChild(el("div", "node-how", x.seenKind === "clicked" ? `clicked · if seen ${alt.seen} · if not seen ${alt.none}`
-      : x.seenKind === "seen" ? `seen · if clicked ${alt.clicked} · if not seen ${alt.none}`
-      : `not seen · if seen ${alt.seen} · if clicked ${alt.clicked}`));
+    const alt = { clicked: f(x.base * config.penalties.clicked), passed: f(x.base * config.penalties.passed), none: f(x.base) };
+    seenNode.appendChild(el("div", "node-how", x.seenKind === "clicked" ? `clicked · if passed ${alt.passed} · if not seen ${alt.none}`
+      : x.seenKind === "passed" ? `passed · if clicked ${alt.clicked} · if not seen ${alt.none}`
+      : `not seen · if passed ${alt.passed} · if clicked ${alt.clicked}`));
     box.appendChild(seenNode);
     return box;
   };
@@ -216,8 +216,8 @@
       row.appendChild(body); li.appendChild(row); li.appendChild(explain(x)); list.appendChild(li);
     });
     const dropped = data.rows.filter(r => baseline[r.id] != null && !rows.some(x => x.row.id === r.id)).length;
-    const clickedCount = data.rows.filter(r => seen[r.url]?.kind === "clicked").length, seenCount = data.rows.filter(r => seen[r.url]?.kind === "seen").length;
-    document.getElementById("summary").textContent = `${rows.length} shown of ${data.rows.length} candidates · ${dropped} left the page · ${rows.filter(x => baseline[x.row.id] == null).length} entered · ${clickedCount} clicked · ${seenCount} seen`;
+    const clickedCount = data.rows.filter(r => seen[r.url]?.kind === "clicked").length, passedCount = data.rows.filter(r => seen[r.url]?.kind === "passed").length;
+    document.getElementById("summary").textContent = `${rows.length} shown of ${data.rows.length} candidates · ${dropped} left the page · ${rows.filter(x => baseline[x.row.id] == null).length} entered · ${clickedCount} clicked · ${passedCount} passed`;
   };
 
   // --- controls ---
@@ -238,7 +238,7 @@
     control(general, "min score", () => config.min_score, v => config.min_score = v, 0, 0.9, 0.05);
     control(general, "top n", () => config.top_n, v => config.top_n = v, 10, 300, 10);
     control(general, "clicked penalty", () => config.penalties.clicked, v => config.penalties.clicked = v, 0, 1, 0.05);
-    control(general, "seen penalty", () => config.penalties.seen, v => config.penalties.seen = v, 0, 1, 0.05);
+    control(general, "passed penalty", () => config.penalties.passed, v => config.penalties.passed = v, 0, 1, 0.05);
     // One heading and grid per question set / question, so related sliders sit together.
     const group = (parent, name) => { const g = el("div", "group"); g.appendChild(el("h3", null, name)); const c = el("div", "controls"); g.appendChild(c); parent.appendChild(g); return c; };
     for (const [set, ws] of Object.entries(config.weights)) {
