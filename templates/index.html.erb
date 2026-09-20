@@ -27,8 +27,7 @@
 <%- end -%>
 </ul>
 <script>
-  // Articles clicked here are remembered in localStorage with a TTL and, on the next page load,
-  // demoted (score × penalty) but kept on the page. Runs once at load; nothing on history back.
+  // Demotes articles already clicked here, remembered in localStorage.
   (() => {
     const KEY = "feed-concierge:clicked", TTL_MS = <%= @site["clicked_ttl_days"] %> * 86400e3, PENALTY = <%= @site["clicked_penalty"] %>;
     const now = Date.now();

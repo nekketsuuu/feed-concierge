@@ -23,8 +23,8 @@ freshness = floor + (1 - floor) / (1 + (age_hours / half_life)^steepness)   # ha
 score     = relevance * freshness
 ```
 
-In the browser, articles you click are remembered in localStorage (`site.clicked_ttl_days`) and demoted
-on the next load by `site.clicked_penalty`; they stay on the page, just lower.
+Articles you click are remembered in localStorage and demoted on later loads (`site.clicked_penalty`,
+`site.clicked_ttl_days`).
 
 The page lists every article with `score >= min_score`, newest-scored first, up to `top_n`.
 
