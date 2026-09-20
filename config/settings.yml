@@ -287,13 +287,6 @@ sources:
     summary_max_chars: 1500
     max_age_days: 14
     excerpt: false
-  - type: rss
-    name: register_spill
-    feeds:
-      - https://registerspill.thorstenball.com/feed
-    summary_max_chars: 1500
-    max_age_days: 14
-    excerpt: false
   - type: feed_links
     name: register_spill_links
     feeds:
