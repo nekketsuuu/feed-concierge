@@ -10,12 +10,14 @@ require_relative "sources/jpcert_weekly"
 require_relative "sources/cisa_kev"
 require_relative "sources/github_advisories"
 require_relative "sources/listing"
+require_relative "sources/feed_links"
 
 module FeedConcierge
   module Sources
     REGISTRY = { "hacker_news" => HackerNews, "lobsters" => Lobsters, "rss" => Rss, "redmine" => Redmine,
                  "github_pulls" => GithubPulls, "jpcert_weekly" => JpcertWeekly, "cisa_kev" => CisaKev,
-                 "github_advisories" => GithubAdvisories, "listing" => Listing }.freeze
+                 "github_advisories" => GithubAdvisories, "listing" => Listing,
+                 "feed_links" => FeedLinks }.freeze
     NON_CONSTRUCTOR_KEYS = %w[type excerpt questions].freeze
 
     # Builds sources from config/settings.yml entries like:
