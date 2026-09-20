@@ -2,7 +2,7 @@ name: Build and publish
 
 on:
   schedule:
-    - cron: "17 */2 * * *"
+    - cron: "53 1-23/2 * * *"   # every two hours at :53 JST (UTC+9 -> odd UTC hours)
   workflow_dispatch:
 
 concurrency:
