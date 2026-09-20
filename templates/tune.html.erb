@@ -86,8 +86,6 @@
   const pct = v => `${Math.max(0, Math.min(1, v)) * 100}%`;
   const days = h => `${Number.isInteger(h / 24) ? h / 24 : (h / 24).toFixed(1).replace(/\.0$/, "")}d`;
   const dur = h => h < 48 ? `${Math.round(h)}h` : days(h);
-  // Same click memory as index.html; entries past their TTL are ignored.
-  const clicked = (() => { try { const c = JSON.parse(localStorage.getItem("feed-concierge:clicked") || "{}"); const now = Date.now(); return Object.fromEntries(Object.entries(c).filter(([, until]) => until > now)); } catch { return {}; } })();
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const fillOf = value => { const i = el("i"); i.style.width = pct(value); return i; };
   const flexRow = (cls, parts) => {
@@ -110,15 +108,10 @@
     const components = row.components.map(c => { const value = answerOf(row, c); return { id: c.id, value, weight: weights[c.id], contribution: weights[c.id] * value }; });
     const relevance = components.reduce((s, c) => s + c.contribution, 0);
     const freshness = fresh(row.age_hours, halfLifeOf(row));
-    const wasClicked = Boolean(clicked[row.url]);
-    const penalty = wasClicked ? config.clicked_penalty : 1;
-    const base = relevance * freshness;
-    return { row, components, relevance, freshness, wasClicked, penalty, base, score: base * penalty };
+    return { row, components, relevance, freshness, score: relevance * freshness };
   };
-  // Selection mirrors the build (threshold, dedup, caps, top n) on the unpenalized score; the
-  // click penalty only reorders the selected articles, as index.html does in the browser.
   const page = () => {
-    const scored = data.rows.map(score).filter(x => x.base >= config.min_score).sort((a, b) => b.base - a.base);
+    const scored = data.rows.map(score).filter(x => x.score >= config.min_score).sort((a, b) => b.score - a.score);
     const seen = new Set(), perSource = {}, out = [];
     for (const x of scored) {
       if (seen.has(x.row.dedup_key)) continue;
@@ -128,19 +121,13 @@
       out.push(x);
       if (out.length >= config.top_n) break;
     }
-    return out.map((x, i) => [x, i]).sort(([a, i], [b, j]) => b.score - a.score || i - j).map(([x]) => x);
+    return out;
   };
-
-  // The reference order is the default config applied in this browser, click history included,
-  // so movement only reflects slider changes.
-  const baseline = (() => { const saved = config; config = JSON.parse(JSON.stringify(defaults)); const ranks = Object.fromEntries(page().map((x, i) => [x.row.id, i + 1])); config = saved; return ranks; })();
 
   // --- explain tree (same drawing as before) ---
   const waterfall = x => {
     let running = 1, parts = [], notes = [];
-    const steps = [["relevance", x.relevance], ["freshness", x.freshness]];
-    if (x.wasClicked) steps.push(["clicked", x.penalty]);
-    for (const [name, factor] of steps) { const loss = running * (1 - factor); parts.push([loss, el("div", "wf-loss"), `${name} removed ${f(loss)}`]); notes.push(`−${f(loss)} ${name}`); running *= factor; }
+    for (const [name, factor] of [["relevance", x.relevance], ["freshness", x.freshness]]) { const loss = running * (1 - factor); parts.push([loss, el("div", "wf-loss"), `${name} removed ${f(loss)}`]); notes.push(`−${f(loss)} ${name}`); running *= factor; }
     parts.unshift([running, el("div", "wf-kept"), `score ${f(running)}`]);
     const wrap = el("div"); wrap.appendChild(flexRow("wf", parts));
     const legend = el("div", "wf-legend"); legend.appendChild(el("b", null, `score ${f(running)}`)); legend.appendChild(el("span", null, ` · ${notes.join(" · ")}`)); wrap.appendChild(legend);
@@ -190,11 +177,6 @@
     fn.appendChild(curve(x));
     fn.appendChild(node("evergreen", x.row.evergreen, `adds ${days(bonus * x.row.evergreen)} to the ${days(base)} half-life · freshness without it ${f(fresh(x.row.age_hours, base))}, fully evergreen ${f(fresh(x.row.age_hours, base + bonus))}`));
     box.appendChild(fn);
-    // clicked: one line with the score the other state would give.
-    const unclicked = x.relevance * x.freshness;
-    const clickNode = el("div", "node");
-    clickNode.appendChild(el("div", "node-how", x.wasClicked ? `clicked · if not clicked ${f(unclicked)}` : `not clicked · if clicked ${f(unclicked * config.clicked_penalty)}`));
-    box.appendChild(clickNode);
     return box;
   };
 
@@ -206,17 +188,16 @@
       const li = el("li");
       const row = el("div", "row");
       row.appendChild(el("span", "rank", String(i + 1)));
-      const before = baseline[x.row.id], move = before == null ? "new" : before - (i + 1);
+      const before = x.row.baseline_rank, move = before == null ? "new" : before - (i + 1);
       const delta = el("span", "delta " + (move === "new" ? "new" : move > 0 ? "up" : move < 0 ? "down" : ""), move === "new" ? "new" : move > 0 ? `▲${move}` : move < 0 ? `▼${-move}` : "–");
-      delta.title = before == null ? "not on the page at default settings" : `default rank ${before}`;
+      delta.title = before == null ? "not on the published page" : `published rank ${before}`;
       row.appendChild(delta);
       const body = el("span"); const a = el("a", null, x.row.title); a.href = x.row.url; body.appendChild(a);
       body.appendChild(el("span", "meta", `${x.row.domain || ""} · ${x.row.date} · ${x.row.source}`));
       row.appendChild(body); li.appendChild(row); li.appendChild(explain(x)); list.appendChild(li);
     });
-    const dropped = data.rows.filter(r => baseline[r.id] != null && !rows.some(x => x.row.id === r.id)).length;
-    const clickedCount = data.rows.filter(r => clicked[r.url]).length;
-    document.getElementById("summary").textContent = `${rows.length} shown of ${data.rows.length} candidates · ${dropped} left the page · ${rows.filter(x => baseline[x.row.id] == null).length} entered · ${clickedCount} clicked`;
+    const dropped = data.rows.filter(r => r.baseline_rank != null && !rows.some(x => x.row.id === r.id)).length;
+    document.getElementById("summary").textContent = `${rows.length} shown of ${data.rows.length} candidates · ${dropped} left the page · ${rows.filter(x => x.row.baseline_rank == null).length} entered`;
   };
 
   // --- controls ---
@@ -236,7 +217,6 @@
     control(general, "steepness", () => config.freshness.steepness, v => config.freshness.steepness = v, 1, 4, 0.5);
     control(general, "min score", () => config.min_score, v => config.min_score = v, 0, 0.9, 0.05);
     control(general, "top n", () => config.top_n, v => config.top_n = v, 10, 300, 10);
-    control(general, "clicked penalty", () => config.clicked_penalty, v => config.clicked_penalty = v, 0, 1, 0.05);
     // One heading and grid per question set / question, so related sliders sit together.
     const group = (parent, name) => { const g = el("div", "group"); g.appendChild(el("h3", null, name)); const c = el("div", "controls"); g.appendChild(c); parent.appendChild(g); return c; };
     for (const [set, ws] of Object.entries(config.weights)) {

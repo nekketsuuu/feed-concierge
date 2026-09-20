@@ -23,36 +23,9 @@
 </header>
 <ul>
 <%- ranked.each do |r| -%>
-  <li data-score="<%= r.score.round(4) %>" data-url="<%= h(r.article.url) %>"><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= local(r.article.published_at).iso8601 %>"><%= date_label(r.article.published_at) %></time></span></li>
+  <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= local(r.article.published_at).iso8601 %>"><%= date_label(r.article.published_at) %></time></span></li>
 <%- end -%>
 </ul>
-<script>
-  // Demotes articles already clicked here, remembered in localStorage.
-  (() => {
-    const KEY = "feed-concierge:clicked", TTL_MS = <%= @site["clicked_ttl_days"] %> * 86400e3, PENALTY = <%= @site["clicked_penalty"] %>;
-    const now = Date.now();
-    let clicked = {};
-    try { clicked = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { clicked = {}; }
-    for (const [url, until] of Object.entries(clicked)) if (!(until > now)) delete clicked[url];
-    const list = document.querySelector("ul");
-    const items = [...list.children];
-    if (items.some(li => clicked[li.dataset.url])) {
-      const order = items.map((li, i) => ({ li, i, score: Number(li.dataset.score) * (clicked[li.dataset.url] ? PENALTY : 1) }))
-        .sort((a, b) => b.score - a.score || a.i - b.i);
-      const fragment = document.createDocumentFragment();
-      for (const { li } of order) fragment.appendChild(li);
-      list.appendChild(fragment);
-    }
-    const remember = event => {
-      const li = event.target.closest("li");
-      if (!li || !event.target.closest("a") || !list.contains(li)) return;
-      clicked[li.dataset.url] = now + TTL_MS;
-      try { localStorage.setItem(KEY, JSON.stringify(clicked)); } catch { /* storage unavailable */ }
-    };
-    list.addEventListener("click", remember, true);
-    list.addEventListener("auxclick", remember, true);
-  })();
-</script>
 <footer>Updated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a> · <a href="tune.html">tune</a></footer>
 </body>
 </html>

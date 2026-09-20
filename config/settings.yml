@@ -356,6 +356,3 @@ site:
   # Times on the page are shown in this zone.
   timezone: "+09:00"
   timezone_label: JST
-  # Articles clicked in the browser are demoted on the next load: score × penalty, forgotten after the TTL.
-  clicked_penalty: 0.5
-  clicked_ttl_days: 30
