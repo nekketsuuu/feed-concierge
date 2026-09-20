@@ -54,16 +54,9 @@
     list.addEventListener("click", remember, true);
     list.addEventListener("auxclick", remember, true);
     if (!("IntersectionObserver" in window)) return;
-    // Time on screen counts only while the tab is visible and the page is not scrolling.
-    const IDLE_MS = 250;
-    let lastScroll = -Infinity;
-    const shownAt = new Map(), onScreen = new Map();
-    const idleTime = (start, end) => Math.max(0, end - Math.max(start, lastScroll + IDLE_MS));
-    const settle = () => {
-      const t = performance.now();
-      for (const [li, started] of shownAt) { if (document.visibilityState === "visible") onScreen.set(li, (onScreen.get(li) || 0) + idleTime(started, t)); shownAt.set(li, t); }
-      return t;
-    };
+    // Counts time in the reading band (top part of the viewport) while the tab is visible;
+    // leaving through the top after enough of it marks the article as passed.
+    const shownAt = new Map(), inBand = new Map();
     const observer = new IntersectionObserver(entries => {
       const t = performance.now();
       for (const entry of entries) {
@@ -72,13 +65,18 @@
         const started = shownAt.get(li);
         if (started == null) continue;
         shownAt.delete(li);
-        const total = (onScreen.get(li) || 0) + (document.visibilityState === "visible" ? idleTime(started, t) : 0);
-        onScreen.set(li, total);
+        const total = (inBand.get(li) || 0) + (document.visibilityState === "visible" ? t - started : 0);
+        inBand.set(li, total);
         if (entry.boundingClientRect.bottom < 0 && total >= DWELL_MS) { mark(li.dataset.url, "passed"); observer.unobserve(li); }
       }
+    }, { rootMargin: "0px 0px -65% 0px" });
+    document.addEventListener("visibilitychange", () => {
+      const t = performance.now();
+      for (const [li, started] of shownAt) {
+        if (document.visibilityState === "hidden") inBand.set(li, (inBand.get(li) || 0) + (t - started));
+        shownAt.set(li, t);
+      }
     });
-    window.addEventListener("scroll", () => { lastScroll = settle(); }, { passive: true });
-    document.addEventListener("visibilitychange", settle);
     for (const li of items) observer.observe(li);
   })();
 </script>
