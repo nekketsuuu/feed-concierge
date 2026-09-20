@@ -31,11 +31,11 @@
   // for a while. Remembered in localStorage.
   (() => {
     const KEY = "feed-concierge:seen", TTL_MS = <%= @site["seen_ttl_days"] %> * 86400e3, DWELL_MS = <%= @site["seen_dwell_ms"] %>;
-    const PENALTY = { clicked: <%= @site["clicked_penalty"] %>, passed: <%= @site["passed_penalty"] %> };
+    const PENALTY = { clicked: <%= @site["clicked_penalty"] %>, seen: <%= @site["seen_penalty"] %> };
     const now = Date.now();
     let seen = {};
     try { seen = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { seen = {}; }
-    for (const [url, entry] of Object.entries(seen)) if (!(entry && entry.until > now)) delete seen[url];
+    for (const [url, entry] of Object.entries(seen)) { if (!(entry && entry.until > now)) delete seen[url]; else if (entry.kind === "passed") entry.kind = "seen"; }
     const save = () => { try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch { /* storage unavailable */ } };
     const list = document.querySelector("ul");
     const items = [...list.children];
@@ -46,7 +46,7 @@
       for (const { li } of order) fragment.appendChild(li);
       list.appendChild(fragment);
     }
-    const mark = (url, kind) => { if (kind === "passed" && seen[url]?.kind === "clicked") return; seen[url] = { kind, until: now + TTL_MS }; save(); };
+    const mark = (url, kind) => { if (kind === "seen" && seen[url]?.kind === "clicked") return; seen[url] = { kind, until: now + TTL_MS }; save(); };
     const remember = event => {
       const li = event.target.closest("li");
       if (li && event.target.closest("a") && list.contains(li)) mark(li.dataset.url, "clicked");
@@ -54,7 +54,7 @@
     list.addEventListener("click", remember, true);
     list.addEventListener("auxclick", remember, true);
     if (!("IntersectionObserver" in window)) return;
-    // An article is passed when one continuous stay in the reading band (top part of the
+    // An article counts as seen when one continuous stay in the reading band (top part of the
     // viewport, tab visible) lasts long enough and ends by leaving through the top.
     const shownAt = new Map();
     const observer = new IntersectionObserver(entries => {
@@ -65,7 +65,7 @@
         const started = shownAt.get(li);
         shownAt.delete(li);
         if (started == null || document.visibilityState !== "visible") continue;
-        if (entry.boundingClientRect.bottom < 0 && t - started >= DWELL_MS) { mark(li.dataset.url, "passed"); observer.unobserve(li); }
+        if (entry.boundingClientRect.bottom < 0 && t - started >= DWELL_MS) { mark(li.dataset.url, "seen"); observer.unobserve(li); }
       }
     }, { rootMargin: "0px 0px -65% 0px" });
     document.addEventListener("visibilitychange", () => { const t = performance.now(); for (const li of shownAt.keys()) shownAt.set(li, t); });

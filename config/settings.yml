@@ -357,8 +357,8 @@ site:
   timezone: "+09:00"
   timezone_label: JST
   # Seen articles are demoted in the browser: clicked ones by clicked_penalty, ones scrolled past the
-  # top after seen_dwell_ms on screen by passed_penalty; both forgotten after seen_ttl_days.
+  # top after seen_dwell_ms on screen by seen_penalty; both forgotten after seen_ttl_days.
   clicked_penalty: 0.5
-  passed_penalty: 0.8
+  seen_penalty: 0.8
   seen_dwell_ms: 1500
   seen_ttl_days: 30
