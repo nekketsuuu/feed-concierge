@@ -14,7 +14,7 @@ module FeedConcierge
       MEDIA = /\.(png|jpe?g|gif|webp|svg|mp4|mp3|pdf)(\?|\z)/i
 
       def initialize(name:, feeds:, max_age_days: 14, max_links_per_entry: 40, min_anchor_chars: 30,
-                     exclude_domains: [], resolve_redirects: false)
+                     exclude_domains: [], resolve_redirects: false, entry_describes_link: false, fallback_to_page: false)
         @name = name
         @feeds = feeds
         @max_age_days = max_age_days
@@ -23,6 +23,8 @@ module FeedConcierge
         @feed_hosts = @feeds.map { |f| URI(f).host.to_s.delete_prefix("www.") }
         @exclude_domains = DEFAULT_EXCLUDES + exclude_domains + @feed_hosts
         @resolve_redirects = resolve_redirects
+        @entry_describes_link = entry_describes_link
+        @fallback_to_page = fallback_to_page
       end
 
       def articles
@@ -38,12 +40,18 @@ module FeedConcierge
       def links_of(item)
         encoded = item.respond_to?(:content_encoded) ? item.content_encoded.to_s : ""
         body = encoded.empty? ? item.description.to_s : encoded
-        body.scan(%r{<a [^>]*href="(https?://[^"]+)"[^>]*>(.*?)</a>}m)
+        links = anchors(body)
+        links = anchors(Http.get(item.link.to_s)) if links.empty? && @fallback_to_page && item.link
+        links.first(@max_links_per_entry).filter_map { |href, anchor| to_article(href, anchor, item, links.size) }
+      rescue FetchError, SystemCallError, Timeout::Error, OpenSSL::SSL::SSLError
+        []
+      end
+
+      def anchors(html)
+        html.scan(%r{<a [^>]*href="(https?://[^"]+)"[^>]*>(.*?)</a>}m)
             .map { |href, anchor| [resolved(CGI.unescapeHTML(href)), text(anchor)] }
             .reject { |href, _| excluded?(href) || href.match?(MEDIA) }
             .uniq(&:first)
-            .first(@max_links_per_entry)
-            .filter_map { |href, anchor| to_article(href, anchor, item) }
       end
 
       # Newsletter tracking links (on the feed's own host) are followed to the real article.
@@ -62,12 +70,18 @@ module FeedConcierge
         true
       end
 
-      def to_article(href, anchor, item)
-        title = anchor.size >= @min_anchor_chars ? anchor : (page_title(href) || anchor)
+      def to_article(href, anchor, item, link_count)
+        # A post that exists to point at one link (Rubyflow) already describes it in its own title and text.
+        described = @entry_describes_link && link_count == 1
+        title = if described then text(item.title)
+                elsif anchor.size >= @min_anchor_chars then anchor
+                else page_title(href) || anchor
+                end
         return if title.empty?
 
+        summary = described ? text(item.description) : "Linked from \"#{text(item.title)}\" as: #{anchor}"
         Article.new(id: "#{@name}:#{href}", source: @name, title: title, url: href,
-                    published_at: Clock.parse(item.pubDate), summary: "Linked from \"#{item.title}\" as: #{anchor}")
+                    published_at: Clock.parse(item.pubDate), summary: summary)
       end
 
       def page_title(href)

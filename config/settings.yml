@@ -204,11 +204,14 @@ sources:
     summary_max_chars: 1500
     max_age_days: 14
     excerpt: false
-  - type: rss
-    name: rubyflow
+  - type: feed_links
+    name: rubyflow_links
     feeds:
       - https://rubyflow.com/rss
     max_age_days: 14
+    max_links_per_entry: 1
+    entry_describes_link: true
+    fallback_to_page: true
   - type: listing
     name: anthropic_news
     require_date: true
