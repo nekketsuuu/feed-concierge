@@ -189,7 +189,9 @@
     box.appendChild(fn);
     // clicked: one line with the score the other state would give.
     const unclicked = x.relevance * x.freshness;
-    box.appendChild(el("div", "node-how", x.wasClicked ? `clicked · if not clicked ${f(unclicked)}` : `not clicked · if clicked ${f(unclicked * config.clicked_penalty)}`));
+    const clickNode = el("div", "node");
+    clickNode.appendChild(el("div", "node-how", x.wasClicked ? `clicked · if not clicked ${f(unclicked)}` : `not clicked · if clicked ${f(unclicked * config.clicked_penalty)}`));
+    box.appendChild(clickNode);
     return box;
   };
 
