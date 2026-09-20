@@ -11,7 +11,7 @@ module FeedConcierge
   # Tag questions (one Noul per tag in config/tags.yml) are stored under "tags".
   class Judge
     # Bump when questions change so cached judgments are redone on the next build.
-    VERSION = 4
+    VERSION = 5
     # Bump one set's version to re-judge only the sources that use it (wording changes).
     SET_VERSIONS = { "advisory" => 3, "changelog" => 2 }.freeze
 
@@ -19,8 +19,8 @@ module FeedConcierge
       "The article is about a topic the reader profile explicitly says they are not interested in, or is unrelated to anything in the profile.",
       "The article is loosely adjacent to the reader's interests but the main topic is not one they listed.",
       "The article is about one of the reader's listed interests, in a general or introductory way.",
-      "The article is squarely about one of the reader's listed interests and matches the kind of content they say they enjoy.",
-      "The article is exactly the kind of piece the reader profile describes as a favorite: a listed topic treated in the listed style."
+      "The article is squarely about one of the reader's listed interests.",
+      "The article is centrally about a topic the reader lists as a favorite, or about several listed interests at once."
     ].freeze
 
     # Interest for changelog entries is about the service and the change, not the prose: the
