@@ -7,19 +7,21 @@
 <style>
   :root { color-scheme: light dark; --muted: #777; }
   body { font: 16px/1.45 system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+  header { display: flex; align-items: baseline; gap: .8rem; flex-wrap: wrap; }
   h1 { font-size: 1.2em; margin: 0; }
+  header .meta { margin: 0; }
   ul { list-style: none; padding: 0; margin: 1.2rem 0; }
   li { padding: .45rem 0; border-bottom: 1px solid rgba(127,127,127,.2); }
   li a { text-decoration: none; }
   li a:hover { text-decoration: underline; }
   .meta { color: var(--muted); font-size: .8em; margin-left: .5rem; white-space: nowrap; }
   .tag { display: inline-block; font-size: .72em; line-height: 1.5; padding: 0 .45em; margin-left: .35rem; border-radius: 4px; border: 1px solid; vertical-align: 2px; color: #333; background: #fffcd7; border-color: #d5d458; }
-  footer { color: var(--muted); font-size: .75em; margin-top: 1.5rem; }
 </style>
 </head>
 <body>
 <header>
   <h1><%= h(title) %></h1>
+  <span class="meta">updated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>">repo</a></span>
 </header>
 <ul>
 <%- ranked.each do |r| -%>
@@ -72,6 +74,5 @@
     for (const li of items) observer.observe(li);
   })();
 </script>
-<footer>Updated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a> · <a href="tune.html">tune</a></footer>
 </body>
 </html>
