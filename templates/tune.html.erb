@@ -187,7 +187,12 @@
     fn.appendChild(curve(x));
     fn.appendChild(node("evergreen", x.row.evergreen, `adds ${days(bonus * x.row.evergreen)} to the ${days(base)} half-life · freshness without it ${f(fresh(x.row.age_hours, base))}, fully evergreen ${f(fresh(x.row.age_hours, base + bonus))}`));
     box.appendChild(fn);
-    box.appendChild(el("div", "node-how", x.wasClicked ? `clicked 1 · score × ${f(config.clicked_penalty)}` : "clicked 0"));
+    // clicked: a 0/1 bar and, on the same line, the score the other state would give.
+    const unclicked = x.relevance * x.freshness;
+    const clickRow = el("div", "node"); const head = el("div", "node-head"); head.appendChild(el("span", null, "clicked"));
+    const cbar = el("div", "bar"); cbar.appendChild(fillOf(x.wasClicked ? 1 : 0)); head.appendChild(cbar);
+    head.appendChild(el("span", null, x.wasClicked ? `1 · if not clicked ${f(unclicked)}` : `0 · if clicked ${f(unclicked * config.clicked_penalty)}`));
+    clickRow.appendChild(head); box.appendChild(clickRow);
     return box;
   };
 
