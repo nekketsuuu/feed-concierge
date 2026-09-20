@@ -57,7 +57,6 @@ module FeedConcierge
     def tune_json(candidates)
       f = @ranking_config["freshness"]
       config = { weights: @ranking_config["weights"], choice_weights: @ranking_config["choice_weights"] || {},
-                 penalties: { clicked: @site["clicked_penalty"], passed: @site["passed_penalty"] },
                  min_score: @ranking_config["min_score"],
                  top_n: @ranking_config["top_n"],
                  max_per_source: @ranking_config["max_per_source"] || {},

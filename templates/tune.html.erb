@@ -32,6 +32,7 @@
   .delta { font-size: .8em; font-variant-numeric: tabular-nums; }
   .delta.up { color: #0a7a2f; } .delta.down { color: #b23a3a; } .delta.new { color: var(--bar-fill); }
   .meta { color: var(--muted); font-size: .8em; margin-left: .5rem; white-space: nowrap; }
+  .seen-start { margin-top: 1.2rem; }
   .dbg { margin: .35rem 0 .2rem 5.5em; font-size: .78em; color: var(--muted); }
   .dbg span, .dbg div { font-variant-numeric: tabular-nums; }
   .wf { display: flex; gap: 2px; height: 14px; margin: .25rem 0 .1rem; }
@@ -111,14 +112,12 @@
     const relevance = components.reduce((s, c) => s + c.contribution, 0);
     const freshness = fresh(row.age_hours, halfLifeOf(row));
     const seenKind = seen[row.url]?.kind || null;
-    const penalty = seenKind ? config.penalties[seenKind] ?? 1 : 1;
-    const base = relevance * freshness;
-    return { row, components, relevance, freshness, seenKind, penalty, base, score: base * penalty };
+    return { row, components, relevance, freshness, seenKind, score: relevance * freshness };
   };
-  // Selection mirrors the build (threshold, dedup, caps, top n) on the unpenalized score; the
-  // seen penalties only reorder the selected articles, as index.html does in the browser.
+  // Selection mirrors the build (threshold, dedup, caps, top n); seen articles then move below the
+  // rest, as index.html does in the browser.
   const page = () => {
-    const scored = data.rows.map(score).filter(x => x.base >= config.min_score).sort((a, b) => b.base - a.base);
+    const scored = data.rows.map(score).filter(x => x.score >= config.min_score).sort((a, b) => b.score - a.score);
     const kept = new Set(), perSource = {}, out = [];
     for (const x of scored) {
       if (kept.has(x.row.dedup_key)) continue;
@@ -128,7 +127,7 @@
       out.push(x);
       if (out.length >= config.top_n) break;
     }
-    return out.map((x, i) => [x, i]).sort(([a, i], [b, j]) => b.score - a.score || i - j).map(([x]) => x);
+    return out.filter(x => !x.seenKind).concat(out.filter(x => x.seenKind));
   };
 
   // The reference order is the default config applied in this browser, seen memory included,
@@ -138,9 +137,7 @@
   // --- explain tree (same drawing as before) ---
   const waterfall = x => {
     let running = 1, parts = [], notes = [];
-    const steps = [["relevance", x.relevance], ["freshness", x.freshness]];
-    if (x.seenKind) steps.push([x.seenKind, x.penalty]);
-    for (const [name, factor] of steps) { const loss = running * (1 - factor); parts.push([loss, el("div", "wf-loss"), `${name} removed ${f(loss)}`]); notes.push(`−${f(loss)} ${name}`); running *= factor; }
+    for (const [name, factor] of [["relevance", x.relevance], ["freshness", x.freshness]]) { const loss = running * (1 - factor); parts.push([loss, el("div", "wf-loss"), `${name} removed ${f(loss)}`]); notes.push(`−${f(loss)} ${name}`); running *= factor; }
     parts.unshift([running, el("div", "wf-kept"), `score ${f(running)}`]);
     const wrap = el("div"); wrap.appendChild(flexRow("wf", parts));
     const legend = el("div", "wf-legend"); legend.appendChild(el("b", null, `score ${f(running)}`)); legend.appendChild(el("span", null, ` · ${notes.join(" · ")}`)); wrap.appendChild(legend);
@@ -191,10 +188,7 @@
     fn.appendChild(node("evergreen", x.row.evergreen, `adds ${days(bonus * x.row.evergreen)} to the ${days(base)} half-life · freshness without it ${f(fresh(x.row.age_hours, base))}, fully evergreen ${f(fresh(x.row.age_hours, base + bonus))}`));
     box.appendChild(fn);
     const seenNode = el("div", "node");
-    const alt = { clicked: f(x.base * config.penalties.clicked), passed: f(x.base * config.penalties.passed), none: f(x.base) };
-    seenNode.appendChild(el("div", "node-how", x.seenKind === "clicked" ? `clicked · if passed ${alt.passed} · if not seen ${alt.none}`
-      : x.seenKind === "passed" ? `passed · if clicked ${alt.clicked} · if not seen ${alt.none}`
-      : `not seen · if passed ${alt.passed} · if clicked ${alt.clicked}`));
+    seenNode.appendChild(el("div", "node-how", x.seenKind || "not seen"));
     box.appendChild(seenNode);
     return box;
   };
@@ -213,6 +207,7 @@
       row.appendChild(delta);
       const body = el("span"); const a = el("a", null, x.row.title); a.href = x.row.url; body.appendChild(a);
       body.appendChild(el("span", "meta", `${x.row.domain || ""} · ${x.row.date} · ${x.row.source}`));
+      if (x.seenKind && i > 0 && !rows[i - 1].seenKind) li.classList.add("seen-start");
       row.appendChild(body); li.appendChild(row); li.appendChild(explain(x)); list.appendChild(li);
     });
     const dropped = data.rows.filter(r => baseline[r.id] != null && !rows.some(x => x.row.id === r.id)).length;
@@ -237,8 +232,6 @@
     control(general, "steepness", () => config.freshness.steepness, v => config.freshness.steepness = v, 1, 4, 0.5);
     control(general, "min score", () => config.min_score, v => config.min_score = v, 0, 0.9, 0.05);
     control(general, "top n", () => config.top_n, v => config.top_n = v, 10, 300, 10);
-    control(general, "clicked penalty", () => config.penalties.clicked, v => config.penalties.clicked = v, 0, 1, 0.05);
-    control(general, "passed penalty", () => config.penalties.passed, v => config.penalties.passed = v, 0, 1, 0.05);
     // One heading and grid per question set / question, so related sliders sit together.
     const group = (parent, name) => { const g = el("div", "group"); g.appendChild(el("h3", null, name)); const c = el("div", "controls"); g.appendChild(c); parent.appendChild(g); return c; };
     for (const [set, ws] of Object.entries(config.weights)) {
