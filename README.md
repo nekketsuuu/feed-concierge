@@ -23,6 +23,10 @@ freshness = floor + (1 - floor) / (1 + (age_hours / half_life)^steepness)   # ha
 score     = relevance * freshness
 ```
 
+In the browser, articles you click are remembered in localStorage (`site.clicked_ttl_days`) and demoted
+on the next load by `site.clicked_penalty`; they stay on the page, just lower. Visited titles are also
+dimmed with `:visited`, which browsers still honour for links clicked from the same site.
+
 The page lists every article with `score >= min_score`, newest-scored first, up to `top_n`.
 
 Judgments are cached in `data/scores.json` for `retention_days`, so each article costs one Jev
