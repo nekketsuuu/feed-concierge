@@ -296,6 +296,22 @@ sources:
     feeds:
       - https://registerspill.thorstenball.com/feed
     max_age_days: 14
+  - type: feed_links
+    name: ruby_weekly_links
+    feeds:
+      - https://rubyweekly.com/rss
+    max_age_days: 14
+    resolve_redirects: true
+  - type: feed_links
+    name: sre_weekly_links
+    feeds:
+      - https://sreweekly.com/feed/
+    max_age_days: 14
+  - type: rss
+    name: jser_realtime
+    feeds:
+      - https://realtime.jser.info/feed.xml
+    max_age_days: 14
 
 # Articles are forgotten this many days after they were first seen.
 retention_days: 10

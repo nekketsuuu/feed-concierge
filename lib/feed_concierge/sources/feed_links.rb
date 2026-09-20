@@ -13,14 +13,16 @@ module FeedConcierge
                             goodreads.com imdb.com news.ycombinator.com substackcdn.com].freeze
       MEDIA = /\.(png|jpe?g|gif|webp|svg|mp4|mp3|pdf)(\?|\z)/i
 
-      def initialize(name:, feeds:, max_age_days: 14, max_links_per_entry: 40, min_anchor_chars: 20,
-                     exclude_domains: [])
+      def initialize(name:, feeds:, max_age_days: 14, max_links_per_entry: 40, min_anchor_chars: 30,
+                     exclude_domains: [], resolve_redirects: false)
         @name = name
         @feeds = feeds
         @max_age_days = max_age_days
         @max_links_per_entry = max_links_per_entry
         @min_anchor_chars = min_anchor_chars
-        @exclude_domains = DEFAULT_EXCLUDES + exclude_domains + @feeds.map { |f| URI(f).host.to_s.delete_prefix("www.") }
+        @feed_hosts = @feeds.map { |f| URI(f).host.to_s.delete_prefix("www.") }
+        @exclude_domains = DEFAULT_EXCLUDES + exclude_domains + @feed_hosts
+        @resolve_redirects = resolve_redirects
       end
 
       def articles
@@ -37,11 +39,20 @@ module FeedConcierge
         encoded = item.respond_to?(:content_encoded) ? item.content_encoded.to_s : ""
         body = encoded.empty? ? item.description.to_s : encoded
         body.scan(%r{<a [^>]*href="(https?://[^"]+)"[^>]*>(.*?)</a>}m)
-            .map { |href, anchor| [CGI.unescapeHTML(href), text(anchor)] }
+            .map { |href, anchor| [resolved(CGI.unescapeHTML(href)), text(anchor)] }
             .reject { |href, _| excluded?(href) || href.match?(MEDIA) }
             .uniq(&:first)
             .first(@max_links_per_entry)
             .filter_map { |href, anchor| to_article(href, anchor, item) }
+      end
+
+      # Newsletter tracking links (on the feed's own host) are followed to the real article.
+      def resolved(href)
+        return href unless @resolve_redirects && @feed_hosts.include?(URI(href).host.to_s.delete_prefix("www."))
+
+        Http.resolve(href)
+      rescue URI::InvalidURIError, SystemCallError, Timeout::Error, OpenSSL::SSL::SSLError
+        href
       end
 
       def excluded?(href)
