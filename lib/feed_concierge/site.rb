@@ -34,7 +34,7 @@ module FeedConcierge
     def render_tune(ranked, candidates, generated_at)
       title = @site["title"]
       repository_url = @site["repository_url"]
-      tune_data = tune_json(ranked, candidates)
+      tune_data = tune_json(candidates)
       ERB.new(File.read(TUNE_TEMPLATE), trim_mode: "-").result(binding)
     end
 
@@ -54,10 +54,10 @@ module FeedConcierge
     # Everything the tune page needs to re-rank in the browser: the ranking config and, for
     # every candidate, the raw answers behind its score. Embedded in the page because browsers
     # refuse fetch() on file:// pages.
-    def tune_json(ranked, candidates)
-      rank = ranked.each_with_index.to_h { |item, i| [item.article.id, i + 1] }
+    def tune_json(candidates)
       f = @ranking_config["freshness"]
       config = { weights: @ranking_config["weights"], choice_weights: @ranking_config["choice_weights"] || {},
+                 penalties: { clicked: @site["clicked_penalty"], passed: @site["passed_penalty"] },
                  min_score: @ranking_config["min_score"],
                  top_n: @ranking_config["top_n"],
                  max_per_source: @ranking_config["max_per_source"] || {},
@@ -68,7 +68,7 @@ module FeedConcierge
         judgment = item.entry["judgment"]
         { id: item.article.id, title: item.article.title, url: item.article.url, domain: item.article.domain,
           date: date_label(item.article.published_at), source: item.article.source, question_set: judgment["question_set"],
-          dedup_key: item.article.dedup_key, baseline_rank: rank[item.article.id],
+          dedup_key: item.article.dedup_key,
           age_hours: item.age_hours, evergreen: judgment["evergreen"].to_f,
           components: item.components.map { |c| { id: c[:id], value: c[:value] } },
           choices: judgment.select { |k, _| k.end_with?("_probabilities") } }

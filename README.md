@@ -23,6 +23,9 @@ freshness = floor + (1 - floor) / (1 + (age_hours / half_life)^steepness)   # ha
 score     = relevance * freshness
 ```
 
+Articles you clicked, or scrolled past after they were on screen for a while, are demoted on later
+loads (`site.clicked_penalty`, `site.passed_penalty`); the browser keeps that in localStorage.
+
 The page lists every article with `score >= min_score`, newest-scored first, up to `top_n`.
 
 Judgments are cached in `data/scores.json` for `retention_days`, so each article costs one Jev

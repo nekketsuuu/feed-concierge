@@ -23,9 +23,62 @@
 </header>
 <ul>
 <%- ranked.each do |r| -%>
-  <li><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= local(r.article.published_at).iso8601 %>"><%= date_label(r.article.published_at) %></time></span></li>
+  <li data-score="<%= r.score.round(4) %>" data-url="<%= h(r.article.url) %>"><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= local(r.article.published_at).iso8601 %>"><%= date_label(r.article.published_at) %></time></span></li>
 <%- end -%>
 </ul>
+<script>
+  // Demotes articles seen before: clicked here, or scrolled past the top after being on screen
+  // for a while. Remembered in localStorage.
+  (() => {
+    const KEY = "feed-concierge:seen", TTL_MS = <%= @site["seen_ttl_days"] %> * 86400e3, DWELL_MS = <%= @site["seen_dwell_ms"] %>;
+    const PENALTY = { clicked: <%= @site["clicked_penalty"] %>, passed: <%= @site["passed_penalty"] %> };
+    const now = Date.now();
+    let seen = {};
+    try { seen = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { seen = {}; }
+    for (const [url, entry] of Object.entries(seen)) if (!(entry && entry.until > now)) delete seen[url];
+    const save = () => { try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch { /* storage unavailable */ } };
+    const list = document.querySelector("ul");
+    const items = [...list.children];
+    if (items.some(li => seen[li.dataset.url])) {
+      const order = items.map((li, i) => ({ li, i, score: Number(li.dataset.score) * (seen[li.dataset.url] ? PENALTY[seen[li.dataset.url].kind] ?? 1 : 1) }))
+        .sort((a, b) => b.score - a.score || a.i - b.i);
+      const fragment = document.createDocumentFragment();
+      for (const { li } of order) fragment.appendChild(li);
+      list.appendChild(fragment);
+    }
+    const mark = (url, kind) => { if (kind === "passed" && seen[url]?.kind === "clicked") return; seen[url] = { kind, until: now + TTL_MS }; save(); };
+    const remember = event => {
+      const li = event.target.closest("li");
+      if (li && event.target.closest("a") && list.contains(li)) mark(li.dataset.url, "clicked");
+    };
+    list.addEventListener("click", remember, true);
+    list.addEventListener("auxclick", remember, true);
+    if (!("IntersectionObserver" in window)) return;
+    // Time on screen accumulates only while the tab is visible; leaving through the top counts.
+    const shownAt = new Map(), onScreen = new Map();
+    const observer = new IntersectionObserver(entries => {
+      const t = performance.now();
+      for (const entry of entries) {
+        const li = entry.target;
+        if (entry.isIntersecting) { shownAt.set(li, t); continue; }
+        const started = shownAt.get(li);
+        if (started == null) continue;
+        shownAt.delete(li);
+        const total = (onScreen.get(li) || 0) + (document.visibilityState === "visible" ? t - started : 0);
+        onScreen.set(li, total);
+        if (entry.boundingClientRect.bottom < 0 && total >= DWELL_MS) { mark(li.dataset.url, "passed"); observer.unobserve(li); }
+      }
+    });
+    document.addEventListener("visibilitychange", () => {
+      const t = performance.now();
+      for (const [li, started] of shownAt) {
+        if (document.visibilityState === "hidden") onScreen.set(li, (onScreen.get(li) || 0) + (t - started));
+        shownAt.set(li, t);
+      }
+    });
+    for (const li of items) observer.observe(li);
+  })();
+</script>
 <footer>Updated <time datetime="<%= local(generated_at).iso8601 %>"><%= datetime_label(generated_at) %></time> · <a href="<%= h(repository_url) %>"><%= h(repository_url.delete_prefix("https://")) %></a> · <a href="tune.html">tune</a></footer>
 </body>
 </html>
