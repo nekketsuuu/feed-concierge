@@ -112,10 +112,13 @@
     const freshness = fresh(row.age_hours, halfLifeOf(row));
     const wasClicked = Boolean(clicked[row.url]);
     const penalty = wasClicked ? config.clicked_penalty : 1;
-    return { row, components, relevance, freshness, wasClicked, penalty, score: relevance * freshness * penalty };
+    const base = relevance * freshness;
+    return { row, components, relevance, freshness, wasClicked, penalty, base, score: base * penalty };
   };
+  // Selection mirrors the build (threshold, dedup, caps, top n) on the unpenalized score; the
+  // click penalty only reorders the selected articles, as index.html does in the browser.
   const page = () => {
-    const scored = data.rows.map(score).filter(x => x.score >= config.min_score).sort((a, b) => b.score - a.score);
+    const scored = data.rows.map(score).filter(x => x.base >= config.min_score).sort((a, b) => b.base - a.base);
     const seen = new Set(), perSource = {}, out = [];
     for (const x of scored) {
       if (seen.has(x.row.dedup_key)) continue;
@@ -125,7 +128,7 @@
       out.push(x);
       if (out.length >= config.top_n) break;
     }
-    return out;
+    return out.map((x, i) => [x, i]).sort(([a, i], [b, j]) => b.score - a.score || i - j).map(([x]) => x);
   };
 
   // The reference order is the default config applied in this browser, click history included,
