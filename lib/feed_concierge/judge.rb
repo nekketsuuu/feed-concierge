@@ -11,7 +11,7 @@ module FeedConcierge
   # Tag questions (one Noul per tag in config/tags.yml) are stored under "tags".
   class Judge
     # Bump when questions change so cached judgments are redone on the next build.
-    VERSION = 5
+    VERSION = 6
     # Bump one set's version to re-judge only the sources that use it (wording changes).
     SET_VERSIONS = { "advisory" => 3, "changelog" => 3 }.freeze
 
@@ -19,8 +19,8 @@ module FeedConcierge
       "The article is about a topic the reader profile explicitly says they are not interested in, or is unrelated to anything in the profile.",
       "The article is loosely adjacent to the reader's interests but the main topic is not one they listed.",
       "The article is about one of the reader's listed interests, in a general or introductory way.",
-      "The article is squarely about one of the reader's listed interests.",
-      "The article is centrally about a topic the reader lists as a favorite, or about several listed interests at once."
+      "The article is squarely about one of the reader's listed interests but covers familiar ground.",
+      "The article is squarely about one of the reader's listed interests and offers something new the reader could apply: a technique, tool, finding, or design they are unlikely to have seen before."
     ].freeze
 
     # Interest for changelog entries is about the service and the change, not the prose: the
@@ -28,9 +28,9 @@ module FeedConcierge
     CHANGE_INTEREST_LEVELS = [
       "The product or service is one the reader would not use, or the change is irrelevant to the way they build and operate software.",
       "The service is one the reader might use, but the change does not affect how they build or operate: an unrelated region, a tier they would not buy, or a marketing or partner announcement.",
-      "The service is one the reader likely uses, and the change is minor: an incremental option, a small integration, or a platform variant they may not run.",
-      "The service is one the reader uses, and the change is practical for them: a new capability, a lifted limit, a changed default, an integration they would adopt, or a fix to something they rely on.",
-      "The change directly alters something the reader depends on today in a core service: pricing or limits, deprecations, security defaults, or a long-requested capability."
+      "The service is one the reader uses, but the change is incremental and would not change what they build or how they run it.",
+      "The service is one the reader uses, and the change is practical for them: a new capability, a lifted limit, a changed default, or an integration they would adopt.",
+      "The change removes a constraint or adds a capability the reader would use in their own systems: a lifted limit, a longer timeout, a new integration between services they run, a changed default, a deprecation, or a pricing change."
     ].freeze
 
     SUBSTANCE_LEVELS = [
