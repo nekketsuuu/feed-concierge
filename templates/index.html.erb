@@ -58,8 +58,8 @@
     list.addEventListener("click", remember, true);
     list.addEventListener("auxclick", remember, true);
     if (!("IntersectionObserver" in window)) return;
-    // An article counts as passed when one continuous stay in the reading band (top part of the
-    // viewport, tab visible) lasts long enough and ends by leaving through the top.
+    // An article counts as passed when one continuous stay on screen (tab visible) lasts long
+    // enough and ends by leaving through the top.
     const shownAt = new Map();
     const observer = new IntersectionObserver(entries => {
       const t = performance.now();
@@ -71,7 +71,7 @@
         if (started == null || document.visibilityState !== "visible") continue;
         if (entry.boundingClientRect.bottom < 0 && t - started >= DWELL_MS) { mark(li.dataset.url, "passed"); observer.unobserve(li); }
       }
-    }, { rootMargin: "0px 0px -65% 0px" });
+    });
     document.addEventListener("visibilitychange", () => { const t = performance.now(); for (const li of shownAt.keys()) shownAt.set(li, t); });
     for (const li of items) observer.observe(li);
   })();
