@@ -13,6 +13,8 @@ module FeedConcierge
                       Errno::EHOSTUNREACH, Errno::ENETUNREACH, EOFError, OpenSSL::SSL::SSLError].freeze
 
     class Error < StandardError; end
+    # The request never reached the API: the edge (a WAF) refused its body.
+    class Blocked < Error; end
 
     def initialize(api_key: ENV.fetch("TYPESAFE_AI_API_KEY"), model: "jev-latest", max_retries: 5)
       @api_key = api_key
@@ -27,8 +29,10 @@ module FeedConcierge
         response = post(payload)
         return JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
 
+        raise Blocked, "TypeSafe API 403: request blocked at the edge" if blocked?(response)
+
         retryable = RETRYABLE_STATUSES.include?(response.code)
-        raise Error, "TypeSafe API #{response.code}: #{response.body[0, 500]}" unless retryable && attempt < @max_retries
+        raise Error, "TypeSafe API #{response.code}: #{brief(response.body)}" unless retryable && attempt < @max_retries
 
         attempt += 1
         sleep(backoff(attempt, response["retry-after"]))
@@ -41,6 +45,10 @@ module FeedConcierge
     end
 
     private
+
+    def blocked?(response) = response.code == "403" && response.body.to_s.lstrip.start_with?("<")
+
+    def brief(body) = body.to_s.gsub(/\s+/, " ")[0, 200]
 
     def post(payload)
       Net::HTTP.start(ENDPOINT.host, ENDPOINT.port, use_ssl: true, open_timeout: 15, read_timeout: 60) do |http|

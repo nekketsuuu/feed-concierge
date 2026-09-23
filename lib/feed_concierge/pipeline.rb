@@ -50,8 +50,7 @@ module FeedConcierge
           while (article = queue.pop)
             begin
               excerpt = fetch_excerpt(article)
-              judgment = @judge.judge(article, excerpt: excerpt, reader_profile: profile, question_set: question_set_for(article))
-              results << [article, excerpt, judgment]
+              results << [article, excerpt, judge_with_fallback(article, excerpt, profile)]
             rescue JevClient::Error => e
               @log.puts "  skipped #{article.id}: #{e.message}"
             end
@@ -66,6 +65,16 @@ module FeedConcierge
         @log.puts format("  %-60.60s interest=%.2f worth=%.2f", article.title, judgment["interest"].to_f,
                          judgment["worth_reading"].to_f)
       end
+    end
+
+    # Advisory texts with exploit-like strings get blocked before reaching Jev; those are judged
+    # from the title alone.
+    def judge_with_fallback(article, excerpt, profile)
+      @judge.judge(article, excerpt: excerpt, reader_profile: profile, question_set: question_set_for(article))
+    rescue JevClient::Blocked
+      @log.puts "  #{article.id}: body blocked at the edge, judging from the title"
+      bare = article.with(summary: nil, tags: nil)
+      @judge.judge(bare, excerpt: nil, reader_profile: profile, question_set: question_set_for(article)).merge("degraded" => true)
     end
 
     def question_set_for(article)
