@@ -52,5 +52,6 @@ Open `tune.html`.
   scrapes an index page with regexes given in the config; items without a date are dated when first seen.
   The `feed_links` type turns the outbound links of a feed's recent entries (Register Spill) into articles.
   The `github_releases` type makes one article per release of a repository (Claude Code); Jev picks the
-  changes worth catching up on and they become the title.
+  changes worth catching up on and they become the title. The `openai_changelog` type reads OpenAI's
+  API changelog page, one article per dated entry.
 - `lib/feed_concierge/judge.rb`: question wording and Score levels. Jev reads literally, so describe concrete situations per level rather than degrees.

@@ -11,7 +11,7 @@ module FeedConcierge
     # they become the title.
     class GithubReleases
       def initialize(name:, repo:, product:, client:, lookback_days: 14, min_probability: 0.6, max_picks: 3,
-                     max_bullets: 120, known: ->(_id) { false })
+                     max_bullets: 120, sections: nil, known: ->(_id) { false })
         @name = name
         @repo = repo
         @product = product
@@ -20,6 +20,7 @@ module FeedConcierge
         @min_probability = min_probability
         @max_picks = max_picks
         @max_bullets = max_bullets
+        @sections = sections
         @known = known
       end
 
@@ -49,7 +50,7 @@ module FeedConcierge
       end
 
       def to_article(rel)
-        version = rel["tag_name"].to_s.delete_prefix("v")
+        version = rel["tag_name"].to_s.sub(/\A\D*/, "")
         bullets = bullets_of(rel["body"].to_s)
         picks = bullets.empty? ? [] : pick(bullets)
         title = "#{@product} #{version}: #{picks.empty? ? describe(bullets) : picks.map { |b| headline(b) }.join(' · ')}"
@@ -59,8 +60,16 @@ module FeedConcierge
                     published_at: Clock.parse(rel["published_at"]), summary: summary[0, 1500])
       end
 
+      # With a sections allowlist, only bullets under those markdown headings count.
       def bullets_of(body)
-        body.lines.map(&:strip).select { |l| l.start_with?("- ", "* ") }.map { |l| l[2..].strip }.first(@max_bullets)
+        heading = nil
+        body.lines.map(&:strip).filter_map do |line|
+          heading = line.sub(/\A#+\s*/, "") and next if line.start_with?("#")
+          next unless line.start_with?("- ", "* ")
+          next if @sections && !@sections.include?(heading)
+
+          line[2..].strip
+        end.first(@max_bullets)
       end
 
       # One Noul per bullet, all in one request; the bullets above the threshold become the title.

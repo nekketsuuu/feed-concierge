@@ -350,6 +350,32 @@ sources:
     item_regex: '<a [^>]*href="(?<href>https://www\.uber\.com/[a-z]{2}/[a-z-]+/blog/[a-z0-9-]+/)"[^>]*>(?<title>[^<]+)</a></div><div[^>]*>(?<date>[A-Z][a-z]+ \d{1,2}, \d{4})</div>'
     require_date: true
     max_age_days: 14
+  - type: rss
+    name: openai_news
+    feeds:
+      - https://openai.com/news/rss.xml
+    categories: [Research, Engineering, Product, API, Release, Safety, "Safety & Alignment", Security, Publication, Applied AI, Guides]
+    max_age_days: 14
+    excerpt: false
+  - type: listing
+    name: openai_cookbook
+    url: https://developers.openai.com/cookbook
+    item_regex: '<a class="recipe-row[^"]*" href="(?<href>/cookbook/examples/[^"]+)">(?<block>.*?)</a>'
+    title_regex: 'recipe-title[^>]*>(?<title>[^<]+)<'
+    date_regex: 'dateTime="(?<date>\d{4}-\d{2}-\d{2})"'
+    max_age_days: 14
+  - type: github_releases
+    name: codex_releases
+    repo: openai/codex
+    product: Codex CLI
+    sections: [New Features, Bug Fixes, Breaking Changes]
+    excerpt: false
+    questions: changelog
+  - type: openai_changelog
+    name: openai_api_changelog
+    max_age_days: 14
+    excerpt: false
+    questions: changelog
 
 # Articles are forgotten this many days after they were first seen.
 retention_days: 10
