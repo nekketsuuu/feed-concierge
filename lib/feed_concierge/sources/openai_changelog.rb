@@ -31,17 +31,24 @@ module FeedConcierge
           published = Time.utc(year, date.month, date.day)
           next if published < cutoff
 
-          text = CGI.unescapeHTML(m[:body].gsub(/<[^>]+>/, " ")).gsub(/\s+/, " ").strip
+          text = plain(m[:body])
           next if text.empty?
 
-          Article.new(id: "#{@name}:#{published.strftime('%Y-%m-%d')}:#{text.hash.abs.to_s(36)}", source: @name,
-                      title: "OpenAI API #{m[:kind].downcase}: #{headline(text)}", url: URL,
+          key = "#{published.strftime('%Y-%m-%d')}-#{text.sum.to_s(36)}"
+          Article.new(id: "#{@name}:#{key}", source: @name,
+                      title: "OpenAI API #{m[:kind].downcase}: #{headline(text)}", url: "#{URL}##{key}",
                       published_at: published, summary: text[0, @summary_max_chars],
                       tags: [m[:kind]] + m[:badges].scan(/data-variant="soft">([^<]+)</).flatten.map(&:strip))
         end
       end
 
       private
+
+      # Inline tags (code, links) vanish without leaving spaces; block tags become spaces.
+      def plain(html)
+        inline = html.gsub(%r{</?(?:code|a|em|strong|b|i|span)\b[^>]*>}, "")
+        CGI.unescapeHTML(inline.gsub(/<[^>]+>/, " ")).gsub(/\s+/, " ").strip
+      end
 
       def headline(text)
         sentence = text.split(/(?<=[.!?])\s+/).first.to_s
