@@ -11,22 +11,27 @@ require_relative "sources/cisa_kev"
 require_relative "sources/github_advisories"
 require_relative "sources/listing"
 require_relative "sources/feed_links"
+require_relative "sources/github_releases"
 
 module FeedConcierge
   module Sources
     REGISTRY = { "hacker_news" => HackerNews, "lobsters" => Lobsters, "rss" => Rss, "redmine" => Redmine,
                  "github_pulls" => GithubPulls, "jpcert_weekly" => JpcertWeekly, "cisa_kev" => CisaKev,
                  "github_advisories" => GithubAdvisories, "listing" => Listing,
-                 "feed_links" => FeedLinks }.freeze
+                 "feed_links" => FeedLinks, "github_releases" => GithubReleases }.freeze
     NON_CONSTRUCTOR_KEYS = %w[type excerpt questions].freeze
 
     # Builds sources from config/settings.yml entries like:
     #   - type: hacker_news
     #     feeds: [https://hnrss.org/frontpage]
-    def self.build(configs)
+    # Sources that ask Jev while fetching (release titling) also receive the client and a
+    # predicate for articles the store already holds.
+    def self.build(configs, client: nil, known: ->(_id) { false })
       configs.map do |cfg|
-        klass = REGISTRY.fetch(cfg.fetch("type")) { raise ArgumentError, "unknown source type: #{cfg["type"]}" }
-        klass.new(**cfg.except(*NON_CONSTRUCTOR_KEYS).transform_keys(&:to_sym))
+        klass = REGISTRY.fetch(cfg.fetch("type")) { raise ArgumentError, "unknown source type: #{cfg['type']}" }
+        args = cfg.except(*NON_CONSTRUCTOR_KEYS).transform_keys(&:to_sym)
+        args.merge!(client: client, known: known) if klass.instance_method(:initialize).parameters.any? { |_, n| n == :client }
+        klass.new(**args)
       end
     end
 
@@ -42,11 +47,11 @@ module FeedConcierge
 
     # Sources are fetched in config order; when several list the same link, the first wins.
     # A broken source is logged and skipped so the rest of the build still runs.
-    def self.fetch_all(configs, logger: $stderr)
-      articles = build(configs).flat_map do |source|
+    def self.fetch_all(configs, logger: $stderr, client: nil, known: ->(_id) { false })
+      articles = build(configs, client: client, known: known).flat_map do |source|
         source.articles
-      rescue FetchError, RSS::Error, JSON::ParserError, SystemCallError, Timeout::Error => e
-        logger.puts "source #{source.class.name.split("::").last} failed: #{e.message[0, 200]}"
+      rescue FetchError, JevClient::Error, RSS::Error, JSON::ParserError, SystemCallError, Timeout::Error => e
+        logger.puts "source #{source.class.name.split('::').last} failed: #{e.message[0, 200]}"
         []
       end
       articles.uniq(&:id).uniq(&:canonical_url)

@@ -51,4 +51,6 @@ Open `tune.html`.
   Sites without a feed (anthropic.com, claude.com, the Alignment Science Blog) use the `listing` type, which
   scrapes an index page with regexes given in the config; items without a date are dated when first seen.
   The `feed_links` type turns the outbound links of a feed's recent entries (Register Spill) into articles.
+  The `github_releases` type makes one article per release of a repository (Claude Code); Jev picks the
+  changes worth catching up on and they become the title.
 - `lib/feed_concierge/judge.rb`: question wording and Score levels. Jev reads literally, so describe concrete situations per level rather than degrees.

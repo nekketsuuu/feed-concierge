@@ -28,6 +28,12 @@ sources:
     summary_max_chars: 1200
     excerpt: false
     questions: changelog
+  - type: github_releases
+    name: claude_code_releases
+    repo: anthropics/claude-code
+    product: Claude Code
+    excerpt: false
+    questions: changelog
   - type: rss
     name: aws_whats_new
     feeds:

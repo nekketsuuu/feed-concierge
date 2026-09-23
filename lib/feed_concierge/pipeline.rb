@@ -6,6 +6,7 @@ module FeedConcierge
       @settings = settings
       @store = Store.new(store_path)
       @output_dir = output_dir
+      @client = client
       @judge = Judge.new(client)
       @skip_excerpt = Sources.without_excerpt(settings["sources"])
       @question_sets = Sources.question_sets(settings["sources"])
@@ -13,7 +14,7 @@ module FeedConcierge
     end
 
     def run
-      articles = Sources.fetch_all(@settings["sources"], logger: @log)
+      articles = Sources.fetch_all(@settings["sources"], logger: @log, client: @client, known: ->(id) { !@store[id].nil? })
       @log.puts "fetched #{articles.size} articles"
 
       pending = articles.reject do |a|
