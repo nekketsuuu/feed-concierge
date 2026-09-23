@@ -364,18 +364,6 @@ sources:
     title_regex: 'recipe-title[^>]*>(?<title>[^<]+)<'
     date_regex: 'dateTime="(?<date>\d{4}-\d{2}-\d{2})"'
     max_age_days: 14
-  - type: github_releases
-    name: codex_releases
-    repo: openai/codex
-    product: Codex CLI
-    sections: [New Features, Bug Fixes, Breaking Changes]
-    excerpt: false
-    questions: changelog
-  - type: openai_changelog
-    name: openai_api_changelog
-    max_age_days: 14
-    excerpt: false
-    questions: changelog
 
 # Articles are forgotten this many days after they were first seen.
 retention_days: 10
