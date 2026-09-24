@@ -536,7 +536,7 @@ ranking:
   # Freshness follows floor + (1 - floor) / (1 + (age / half_life)^steepness): nearly flat for the
   # first day, halfway down at half_life, then a long tail. Evergreen articles get a longer half-life.
   freshness:
-    half_life_hours: 24
+    half_life_hours: 120
     evergreen_half_life_bonus_hours: 48
     steepness: 2
     floor: 0.1
