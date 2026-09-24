@@ -23,7 +23,7 @@ module FeedConcierge
 
     # Builds sources from config/settings.yml entries like:
     #   - type: hacker_news
-    #     feeds: [https://hnrss.org/frontpage]
+    #     min_points: 30
     # Sources that ask Jev while fetching (release titling) also receive the client and a
     # predicate for articles the store already holds.
     def self.build(configs, client: nil, known: ->(_id) { false })

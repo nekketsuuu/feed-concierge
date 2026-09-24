@@ -1,41 +1,56 @@
 # frozen_string_literal: true
 
-require "rss"
+require "json"
 require "uri"
 
 module FeedConcierge
   module Sources
-    # Reads hnrss.org feeds. Article ids are prefixed with "hn:" so other sources can never collide.
+    # Hacker News stories through the Algolia search API: every story submitted within the
+    # lookback window that has reached min_points, independent of when the build runs.
+    # Article ids are prefixed with "hn:" so other sources can never collide.
     class HackerNews
-      def initialize(feeds:)
-        @feeds = feeds
+      ENDPOINT = "https://hn.algolia.com/api/v1/search_by_date"
+      PAGE_SIZE = 1000
+
+      def initialize(lookback_hours: 48, min_points: 30)
+        @lookback_hours = lookback_hours
+        @min_points = min_points
       end
 
       def articles
-        @feeds.flat_map { |url| fetch(url) }.uniq(&:id)
+        since = Time.now.to_i - (@lookback_hours * 3600)
+        page = 0
+        hits = []
+        loop do
+          data = JSON.parse(Http.get(url(since, page)))
+          hits.concat(data.fetch("hits"))
+          page += 1
+          break if page >= data.fetch("nbPages", 1).to_i
+        end
+        hits.map { |hit| to_article(hit) }.uniq(&:id)
       end
 
       private
 
-      def fetch(url)
-        body = Http.get(url)
-        RSS::Parser.parse(body, false).items.filter_map { |item| to_article(item) }
+      def url(since, page)
+        query = URI.encode_www_form(tags: "story", numericFilters: "created_at_i>#{since},points>=#{@min_points}",
+                                    hitsPerPage: PAGE_SIZE, page: page)
+        "#{ENDPOINT}?#{query}"
       end
 
-      def to_article(item)
-        item_id = item.guid&.content.to_s[/id=(\d+)/, 1]
-        return unless item_id
-
+      def to_article(hit)
+        comments_url = "https://news.ycombinator.com/item?id=#{hit['objectID']}"
         Article.new(
-          id: "hn:#{item_id}",
+          id: "hn:#{hit['objectID']}",
           source: "hacker_news",
-          title: item.title.to_s.strip,
-          url: item.link.to_s,
-          comments_url: item.comments.to_s,
-          author: item.dc_creator.to_s,
-          points: item.description.to_s[/Points:\s*(\d+)/, 1].to_i,
-          comment_count: item.description.to_s[/# Comments:\s*(\d+)/, 1].to_i,
-          published_at: item.pubDate || Time.now
+          title: hit["title"].to_s.strip,
+          url: hit["url"].to_s.empty? ? comments_url : hit["url"],
+          comments_url: comments_url,
+          author: hit["author"],
+          points: hit["points"].to_i,
+          comment_count: hit["num_comments"].to_i,
+          published_at: Clock.parse(hit["created_at"]),
+          summary: hit["story_text"].to_s.gsub(/<[^>]+>/, " ").gsub(/\s+/, " ").strip.then { |t| t.empty? ? nil : t[0, 1500] }
         )
       end
     end

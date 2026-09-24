@@ -1,8 +1,7 @@
 sources:
   - type: hacker_news
-    feeds:
-      - https://hnrss.org/frontpage?count=60
-      - https://hnrss.org/best?count=30
+    lookback_hours: 48
+    min_points: 30
   - type: lobsters
     feeds:
       - https://lobste.rs/hottest.json
