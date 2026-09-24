@@ -542,7 +542,7 @@ ranking:
     floor: 0.1
   # The page lists every article whose score reaches min_score, up to top_n of them.
   min_score: 0.35
-  top_n: 200
+  top_n: 500
   # Optional per-source caps so one busy source cannot fill the page.
   max_per_source:
     ruby_bugs: 15
