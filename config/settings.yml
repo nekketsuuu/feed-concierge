@@ -364,6 +364,105 @@ sources:
     title_regex: 'recipe-title[^>]*>(?<title>[^<]+)<'
     date_regex: 'dateTime="(?<date>\d{4}-\d{2}-\d{2})"'
     max_age_days: 14
+  - type: rss
+    name: planetscale_blog
+    feeds:
+      - https://planetscale.com/blog/feed.atom
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: valkey_blog
+    feeds:
+      - https://valkey.io/atom.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: mercari_engineering
+    feeds:
+      - https://engineering.mercari.com/blog/feed.xml
+    max_age_days: 14
+  - type: rss
+    name: iij_engineering
+    feeds:
+      - https://eng-blog.iij.ad.jp/feed
+    max_age_days: 14
+  - type: rss
+    name: mirrativ_tech
+    feeds:
+      - https://tech.mirrativ.stream/rss
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: rubyonrails_news
+    feeds:
+      - https://rubyonrails.org/feed.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: listing
+    name: scoutapm_blog
+    url: https://www.scoutapm.com/blog
+    item_regex: '<article class="blog-card[^"]*">(?<block>(?:(?!</article>).)*?<h2><a href="(?<href>/blog/[^"]+)">(?<title>[^<]+)</a>(?:(?!</article>).)*?)</article>'
+    date_regex: '<time datetime="(?<date>[^"]+)"'
+    summary_regex: '<p>(?<summary>.*?)</p>'
+    max_age_days: 14
+  - type: rss
+    name: zozo_tech
+    feeds:
+      - https://techblog.zozo.com/rss
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: brendan_gregg
+    feeds:
+      - https://www.brendangregg.com/blog/rss.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: microservices_io
+    feeds:
+      - https://microservices.io/feed.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: research_rsc
+    feeds:
+      - https://research.swtch.com/feed.atom
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: cybozu_inside_out
+    feeds:
+      - https://blog.cybozu.io/rss
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: okmij
+    feeds:
+      - https://okmij.org/ftp/rss.xml
+    max_age_days: 14
+  - type: rss
+    name: speedshop
+    feeds:
+      - https://www.speedshop.co/feed.xml
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: listing
+    name: twingate_changelog
+    url: https://www.twingate.com/changelog
+    item_regex: '<h3[^>]*>(?<title>[^<]+)</h3>(?<block>(?:(?!<h3).)*?href="(?<href>\./changelog/[^"]+)"[^>]*><time datetime="(?<date>[^"]+)"(?:(?!<h3).)*?data-framer-name="Changes"[^>]*>(?<summary>(?:(?!<h3).)*?)</div>)'
+    max_age_days: 14
+    excerpt: false
+    questions: changelog
 
 # Articles are forgotten this many days after they were first seen.
 retention_days: 10
