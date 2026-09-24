@@ -6,7 +6,10 @@ sources:
   - type: lobsters
     feeds:
       - https://lobste.rs/hottest.json
+      - https://lobste.rs/page/2.json
+      - https://lobste.rs/page/3.json
       - https://lobste.rs/newest.json
+      - https://lobste.rs/newest/page/2.json
   - type: rss
     name: lwn
     feeds:
