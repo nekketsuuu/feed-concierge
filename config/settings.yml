@@ -9,6 +9,7 @@ sources:
       - https://lobste.rs/page/3.json
       - https://lobste.rs/newest.json
       - https://lobste.rs/newest/page/2.json
+      - https://lobste.rs/t/rust.json
   - type: rss
     name: lwn
     feeds:
@@ -264,6 +265,62 @@ sources:
     feeds:
       - https://transformer-circuits.pub/feed.xml
     max_age_days: 30
+  - type: rss
+    name: rust_blog
+    feeds:
+      - https://blog.rust-lang.org/feed.xml
+      - https://blog.rust-lang.org/inside-rust/feed.xml
+    max_age_days: 14
+  - type: feed_links
+    name: this_week_in_rust_links
+    feeds:
+      - https://this-week-in-rust.org/rss.xml
+    max_age_days: 14
+    min_anchor_chars: 10
+    from_heading: "Updates from Rust Community"
+    until_heading: "Crate of the Week"
+  - type: rss
+    name: rust_analyzer_changelog
+    feeds:
+      - https://rust-analyzer.github.io/feed.xml
+    max_age_days: 14
+    excerpt: false
+    questions: changelog
+  - type: rss
+    name: matklad
+    feeds:
+      - https://matklad.github.io/feed.xml
+    max_age_days: 14
+  - type: rss
+    name: tokio_blog
+    feeds:
+      - https://tokio.rs/blog/index.xml
+    max_age_days: 14
+  - type: rss
+    name: nnethercote
+    feeds:
+      - https://nnethercote.github.io/feed.xml
+    max_age_days: 14
+  - type: rss
+    name: ncameron
+    feeds:
+      - https://www.ncameron.org/blog/rss/
+    max_age_days: 14
+  - type: rss
+    name: jvns
+    feeds:
+      - https://jvns.ca/atom.xml
+    max_age_days: 14
+  - type: rss
+    name: fasterthanlime
+    feeds:
+      - https://fasterthanli.me/index.xml
+    max_age_days: 14
+  - type: rss
+    name: lucumr
+    feeds:
+      - https://lucumr.pocoo.org/feed.atom
+    max_age_days: 14
   - type: rss
     name: simonwillison
     feeds:

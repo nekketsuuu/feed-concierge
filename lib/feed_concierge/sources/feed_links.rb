@@ -14,7 +14,8 @@ module FeedConcierge
       MEDIA = /\.(png|jpe?g|gif|webp|svg|mp4|mp3|pdf)(\?|\z)/i
 
       def initialize(name:, feeds:, max_age_days: 14, max_links_per_entry: 40, min_anchor_chars: 30,
-                     exclude_domains: [], resolve_redirects: false, entry_describes_link: false, fallback_to_page: false)
+                     exclude_domains: [], resolve_redirects: false, entry_describes_link: false, fallback_to_page: false,
+                     from_heading: nil, until_heading: nil)
         @name = name
         @feeds = feeds
         @max_age_days = max_age_days
@@ -25,6 +26,8 @@ module FeedConcierge
         @resolve_redirects = resolve_redirects
         @entry_describes_link = entry_describes_link
         @fallback_to_page = fallback_to_page
+        @from_heading = from_heading && Regexp.new(from_heading)
+        @until_heading = until_heading && Regexp.new(until_heading)
       end
 
       def articles
@@ -40,11 +43,26 @@ module FeedConcierge
       def links_of(item)
         encoded = item.respond_to?(:content_encoded) ? item.content_encoded.to_s : ""
         body = encoded.empty? ? item.description.to_s : encoded
-        links = anchors(body)
+        links = anchors(section_of(body))
         links = anchors(Http.get(item.link.to_s)) if links.empty? && @fallback_to_page && item.link
         links.first(@max_links_per_entry).filter_map { |href, anchor| to_article(href, anchor, item) }
       rescue FetchError, SystemCallError, Timeout::Error, OpenSSL::SSL::SSLError
         []
+      end
+
+      # A roundup is read only between the headings that bracket its article links; what precedes
+      # is boilerplate and what follows lists events or merged PRs.
+      def section_of(html)
+        return html unless @from_heading || @until_heading
+
+        parts = html.split(%r{(?=<h[1-6][^>]*>)})
+        parts = parts.drop_while { |part| !heading_of(part).match?(@from_heading) } if @from_heading
+        parts = parts.take_while { |part| !heading_of(part).match?(@until_heading) } if @until_heading
+        parts.join
+      end
+
+      def heading_of(part)
+        text(part[%r{\A<h([1-6])[^>]*>(.*?)</h\1>}m, 2])
       end
 
       def anchors(html)
