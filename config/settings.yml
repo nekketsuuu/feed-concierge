@@ -9,7 +9,6 @@ sources:
       - https://lobste.rs/page/3.json
       - https://lobste.rs/newest.json
       - https://lobste.rs/newest/page/2.json
-      - https://lobste.rs/t/rust.json
   - type: rss
     name: lwn
     feeds:
