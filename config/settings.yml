@@ -264,6 +264,16 @@ sources:
     feeds:
       - https://transformer-circuits.pub/feed.xml
     max_age_days: 30
+  - type: listing
+    name: ruby_association_news
+    url: https://www.ruby.or.jp/en/news/
+    item_regex: '<dt>(?<block>[^<]*<i[^>]*></i>\s*(?<date>\d{4}-\d{2}-\d{2})\s*</dt>\s*<dd>\s*<a href=''(?<href>/en/news/[^'']+)''>(?<title>[^<]+)</a>)'
+    max_age_days: 14
+  - type: rss
+    name: ruby_central_news
+    feeds:
+      - https://rubycentral.org/news/feed/
+    max_age_days: 14
   - type: rss
     name: go_blog
     feeds:
