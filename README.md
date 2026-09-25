@@ -42,6 +42,14 @@ bin/regenerate  # rebuild the page from the cache with current weights
 FEED_CONCIERGE_FAKE_JEV=1 bin/build  # dry run without an API key
 ```
 
+GitHub's schedule sometimes skips a run. `systemd/` has a user timer that dispatches the workflow
+on the hours in between; link it from a checkout with `gh` logged in:
+
+```sh
+systemctl --user link "$PWD/systemd/feed-concierge-dispatch.service"
+systemctl --user enable --now "$PWD/systemd/feed-concierge-dispatch.timer"
+```
+
 ## Tuning
 
 Open `tune.html`.

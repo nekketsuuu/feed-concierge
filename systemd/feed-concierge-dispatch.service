@@ -1,0 +1,6 @@
+[Unit]
+Description=Dispatch the Feed Concierge build workflow
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/gh workflow run build.yml --repo nekketsuuu/feed-concierge

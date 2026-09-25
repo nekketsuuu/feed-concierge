@@ -1,0 +1,9 @@
+[Unit]
+Description=Dispatch the Feed Concierge build on the hours the GitHub schedule skips
+
+[Timer]
+OnCalendar=*-*-* 01/2:53:00 Asia/Tokyo
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target
