@@ -265,6 +265,11 @@ sources:
       - https://transformer-circuits.pub/feed.xml
     max_age_days: 30
   - type: rss
+    name: go_blog
+    feeds:
+      - https://go.dev/blog/feed.atom
+    max_age_days: 14
+  - type: rss
     name: rust_blog
     feeds:
       - https://blog.rust-lang.org/feed.xml
