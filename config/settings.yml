@@ -36,6 +36,104 @@ sources:
     product: Claude Code
     excerpt: false
     questions: changelog
+  - type: github_releases
+    name: prometheus_releases
+    repo: prometheus/prometheus
+    product: Prometheus
+    excerpt: false
+    questions: changelog
+  - type: github_releases
+    name: alertmanager_releases
+    repo: prometheus/alertmanager
+    product: Alertmanager
+    excerpt: false
+    questions: changelog
+  - type: github_releases
+    name: thanos_releases
+    repo: thanos-io/thanos
+    product: Thanos
+    excerpt: false
+    questions: changelog
+  - type: github_releases
+    name: grafana_releases
+    repo: grafana/grafana
+    product: Grafana
+    newest_per_day: true
+    excerpt: false
+    questions: changelog
+  - type: github_releases
+    name: nginx_releases
+    repo: nginx/nginx
+    product: nginx
+    sections: [What's Changed]
+    newest_per_day: true
+    excerpt: false
+    questions: changelog
+  - type: github_releases
+    name: proxysql_releases
+    repo: sysown/proxysql
+    product: ProxySQL
+    excerpt: false
+    questions: changelog
+  - type: github_releases
+    name: fluentd_releases
+    repo: fluent/fluentd
+    product: Fluentd
+    excerpt: false
+    questions: changelog
+  - type: github_releases
+    name: fluent_bit_releases
+    repo: fluent/fluent-bit
+    product: Fluent Bit
+    sections: [What's Changed]
+    excerpt: false
+    questions: changelog
+  - type: github_releases
+    name: cadvisor_releases
+    repo: google/cadvisor
+    product: cAdvisor
+    sections: [What's Changed]
+    excerpt: false
+    questions: changelog
+  - type: github_releases
+    name: ecs_agent_releases
+    repo: aws/amazon-ecs-agent
+    product: Amazon ECS Agent
+    excerpt: false
+    questions: changelog
+  - type: github_releases
+    name: ssm_agent_releases
+    repo: aws/amazon-ssm-agent
+    product: Amazon SSM Agent
+    excerpt: false
+    questions: changelog
+  - type: postgresql_releases
+    name: postgresql_releases
+    excerpt: false
+    questions: changelog
+  - type: mysql_releases
+    name: mysql_releases
+    series: ["8.0", "8.4", "9.7", "26.7"]
+    excerpt: false
+    questions: changelog
+  - type: rss
+    name: postgresql_news
+    feeds:
+      - https://www.postgresql.org/news.rss
+    max_age_days: 14
+  - type: rss
+    name: planet_postgresql
+    feeds:
+      - https://planet.postgresql.org/rss20.xml
+    max_age_days: 14
+  - type: rss
+    name: mysql_blog
+    feeds:
+      - https://planet.mysql.com/rss20.xml
+    link_regex: '^https://blogs\.oracle\.com/mysql/'
+    user_agent: false
+    max_age_days: 14
+    excerpt: false
   - type: aws_whats_new
     name: aws_whats_new
     feeds:
@@ -630,6 +728,7 @@ ranking:
     github_advisories: 8
     aws_security_bulletins: 8
     bleepingcomputer: 8
+    planet_postgresql: 8
   # Articles below this relevance never make the page even when fresh.
   min_relevance: 0.2
 

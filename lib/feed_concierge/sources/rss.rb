@@ -9,12 +9,15 @@ module FeedConcierge
     # Plain RSS 2.0, RSS 1.0, or Atom feeds without aggregator metadata (no points or comment
     # counts). The feed's own content is kept as a summary.
     class Rss
-      def initialize(name:, feeds:, summary_max_chars: 600, max_age_days: nil, categories: nil)
+      def initialize(name:, feeds:, summary_max_chars: 600, max_age_days: nil, categories: nil, link_regex: nil,
+                     user_agent: Http::USER_AGENT)
         @name = name
         @feeds = feeds
         @summary_max_chars = summary_max_chars
         @max_age_days = max_age_days
         @categories = categories
+        @link_regex = link_regex && Regexp.new(link_regex)
+        @user_agent = user_agent || nil
       end
 
       def articles
@@ -28,13 +31,15 @@ module FeedConcierge
       private
 
       def fetch(url)
-        body = Http.get(url)
+        body = Http.get(url, user_agent: @user_agent)
         feed = RSS::Parser.parse(body, false) or raise FetchError, "#{url}: not a feed"
         feed.items.select { |item| wanted?(item) }.filter_map { |item| to_article(item) }
       end
 
-      # With a categories allowlist, only items carrying one of those feed categories are kept.
+      # With a categories allowlist, only items carrying one of those feed categories are kept;
+      # link_regex keeps the items of an aggregator that point at one site.
       def wanted?(item)
+        return false if @link_regex && !link_of(item).match?(@link_regex)
         return true unless @categories
 
         names = item.respond_to?(:categories) ? item.categories.map { |c| text_of(c).strip } : []

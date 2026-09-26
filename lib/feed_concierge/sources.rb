@@ -12,7 +12,10 @@ require_relative "sources/cisa_kev"
 require_relative "sources/github_advisories"
 require_relative "sources/listing"
 require_relative "sources/feed_links"
+require_relative "sources/release_notes"
 require_relative "sources/github_releases"
+require_relative "sources/postgresql_releases"
+require_relative "sources/mysql_releases"
 
 module FeedConcierge
   module Sources
@@ -20,7 +23,8 @@ module FeedConcierge
                  "redmine" => Redmine,
                  "github_pulls" => GithubPulls, "jpcert_weekly" => JpcertWeekly, "cisa_kev" => CisaKev,
                  "github_advisories" => GithubAdvisories, "listing" => Listing,
-                 "feed_links" => FeedLinks, "github_releases" => GithubReleases }.freeze
+                 "feed_links" => FeedLinks, "github_releases" => GithubReleases,
+                 "postgresql_releases" => PostgresqlReleases, "mysql_releases" => MysqlReleases }.freeze
     NON_CONSTRUCTOR_KEYS = %w[type excerpt questions].freeze
 
     # Builds sources from config/settings.yml entries like:
