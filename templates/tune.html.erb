@@ -229,7 +229,7 @@
     control(general, "floor", () => config.freshness.floor, v => config.freshness.floor = v, 0, 0.9, 0.05);
     control(general, "steepness", () => config.freshness.steepness, v => config.freshness.steepness = v, 1, 4, 0.5);
     control(general, "min score", () => config.min_score, v => config.min_score = v, 0, 0.9, 0.05);
-    control(general, "top n", () => config.top_n, v => config.top_n = v, 10, 500, 10);
+    control(general, "top n", () => config.top_n, v => config.top_n = v, 10, 1000, 10);
     // One heading and grid per question set / question, so related sliders sit together.
     const group = (parent, name) => { const g = el("div", "group"); g.appendChild(el("h3", null, name)); const c = el("div", "controls"); g.appendChild(c); parent.appendChild(g); return c; };
     for (const [set, ws] of Object.entries(config.weights)) {
