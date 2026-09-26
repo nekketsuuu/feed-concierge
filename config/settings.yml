@@ -363,6 +363,11 @@ sources:
       - https://transformer-circuits.pub/feed.xml
     max_age_days: 30
   - type: rss
+    name: sorah_diary
+    feeds:
+      - https://diary.sorah.jp/feed
+    max_age_days: 14
+  - type: rss
     name: github_blog
     feeds:
       - https://github.blog/feed/
