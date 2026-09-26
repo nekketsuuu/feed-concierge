@@ -368,6 +368,22 @@ sources:
       - https://diary.sorah.jp/feed
     max_age_days: 14
   - type: rss
+    name: github_next
+    feeds:
+      - https://githubnext.com/rss.xml
+    max_age_days: 14
+  - type: rss
+    name: microsoft_research
+    feeds:
+      - https://www.microsoft.com/en-us/research/feed/
+    max_age_days: 14
+  - type: rss
+    name: amazon_science
+    feeds:
+      - https://www.amazon.science/index.rss
+    link_regex: '^https://www\.amazon\.science/blog/'
+    max_age_days: 14
+  - type: rss
     name: github_blog
     feeds:
       - https://github.blog/feed/
