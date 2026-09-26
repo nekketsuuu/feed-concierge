@@ -4,6 +4,7 @@ require_relative "sources/http"
 require_relative "sources/hacker_news"
 require_relative "sources/lobsters"
 require_relative "sources/rss"
+require_relative "sources/aws_whats_new"
 require_relative "sources/redmine"
 require_relative "sources/github_pulls"
 require_relative "sources/jpcert_weekly"
@@ -15,7 +16,8 @@ require_relative "sources/github_releases"
 
 module FeedConcierge
   module Sources
-    REGISTRY = { "hacker_news" => HackerNews, "lobsters" => Lobsters, "rss" => Rss, "redmine" => Redmine,
+    REGISTRY = { "hacker_news" => HackerNews, "lobsters" => Lobsters, "rss" => Rss, "aws_whats_new" => AwsWhatsNew,
+                 "redmine" => Redmine,
                  "github_pulls" => GithubPulls, "jpcert_weekly" => JpcertWeekly, "cisa_kev" => CisaKev,
                  "github_advisories" => GithubAdvisories, "listing" => Listing,
                  "feed_links" => FeedLinks, "github_releases" => GithubReleases }.freeze

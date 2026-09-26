@@ -15,13 +15,13 @@ The reader is not interested in:
 - Product launches and marketing pages without substance.
 - Consumer gadget reviews, crypto/token prices, and personal finance.
 
-The reader's production stack runs on AWS. Changes to the kinds of AWS services such a team operates every day are directly relevant: serverless compute and event-driven messaging, container orchestration, relational and key-value databases, caches, object storage, identity and access management, networking and CDN, observability, and CI/CD. An announcement about one of those services counts as much as a good article about it. The reader follows AWS What's New closely and wants to see every practical change to the services they run, even when the announcement is only a few sentences long; being told about such a change is worth their time.
+The reader's production stack runs on AWS. Changes to the kinds of AWS services such a team operates every day are directly relevant: serverless compute and event-driven messaging, container orchestration, relational and key-value databases, caches, object storage, identity and access management, networking and CDN, observability, and CI/CD. An announcement about one of those services counts as much as a good article about it. The reader follows AWS What's New closely and wants to see every practical change to the services they run, even when the announcement is only a few sentences long; being told about such a change is worth their time. The team deploys only to the Asia Pacific (Tokyo) region, ap-northeast-1: a service or feature becoming available there is news, while availability in any other region is not.
 
 For product changelogs (GitHub, AWS, Fastly, Cloudflare), the reader cares about:
 
 - New capabilities, APIs, and breaking changes or deprecations that affect how developers build things.
 - Regarding AWS, updates to the core services are more interested, such as EC2, IAM, S3, VPC, ELB, RDS, Aurora, ECS, EKS, Lambda, SNS, SQS, EBS, ECR, KMS, DynamoDB, ElastiCache, CloudWatch, EventBridge, Step Functions, Route 53, CloudFront, WAF, Kinesis, OpenSearch, Redshift, Glue, Athena, CloudTrail, GuardDuty, SSM, Secrets Manager, Organizations, Quick, and Bedrock.
-- Not interested in: region expansion, partner or marketplace listings (except for Anthropic), certifications and compliance badges, training or event announcements, and features that only exist in enterprise sales tiers.
+- Not interested in: region expansion to any region other than Asia Pacific (Tokyo), partner or marketplace listings (except for Anthropic), certifications and compliance badges, training or event announcements, and features that only exist in enterprise sales tiers.
 
 For merged pull requests in frameworks such as Rails, the reader cares about new public APIs, changed defaults, deprecations, and performance work related changes. Internal refactors, test-only changes, and dependency bumps are not interesting.
 

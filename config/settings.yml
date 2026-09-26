@@ -36,7 +36,7 @@ sources:
     product: Claude Code
     excerpt: false
     questions: changelog
-  - type: rss
+  - type: aws_whats_new
     name: aws_whats_new
     feeds:
       - https://aws.amazon.com/about-aws/whats-new/recent/feed/
