@@ -264,6 +264,11 @@ sources:
     feeds:
       - https://transformer-circuits.pub/feed.xml
     max_age_days: 30
+  - type: rss
+    name: github_blog
+    feeds:
+      - https://github.blog/feed/
+    max_age_days: 14
   - type: listing
     name: ruby_association_news
     url: https://www.ruby.or.jp/en/news/
