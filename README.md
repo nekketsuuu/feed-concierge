@@ -55,7 +55,7 @@ systemctl --user enable --now "$PWD/systemd/feed-concierge-dispatch.timer"
 Open `tune.html`.
 
 - `config/profile.md`: describe what you like and dislike. This is the "prompt".
-- `config/settings.yml`: sources, weights, freshness half-life, retention, score threshold and cap, per-source caps.
+- `config/settings.yml`: sources, weights, freshness half-life, retention, score threshold and cap.
   Sites without a feed (anthropic.com, claude.com, the Alignment Science Blog) use the `listing` type, which
   scrapes an index page with regexes given in the config; items without a date are dated when first seen.
   The `feed_links` type turns the outbound links of a feed's recent entries (Register Spill) into articles.

@@ -23,11 +23,10 @@ module FeedConcierge
     end
 
     # Applies the page rules to sorted candidates: score threshold, one entry per CVE or URL,
-    # per-source caps, and the overall cap.
+    # and the overall cap.
     def page_from(candidates)
       candidates.select { |r| r.score >= @config["min_score"] }
                 .uniq { |r| r.article.dedup_key }
-                .then { |list| cap_per_source(list) }
                 .first(@config["top_n"])
     end
 
@@ -55,17 +54,6 @@ module FeedConcierge
           if_evergreen_one: freshness_of(item.age_hours, evergreen: 1.0).round(3)
         }
       }
-    end
-
-    def cap_per_source(list)
-      limits = @config["max_per_source"] || {}
-      counts = Hash.new(0)
-      list.select do |r|
-        limit = limits[r.article.source]
-        next true unless limit
-
-        (counts[r.article.source] += 1) <= limit
-      end
     end
 
     private

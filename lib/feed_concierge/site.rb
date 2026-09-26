@@ -59,7 +59,6 @@ module FeedConcierge
       config = { weights: @ranking_config["weights"], choice_weights: @ranking_config["choice_weights"] || {},
                  min_score: @ranking_config["min_score"],
                  top_n: @ranking_config["top_n"],
-                 max_per_source: @ranking_config["max_per_source"] || {},
                  freshness: { half_life_days: f["half_life_hours"] / 24.0,
                               bonus_days: f["evergreen_half_life_bonus_hours"] / 24.0,
                               floor: f["floor"], steepness: f["steepness"] } }

@@ -719,16 +719,6 @@ ranking:
   # The page lists every article whose score reaches min_score, up to top_n of them.
   min_score: 0.35
   top_n: 500
-  # Optional per-source caps so one busy source cannot fill the page.
-  max_per_source:
-    ruby_bugs: 15
-    rails_prs: 10
-    cisa_kev: 8
-    jpcert_weekly: 8
-    github_advisories: 8
-    aws_security_bulletins: 8
-    bleepingcomputer: 8
-    planet_postgresql: 8
   # Articles below this relevance never make the page even when fresh.
   min_relevance: 0.2
 

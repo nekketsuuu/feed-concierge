@@ -114,16 +114,14 @@
     const seenKind = seen[row.url]?.kind || null;
     return { row, components, relevance, freshness, seenKind, score: relevance * freshness };
   };
-  // Selection mirrors the build (threshold, dedup, caps, top n); seen articles then move below the
+  // Selection mirrors the build (threshold, dedup, top n); seen articles then move below the
   // rest, as index.html does in the browser.
   const page = () => {
     const scored = data.rows.map(score).filter(x => x.score >= config.min_score).sort((a, b) => b.score - a.score);
-    const kept = new Set(), perSource = {}, out = [];
+    const kept = new Set(), out = [];
     for (const x of scored) {
       if (kept.has(x.row.dedup_key)) continue;
-      const cap = config.max_per_source[x.row.source];
-      if (cap != null && (perSource[x.row.source] || 0) >= cap) continue;
-      kept.add(x.row.dedup_key); perSource[x.row.source] = (perSource[x.row.source] || 0) + 1;
+      kept.add(x.row.dedup_key);
       out.push(x);
       if (out.length >= config.top_n) break;
     }
