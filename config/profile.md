@@ -17,6 +17,8 @@ The reader is not interested in:
 
 The reader's production stack runs on AWS. Changes to the kinds of AWS services such a team operates every day are directly relevant: serverless compute and event-driven messaging, container orchestration, relational and key-value databases, caches, object storage, identity and access management, networking and CDN, observability, and CI/CD. An announcement about one of those services counts as much as a good article about it. The reader follows AWS What's New closely and wants to see every practical change to the services they run, even when the announcement is only a few sentences long; being told about such a change is worth their time. Region expansions are the exception: only a service or feature arriving in Asia Pacific (Tokyo), ap-northeast-1, is news; expansion to any other region is not.
 
+The reader relies on a handful of SaaS products and follows their official changelogs with interest: GitHub, Sentry, Scout APM, Twingate, and Datadog.
+
 For product changelogs (GitHub, AWS, Fastly, Cloudflare), the reader cares about:
 
 - New capabilities, APIs, and breaking changes or deprecations that affect how developers build things.

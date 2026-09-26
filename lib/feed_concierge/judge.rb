@@ -13,7 +13,7 @@ module FeedConcierge
     # Bump when questions change so cached judgments are redone on the next build.
     VERSION = 6
     # Bump one set's version to re-judge only the sources that use it (wording changes).
-    SET_VERSIONS = { "advisory" => 3, "changelog" => 6 }.freeze
+    SET_VERSIONS = { "advisory" => 3, "changelog" => 7 }.freeze
 
     INTEREST_LEVELS = [
       "The article is about a topic the reader profile explicitly says they are not interested in, or is unrelated to anything in the profile.",
