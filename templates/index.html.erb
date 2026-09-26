@@ -18,6 +18,9 @@
   li a:hover { text-decoration: underline; }
   .meta { color: var(--muted); font-size: .8em; margin-left: .5rem; white-space: nowrap; }
   .seen-heading { color: var(--muted); font-size: .8em; margin-top: 1.2rem; border-bottom: 0; padding-bottom: 0; }
+  .to-top { position: fixed; right: 1rem; bottom: 1rem; width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 1px solid #8884; background: #8882; color: var(--muted); font-size: 1.3rem; line-height: 1; cursor: pointer; opacity: .6; }
+  .to-top:hover { opacity: 1; }
+  .to-top[hidden] { display: none; }
   .tag { display: inline-block; font-size: .72em; line-height: 1.5; padding: 0 .45em; margin-left: .35rem; border-radius: 4px; border: 1px solid; vertical-align: 2px; color: #333; background: #fffcd7; border-color: #d5d458; }
 </style>
 </head>
@@ -31,7 +34,15 @@
   <li data-url="<%= h(r.article.url) %>"><a href="<%= h(r.article.url) %>"><%= h(r.article.title) %></a><%- tags_for(r).each do |tag| -%><span class="tag"><%= h(tag) %></span><%- end -%><span class="meta"><%= h(r.article.domain) %> · <time datetime="<%= local(r.article.published_at).iso8601 %>"><%= date_label(r.article.published_at) %></time></span></li>
 <%- end -%>
 </ul>
+<button class="to-top" aria-label="Back to top" hidden>↑</button>
 <script>
+  (() => {
+    const button = document.querySelector(".to-top");
+    const update = () => { button.hidden = window.scrollY < window.innerHeight; };
+    button.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+  })();
   // Demotes articles seen before: clicked here, or scrolled past the top after being on screen
   // for a while. Remembered in localStorage.
   (() => {
