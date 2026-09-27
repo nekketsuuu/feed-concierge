@@ -363,6 +363,11 @@ sources:
       - https://transformer-circuits.pub/feed.xml
     max_age_days: 30
   - type: rss
+    name: hatena_speakerdeck
+    feeds:
+      - https://b.hatena.ne.jp/entrylist?url=speakerdeck.com&mode=rss&sort=recent
+    max_age_days: 14
+  - type: rss
     name: sorah_diary
     feeds:
       - https://diary.sorah.jp/feed
