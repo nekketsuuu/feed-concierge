@@ -389,6 +389,11 @@ sources:
     link_regex: '^https://www\.amazon\.science/blog/'
     max_age_days: 14
   - type: rss
+    name: windows_developer_blog
+    feeds:
+      - https://blogs.windows.com/windowsdeveloper/feed/
+    max_age_days: 14
+  - type: rss
     name: github_blog
     feeds:
       - https://github.blog/feed/
