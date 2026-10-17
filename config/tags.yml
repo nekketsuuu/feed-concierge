@@ -22,7 +22,7 @@ tags:
   linux: "The Linux kernel, distributions, or the Linux desktop."
   math: "Mathematics as the main subject."
   mobile: "Mobile app development for iOS or Android, including cross-platform frameworks."
-  networking: "Network protocols, routing, DNS, TCP/IP, HTTP internals, or network infrastructure."
+  network: "Network protocols, routing, DNS, TCP/IP, HTTP internals, or network infrastructure."
   performance: "Measuring or improving speed, latency, throughput, or memory use."
   plt: "Programming language theory, type systems, semantics, or language design decisions."
   privacy: "Personal data, tracking, surveillance, or privacy protections."
