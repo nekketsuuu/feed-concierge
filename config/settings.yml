@@ -18,16 +18,9 @@ sources:
     feeds:
       - https://www.phoronix.com/rss.php
   - type: rss
-    name: ubuntu_weekly_topics
+    name: gihyo
     feeds:
       - https://gihyo.jp/feed/rss2
-    link_regex: '^https://gihyo\.jp/admin/clip/01/ubuntu-topics/'
-    max_age_days: 14
-  - type: rss
-    name: ubuntu_weekly_recipe
-    feeds:
-      - https://gihyo.jp/feed/rss2
-    link_regex: '^https://gihyo\.jp/admin/serial/01/ubuntu-recipe/'
     max_age_days: 14
   - type: redmine
     name: ruby_bugs
