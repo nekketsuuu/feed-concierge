@@ -177,6 +177,13 @@ sources:
     max_age_days: 14
     excerpt: false
   - type: rss
+    name: flatt_security_blog
+    feeds:
+      - https://blog.flatt.tech/rss
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
     name: tldrsec
     feeds:
       - https://tldrsec.com/feed.xml
