@@ -675,6 +675,20 @@ sources:
     summary_max_chars: 1500
     max_age_days: 14
     excerpt: false
+  - type: rss
+    name: layerx_tech
+    feeds:
+      - https://tech.layerx.co.jp/rss
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
+  - type: rss
+    name: pixiv_inside
+    feeds:
+      - https://inside.pixiv.blog/rss
+    summary_max_chars: 1500
+    max_age_days: 14
+    excerpt: false
   - type: listing
     name: twingate_changelog
     url: https://www.twingate.com/changelog
